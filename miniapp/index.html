@@ -208,6 +208,52 @@ main{flex:1;position:relative;padding:18px 18px calc(var(--tabbar-h) + env(safe-
 .lang-chip{font-size:11px;font-weight:700;padding:9px 13px;border-radius:100px;border:1px solid var(--line);color:var(--muted);transition:.15s}
 .lang-chip.active{border-color:rgba(168,85,255,.6);background:rgba(121,0,255,.16);color:#fff}
 
+
+/* ---------- modal / sheet / devices ---------- */
+.overlay{position:fixed;inset:0;z-index:90;background:rgba(3,1,8,.72);backdrop-filter:blur(6px);
+  display:none;align-items:flex-end;justify-content:center}
+.overlay.show{display:flex}
+.sheet{width:100%;max-width:520px;background:linear-gradient(180deg,#170d2c,#0b0615);
+  border:1px solid var(--line2);border-radius:24px 24px 0 0;padding:24px 20px calc(30px + env(safe-area-inset-bottom));
+  animation:sheetup .32s cubic-bezier(.22,1,.36,1)}
+@keyframes sheetup{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet h3{font-family:var(--display);font-size:15px;margin-bottom:14px}
+.sheet label{font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.08em;text-transform:uppercase;display:block;margin:14px 0 7px}
+.sheet input,.sheet select{width:100%;padding:13px;border-radius:13px;border:1px solid rgba(192,132,252,.3);
+  background:rgba(121,0,255,.08);color:#fff;font-size:14px}
+.sheet select option{background:#130b25}
+.modal-center{align-items:center}
+.qr-card{width:100%;max-width:340px;background:linear-gradient(180deg,#170d2c,#0b0615);
+  border:1px solid var(--line2);border-radius:24px;padding:26px 20px;text-align:center;
+  animation:sheetup .3s cubic-bezier(.22,1,.36,1)}
+.qr-card img{width:230px;height:230px;border-radius:16px;background:#fff;padding:10px;margin:14px auto;display:block}
+.qr-steps{text-align:left;font-size:10.5px;color:var(--muted);line-height:1.8;margin:6px 0 14px}
+.qr-steps b{color:#e9dcfa}
+.conf-pre{max-height:110px;overflow:auto;text-align:left;font-size:9px;color:#cbb9dd;background:rgba(5,3,13,.7);
+  border:1px solid var(--line);border-radius:12px;padding:11px;white-space:pre;user-select:all}
+.dev-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.dev-row:last-child{border-bottom:0}
+.dev-ico{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;
+  background:rgba(121,0,255,.13);border:1px solid rgba(168,85,255,.3);color:var(--light)}
+.dev-ico svg{width:17px;height:17px}
+.dev-mid{flex:1;min-width:0}
+.dev-name{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.dev-meta{font-size:10px;color:var(--muted);margin-top:2px;display:block}
+.dev-btns{display:flex;gap:7px;flex-shrink:0}
+.mini-btn{border:1px solid var(--line2);border-radius:10px;padding:9px 12px;font-size:10.5px;font-weight:700;color:#e9dcfa}
+.mini-btn.danger{border-color:rgba(255,110,110,.35);color:#ff9d9d}
+.mini-btn:active{transform:scale(.94)}
+.pay-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;font-size:11.5px;
+  border-bottom:1px solid rgba(255,255,255,.05)}
+.pay-row:last-child{border-bottom:0}
+.pill{display:inline-block;padding:3px 9px;border-radius:100px;font-size:9px;font-weight:800}
+.p-ok{background:rgba(0,229,155,.12);color:var(--green)}
+.p-bad{background:rgba(255,90,90,.12);color:#ff9d9d}
+.p-warn{background:rgba(255,184,84,.12);color:#ffb454}
+.api-banner{display:none;border:1px solid rgba(255,184,84,.3);background:rgba(255,150,40,.07);border-radius:14px;
+  padding:11px 14px;font-size:10.5px;color:#ffe3c2;margin-bottom:14px}
+.api-banner.show{display:block}
+
 /* ---------- tabbar ---------- */
 nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
   padding-bottom:env(safe-area-inset-bottom);
@@ -243,7 +289,7 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
       <div class="top-name" id="topName">ЧУПИК VPN</div>
     </div>
     <div class="top-right">
-      <span class="demo-pill"><i></i>DEMO</span>
+      <span class="demo-pill" id="apiPill"><i></i>DEMO</span>
       <span class="top-id" id="topId"></span>
     </div>
   </header>
@@ -253,6 +299,7 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
     <a href="https://t.me/Chupik_vpnBot" id="noTgLink">Открыть бота</a>
   </div>
 
+  <div class="api-banner" id="apiBanner">Backend недоступний — показано демо-дані.</div>
   <main id="main">
 
     <!-- ================= ГЛАВНАЯ ================= -->
@@ -263,8 +310,8 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
             <path d="M50 4 91 20v29c0 27-17 45-41 57C26 94 9 76 9 49V20L50 4Z" stroke="#bd8aff" stroke-width="3" fill="#6d22b5" fill-opacity=".15"/>
             <path d="m34 54 11 11 23-25" stroke="#e9d7ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <div class="hero-status"><i style="width:8px;height:8px;border-radius:50%;background:#ffb454;box-shadow:0 0 10px #ffb454"></i>Сервис подключается</div>
-          <p class="hero-note">Mini App готово. VPN-подключение станет доступным после запуска серверов WireGuard.</p>
+          <div class="hero-status" id="homeStatus"><i style="width:8px;height:8px;border-radius:50%;background:#ffb454;box-shadow:0 0 10px #ffb454"></i>Сервис подключается</div>
+          <p class="hero-note" id="homeNote">Mini App готово. VPN-подключение станет доступным после запуска серверов WireGuard.</p>
           <span class="badge-soon"><i></i>Этап: инфраструктура</span>
         </div>
 
@@ -386,6 +433,11 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
         </div>
 
         <div class="card">
+          <h3 class="h-title">История платежей</h3>
+          <div id="payHistory"></div>
+        </div>
+
+        <div class="card">
           <h3 class="h-title">Моя группа</h3>
           <p class="h-sub" id="groupStatus">Группы доступны с тарифа BASIC. Создайте группу и пригласите друзей — у каждого будет свой аккаунт и VPN-доступ.</p>
           <button class="btn btn-outline btn-full" id="groupBtn" style="margin-top:14px">Создать группу</button>
@@ -403,6 +455,41 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
 
   </main>
 
+
+  <div class="overlay" id="addSheet">
+    <div class="sheet">
+      <h3>Добавить устройство</h3>
+      <label>Сервер</label>
+      <select id="addSrvSelect"></select>
+      <label>Название устройства</label>
+      <input id="addName" type="text" placeholder="Например: Мой iPhone" maxlength="40">
+      <p class="qr-steps" style="margin-top:14px">После создания вы получите <b>QR-код и .conf файл</b> WireGuard.
+      Mini App управляет аккаунтом — тунель создаёт приложение WireGuard.</p>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button class="btn btn-outline" id="addCancel" style="flex:1">Отмена</button>
+        <button class="btn btn-primary" id="addSubmit" style="flex:2">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay modal-center" id="qrModal">
+    <div class="qr-card">
+      <h3 class="h-title">Конфигурация WireGuard</h3>
+      <img id="qrImg" alt="QR-код WireGuard">
+      <div class="qr-steps">
+        1. Установите приложение <b>WireGuard</b> (App Store / Google Play / Windows).<br>
+        2. Нажмите <b>«+» → «Создать из QR-кода»</b> и отсканируйте код выше.<br>
+        3. Включите тунель. Mini App сам тунель не создаёт — только выдаёт конфигурацию.
+      </div>
+      <pre class="conf-pre" id="confText"></pre>
+      <div style="display:flex;gap:9px;margin-top:14px">
+        <button class="btn btn-outline mini-btn" id="qrCopy" style="flex:1;padding:12px">Скопировать</button>
+        <button class="btn btn-primary" id="qrDownload" style="flex:1">Скачать .conf</button>
+      </div>
+      <button class="btn btn-outline" id="qrClose" style="width:100%;margin-top:9px">Закрыть</button>
+    </div>
+  </div>
+
   <nav class="tabbar">
     <div class="tabbar-inner">
       <button class="tab active" data-page="home"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3v-10.5Z"/></svg>Главная</button>
@@ -418,42 +505,44 @@ nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
 
 <script>
 "use strict";
-/* ================= данные ================= */
+"use strict";
+/* ================= конфіг ================= */
 const BOT_URL = "https://t.me/Chupik_vpnBot";
 const BOT_USERNAME = "Chupik_vpnBot";
+/* Backend URL передається через параметр: .../miniapp/?api=https://твій-backend
+   (BotFather → Menu Button URL). Пусто = демо-режим. */
+const API_BASE = new URLSearchParams(location.search).get('api') || '';
 
-const SERVERS = [
-  {id:"de", name:"Германия · Франкфурт", flag:"🇩🇪", lon:8.68, lat:50.11},
-  {id:"nl", name:"Нидерланды · Амстердам", flag:"🇳🇱", lon:4.90, lat:52.37},
-  {id:"fr", name:"Франция · Париж", flag:"🇫🇷", lon:2.35, lat:48.86},
-  {id:"uk", name:"Британия · Лондон", flag:"🇬🇧", lon:-0.13, lat:51.51},
-  {id:"pl", name:"Польша · Варшава", flag:"🇵🇱", lon:21.01, lat:52.23},
-  {id:"us-e", name:"США · Нью-Йорк", flag:"🇺🇸", lon:-74.01, lat:40.71},
-  {id:"us-w", name:"США · Лос-Анджелес", flag:"🇺🇸", lon:-118.24, lat:34.05},
-  {id:"ca", name:"Канада · Торонто", flag:"🇨🇦", lon:-79.38, lat:43.65},
-  {id:"ae", name:"ОАЭ · Дубай", flag:"🇦🇪", lon:55.27, lat:25.20},
-  {id:"sg", name:"Сингапур", flag:"🇸🇬", lon:103.82, lat:1.35},
-  {id:"jp", name:"Япония · Токио", flag:"🇯🇵", lon:139.69, lat:35.69},
-  {id:"br", name:"Бразилия · Сан-Паулу", flag:"🇧🇷", lon:-46.63, lat:-23.55}
+/* ================= дані (демо-фолбек без backend) ================= */
+const DEMO_SERVERS = [
+  {id:"de", code:"de", name:"Германия · Франкфурт", country:"Германия", flag:"🇩🇪", lon:8.68, lat:50.11, online:false, peers:0, load1:null},
+  {id:"nl", code:"nl", name:"Нидерланды · Амстердам", country:"Нидерланды", flag:"🇳🇱", lon:4.90, lat:52.37, online:false, peers:0, load1:null},
+  {id:"fr", code:"fr", name:"Франция · Париж", country:"Франция", flag:"🇫🇷", lon:2.35, lat:48.86, online:false, peers:0, load1:null},
+  {id:"uk", code:"uk", name:"Британия · Лондон", country:"Британия", flag:"🇬🇧", lon:-0.13, lat:51.51, online:false, peers:0, load1:null},
+  {id:"pl", code:"pl", name:"Польша · Варшава", country:"Польша", flag:"🇵🇱", lon:21.01, lat:52.23, online:false, peers:0, load1:null},
+  {id:"us-e", code:"us-e", name:"США · Нью-Йорк", country:"США", flag:"🇺🇸", lon:-74.01, lat:40.71, online:false, peers:0, load1:null},
+  {id:"us-w", code:"us-w", name:"США · Лос-Анджелес", country:"США", flag:"🇺🇸", lon:-118.24, lat:34.05, online:false, peers:0, load1:null},
+  {id:"ca", code:"ca", name:"Канада · Торонто", country:"Канада", flag:"🇨🇦", lon:-79.38, lat:43.65, online:false, peers:0, load1:null},
+  {id:"ae", code:"ae", name:"ОАЭ · Дубай", country:"ОАЭ", flag:"🇦🇪", lon:55.27, lat:25.20, online:false, peers:0, load1:null},
+  {id:"sg", code:"sg", name:"Сингапур", country:"Сингапур", flag:"🇸🇬", lon:103.82, lat:1.35, online:false, peers:0, load1:null},
+  {id:"jp", code:"jp", name:"Япония · Токио", country:"Япония", flag:"🇯🇵", lon:139.69, lat:35.69, online:false, peers:0, load1:null},
+  {id:"br", code:"br", name:"Бразилия · Сан-Паулу", country:"Бразилия", flag:"🇧🇷", lon:-46.63, lat:-23.55, online:false, peers:0, load1:null}
 ];
 
 const PLANS = [
-  {id:"free", name:"FREE", price:"€0", desc:"Знакомство с сервисом", devices:1, popular:false,
+  {id:"free", name:"FREE", price:"€0", eur:0, desc:"Знакомство с сервисом", devices:1, popular:false,
    feats:["1 личное устройство","Ограниченный выбор серверов","Базовый приоритет","Личный кабинет","Без групп"]},
-  {id:"basic", name:"BASIC", price:"€1.99", desc:"Базовый комфорт", devices:2, popular:false,
+  {id:"basic", name:"BASIC", price:"€1.99", eur:1.99, desc:"Базовый комфорт", devices:2, popular:false,
    feats:["2 личных устройства","Расширенный выбор серверов","Выше лимит трафика","1 друг в группе"]},
-  {id:"premium", name:"PREMIUM", price:"€4.99", desc:"Лучший баланс", devices:4, popular:true,
+  {id:"premium", name:"PREMIUM", price:"€4.99", eur:4.99, desc:"Лучший баланс", devices:4, popular:true,
    feats:["4 личных устройства","Все стандартные серверы","Повышенный приоритет","Расширенная статистика","До 3 друзей в группе","Приоритетная поддержка"]},
-  {id:"ultimate", name:"ULTIMATE", price:"€7.99", desc:"Максимум возможностей", devices:5, popular:false,
+  {id:"ultimate", name:"ULTIMATE", price:"€7.99", eur:7.99, desc:"Максимум возможностей", devices:5, popular:false,
    feats:["5 личных устройств","Все доступные серверы","Наивысший приоритет","Полная статистика","До 5 друзей в группе","Приоритетная поддержка"]}
 ];
 
 const REF_TIERS = [
-  {n:1, label:"3 часа PREMIUM"},
-  {n:3, label:"12 часов PREMIUM"},
-  {n:5, label:"24 часа PREMIUM"},
-  {n:10, label:"3 дня PREMIUM"},
-  {n:20, label:"7 дней PREMIUM"}
+  {n:1, label:"3 часа PREMIUM"}, {n:3, label:"12 часов PREMIUM"},
+  {n:5, label:"24 часа PREMIUM"}, {n:10, label:"3 дня PREMIUM"}, {n:20, label:"7 дней PREMIUM"}
 ];
 
 const LANGS = [
@@ -466,57 +555,210 @@ const MAP_DOTS = "-180.0,66.0;-180.0,68.0;-178.0,66.0;-178.0,68.0;-176.0,66.0;-1
 
 /* ================= Telegram ================= */
 const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-let user = null;
+let tgUser = null;
 if (tg) {
-  tg.ready();
-  tg.expand();
+  tg.ready(); tg.expand();
   try { tg.setHeaderColor && tg.setHeaderColor("#05030d"); tg.setBackgroundColor && tg.setBackgroundColor("#05030d"); } catch(e){}
-  if (tg.initDataUnsafe && tg.initDataUnsafe.user) user = tg.initDataUnsafe.user;
+  if (tg.initDataUnsafe && tg.initDataUnsafe.user) tgUser = tg.initDataUnsafe.user;
 }
 const haptic = (style) => { try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(style || "light"); } catch(e){} };
 
+/* ================= стан ================= */
 const state = {
   page: "home",
   selectedServer: null,
-  invited: 0,
   lang: "ru",
+  api: false,          // backend підключений
+  me: null,            // /api/me
+  servers: DEMO_SERVERS.slice(),
   plan: "free",
-  devices: 0
+  devices: [],
+  invited: 0,
+  payments: []
 };
 
 /* ================= helpers ================= */
 const $ = (s) => document.querySelector(s);
 const toastEl = $("#toast");
 let toastTimer;
-function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2600); }
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2800); }
 function openBot(start){ const url = start ? BOT_URL + "?start=" + start : BOT_URL; if (tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, "_blank"); }
 async function copyText(t){ try { await navigator.clipboard.writeText(t); } catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy")}catch(_){} ta.remove(); } }
+function fmtDate(ts){ if(!ts) return "—"; return new Date(ts*1000).toLocaleDateString("ru-RU"); }
+function fmtDT(ts){ if(!ts) return "—"; const d=new Date(ts*1000); return d.toLocaleDateString("ru-RU")+" "+d.toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"}); }
 
-/* ================= header / profile ================= */
-function initUser(){
-  const name = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "Гость";
-  const initials = (user && user.first_name ? user.first_name[0] : "Ч").toUpperCase();
-  const avatarHTML = (user && user.photo_url) ? `<img src="${user.photo_url}" alt="">` : initials;
+async function api(path, opts={}){
+  const headers = {"Content-Type":"application/json", ...(opts.headers||{})};
+  if (tg && tg.initData) headers["X-Init-Data"] = tg.initData;
+  const r = await fetch(API_BASE + path, {...opts, headers});
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok) throw Object.assign(new Error(j.detail || r.statusText), {status:r.status});
+  return j;
+}
+
+/* ================= завантаження даних ================= */
+async function loadAll(){
+  if (!API_BASE) return;
+  try {
+    const me = await api("/api/me");
+    state.me = me; state.api = true;
+    state.plan = me.plan;
+    state.devices = me.devices || [];
+    state.invited = (me.referral && me.referral.invited) || 0;
+    state.payments = me.payments || [];
+    try {
+      const sv = await api("/api/servers");
+      if (sv.servers && sv.servers.length) state.servers = sv.servers;
+    } catch(e){}
+    $("#apiBanner").classList.remove("show");
+  } catch (e) {
+    state.api = false;
+    $("#apiBanner").classList.add("show");
+  }
+  renderAll();
+}
+
+/* ================= рендер ================= */
+function renderAll(){
+  renderHeader();
+  renderHome();
+  renderServers();
+  renderDevices();
+  renderPlans();
+  renderProfile();
+}
+
+function renderHeader(){
+  const name = tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(" ") : "Гость";
+  const initials = (tgUser && tgUser.first_name ? tgUser.first_name[0] : "Ч").toUpperCase();
+  const avatarHTML = (tgUser && tgUser.photo_url) ? `<img src="${tgUser.photo_url}" alt="">` : initials;
   $("#avatar").innerHTML = avatarHTML;
   $("#profAvatar").innerHTML = avatarHTML;
   $("#topName").textContent = name;
   $("#profName").textContent = name;
-  const idStr = user ? String(user.id) : "—";
+  const idStr = tgUser ? String(tgUser.id) : "—";
   $("#topId").textContent = "ID " + idStr;
   $("#profId").textContent = idStr;
-  $("#profUsername").textContent = user && user.username ? "@" + user.username : "";
+  $("#profUsername").textContent = tgUser && tgUser.username ? "@" + tgUser.username : "";
   if (!tg) $("#noTg").classList.add("show");
-  // реальная дата первого входа — сохраняем локально
-  let first = null;
-  try { first = localStorage.getItem("chupik_first_visit"); if (!first) { first = new Date().toLocaleDateString("ru-RU"); localStorage.setItem("chupik_first_visit", first);} } catch(e){ first = "—"; }
-  $("#profReg").textContent = first;
+  const pill = $("#apiPill");
+  if (state.api){
+    pill.innerHTML = '<i style="width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)"></i>LIVE';
+    pill.style.borderColor = "rgba(0,229,155,.4)"; pill.style.background = "rgba(0,229,155,.1)";
+  } else {
+    pill.innerHTML = '<i></i>DEMO';
+  }
 }
 
-function refLinkFor(){
-  return user ? `t.me/${BOT_USERNAME}?start=ref_${user.id}` : `t.me/${BOT_USERNAME}`;
+function renderHome(){
+  const planName = state.me ? state.me.plan_name : "FREE";
+  const limit = state.me ? state.me.device_limit : 1;
+  const used = state.devices.length;
+  const days = state.me && state.me.plan_expires_at
+    ? Math.max(0, Math.ceil((state.me.plan_expires_at*1000 - Date.now())/86400000)) : "—";
+  $("#stPlan").textContent = planName;
+  $("#stDevices").innerHTML = used + '<span class="unit">/' + limit + "</span>";
+  $("#stDays").textContent = state.me && state.me.plan_expires_at ? days : "—";
+  const hs = $("#homeStatus");
+  if (state.api){
+    hs.innerHTML = '<i style="width:8px;height:8px;border-radius:50%;background:' +
+      (used>0 ? "var(--green)" : "#ffb454") + ';box-shadow:0 0 10px currentColor"></i>' +
+      (used>0 ? "VPN активно · " + used + " устройст." : "Подписка активна");
+    $("#homeNote").textContent = state.me && state.me.plan_expires_at
+      ? "Подписка до " + fmtDT(state.me.plan_expires_at) + ". Добавьте устройство, чтобы получить конфигурацию WireGuard."
+      : "Добавьте устройство — бот выдаст конфигурацию WireGuard.";
+  }
 }
 
-function renderRewards(){
+function renderServers(){
+  const el = $("#srvList");
+  el.innerHTML = state.servers.map(s=>{
+    const sel = state.selectedServer===s.code || (s.id && state.selectedServer===String(s.id));
+    const status = state.api ? (s.online ? (sel?"Выбран":"Онлайн") : "Недоступен") : (sel?"Выбран":"Скоро");
+    const meta = state.api && s.online
+      ? `WireGuard · peers: ${s.peers}${s.load1!=null?" · load "+s.load1.toFixed(2):""}`
+      : "WireGuard · план запуска";
+    return `<div class="srv ${sel?'selected':''}" data-srv="${s.code||s.id}" role="button" tabindex="0">
+      <span class="srv-flag">${s.flag||"🌐"}</span>
+      <span class="srv-mid"><span class="srv-name">${s.name}</span><span class="srv-meta">${meta}</span></span>
+      <span class="srv-right"><span class="srv-status">${status}</span><span class="srv-ping">${s.online?"онлайн":"—"}</span></span>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".srv").forEach(c=>c.addEventListener("click",()=>{ selectServer(c.dataset.srv); haptic("light"); }));
+}
+
+function selectServer(id){
+  state.selectedServer = (state.selectedServer===id) ? null : id;
+  renderServers();
+  if (state.page==="devices") renderDevices();
+}
+
+function renderDevices(){
+  const plan = state.plan;
+  const max = PLANS.find(p=>p.id===plan).devices;
+  const used = state.devices.length;
+  $("#devLimit").textContent = `${used} / ${max}`;
+  requestAnimationFrame(()=>{ $("#devProgress").style.width = Math.min(100, used/max*100) + "%"; });
+  const card = $("#deviceListCard");
+  if (!state.api || used===0){
+    card.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><b>${state.api ? "Пока нет устройств" : "Управление устройствами"}</b><p>${state.api ? "Нажмите «Добавить устройство» — сформируется конфигурация WireGuard." : "Подключите backend (демо-режим) — управление устройствами появится после запуска серверов."}</p></div>`;
+    return;
+  }
+  const srvName = (id) => { const s = state.servers.find(x=>String(x.id)===String(id)||x.code===id); return s ? s.name : "сервер"; };
+  card.innerHTML = state.devices.map(d=>`
+    <div class="dev-row">
+      <span class="dev-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg></span>
+      <span class="dev-mid"><span class="dev-name">${d.name}</span><span class="dev-meta">${srvName(d.server_id)} · ${d.client_ip} · ${fmtDate(d.created_at)}</span></span>
+      <span class="dev-btns">
+        <button class="mini-btn" data-qr="${d.id}">QR-код</button>
+        <button class="mini-btn danger" data-del="${d.id}">✕</button>
+      </span>
+    </div>`).join("");
+  card.querySelectorAll("[data-qr]").forEach(b=>b.addEventListener("click",()=>openQr(b.dataset.qr)));
+  card.querySelectorAll("[data-del]").forEach(b=>b.addEventListener("click",()=>delDevice(b.dataset.del)));
+}
+
+function renderPlans(){
+  const el = $("#planList");
+  const cur = state.plan;
+  el.innerHTML = PLANS.map(p=>{
+    const isCur = cur===p.id;
+    return `<div class="plan-card ${p.popular?'popular':''} ${isCur?'current':''}">
+      <div class="plan-top">
+        <span class="plan-name">${p.name}</span>
+        ${isCur?'<span class="tag tag-cur">Текущий</span>':(p.popular?'<span class="tag tag-pop">Популярный</span>':'')}
+      </div>
+      <div class="plan-price">${p.price} <small>/ месяц</small></div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-feats">${p.feats.map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${f}</li>`).join("")}</ul>
+      ${isCur ? `<button class="btn btn-outline btn-full" disabled style="opacity:.55">Ваш тариф</button>`
+        : p.id==="free" ? `<button class="btn btn-outline btn-full" data-plan="free">Бесплатный тариф</button>`
+        : `<button class="btn btn-primary btn-full" data-stars="${p.id}">⭐ Купить за Stars</button>
+           <button class="btn btn-outline btn-full" style="margin-top:9px" data-card="${p.id}">💳 Картой на сайте</button>`}
+    </div>`;
+  }).join("");
+  el.querySelectorAll("[data-stars]").forEach(b=>b.addEventListener("click",()=>buyStars(b.dataset.stars)));
+  el.querySelectorAll("[data-card]").forEach(b=>b.addEventListener("click",()=>buyCard(b.dataset.card)));
+  el.querySelectorAll("[data-plan='free']").forEach(b=>b.addEventListener("click",()=>toast("FREE — базовый доступ, доступен всем")));
+}
+
+function renderProfile(){
+  const me = state.me;
+  if (me){
+    $("#profPlan").textContent = me.plan_name;
+    $("#profSub").textContent = me.plan_expires_at ? fmtDT(me.plan_expires_at) : "—";
+    $("#refLink").textContent = me.referral ? me.referral.link.replace("https://","") : "t.me/"+BOT_USERNAME;
+  }
+  $("#profReg").textContent = localStorage.getItem("chupik_first_visit") || "—";
+  // платежі
+  const ph = $("#payHistory");
+  if (state.api && state.payments.length){
+    ph.innerHTML = state.payments.map(p=>`<div class="pay-row"><span>${p.provider==="stars"?"⭐ Stars":"💳 Карта"} · ${p.plan}</span>
+      <b>${p.amount} ${p.currency} <span class="pill ${p.status==="succeeded"?"p-ok":p.status==="refunded"?"p-warn":"p-bad"}">${p.status}</span></b></div>`).join("");
+  } else {
+    ph.innerHTML = '<div class="pay-row"><span>История платежей появится здесь</span><b>—</b></div>';
+  }
+  // нагороди
   const el = $("#rewardList");
   el.innerHTML = REF_TIERS.map(t=>{
     const done = state.invited >= t.n;
@@ -529,64 +771,83 @@ function renderLangs(){
     `<button class="lang-chip ${l.code===state.lang?'active':''}" data-lang="${l.code}">${l.name}</button>`).join("");
   $("#langChips").querySelectorAll(".lang-chip").forEach(b=>b.addEventListener("click",()=>{
     state.lang = b.dataset.lang; haptic("light"); renderLangs();
-    toast("Язык сохранён: " + LANGS.find(x=>x.code===state.lang).name);
+    toast("Язык: " + LANGS.find(x=>x.code===state.lang).name);
   }));
 }
 
-/* ================= servers ================= */
-function renderServers(){
-  const el = $("#srvList");
-  el.innerHTML = SERVERS.map(s=>{
-    const sel = state.selectedServer===s.id;
-    return `<div class="srv ${sel?'selected':''}" data-srv="${s.id}" role="button" tabindex="0">
-      <span class="srv-flag">${s.flag}</span>
-      <span class="srv-mid"><span class="srv-name">${s.name}</span><span class="srv-meta">WireGuard · план запуска</span></span>
-      <span class="srv-right"><span class="srv-status">${sel?'Выбран':'Скоро'}</span><span class="srv-ping">${sel?'—':'— ms'}</span></span>
-    </div>`;
-  }).join("");
-  el.querySelectorAll(".srv").forEach(c=>c.addEventListener("click",()=>{ selectServer(c.dataset.srv); haptic("light"); }));
-}
-function selectServer(id){
-  state.selectedServer = (state.selectedServer===id) ? null : id;
-  renderServers();
+/* ================= покупки ================= */
+async function buyStars(plan){
+  haptic("medium");
+  if (!state.api || !tg){ openBot("buy_"+plan); return; }
+  try {
+    const r = await api("/api/stars/invoice", {method:"POST", body: JSON.stringify({plan})});
+    tg.openInvoice(r.link, (res)=>{
+      if (res === "paid"){ toast("✅ Оплата получена! Обновляю…"); setTimeout(loadAll, 1500); }
+      else if (res === "failed"){ toast("❌ Оплата не прошла"); }
+      else { toast("Ожидание оплаты…"); }
+    });
+  } catch(e){ toast("Ошибка: " + e.message); }
 }
 
-/* ================= tariffs ================= */
-function renderPlans(){
-  const el = $("#planList");
-  el.innerHTML = PLANS.map(p=>{
-    const cur = state.plan===p.id;
-    return `<div class="plan-card ${p.popular?'popular':''} ${cur?'current':''}">
-      <div class="plan-top">
-        <span class="plan-name">${p.name}</span>
-        ${cur?'<span class="tag tag-cur">Текущий</span>':(p.popular?'<span class="tag tag-pop">Популярный</span>':'')}
-      </div>
-      <div class="plan-price">${p.price} <small>/ месяц</small></div>
-      <div class="plan-desc">${p.desc}</div>
-      <ul class="plan-feats">${p.feats.map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${f}</li>`).join("")}</ul>
-      <button class="btn ${cur?'btn-outline':'btn-primary'} btn-full plan-btn" data-plan="${p.id}" ${cur?'disabled style="opacity:.55"':''}>${cur?'Ваш тариф':'Выбрать '+p.name}</button>
-    </div>`;
-  }).join("");
-  el.querySelectorAll(".plan-btn").forEach(b=>b.addEventListener("click",()=>{
-    haptic("medium");
-    openBot("buy_" + b.dataset.plan);
-  }));
-}
-
-/* ================= devices ================= */
-function renderDevices(){
-  const max = PLANS.find(p=>p.id===state.plan).devices;
-  $("#devLimit").textContent = `${state.devices} / ${max}`;
-  requestAnimationFrame(()=>{ $("#devProgress").style.width = Math.min(100, state.devices/max*100) + "%"; });
-  const card = $("#deviceListCard");
-  if (state.devices===0){
-    card.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><b>Пока нет устройств</b><p>Конфигурация WireGuard выдаётся ботом после покупки подписки и запуска серверов.</p></div>`;
+function buyCard(plan){
+  haptic("medium");
+  if (state.api && API_BASE){
+    const url = API_BASE + "/pay?plan=" + plan;
+    if (tg && tg.openLink) tg.openLink(url); else window.open(url, "_blank");
   } else {
-    card.innerHTML = state.devicesDummy ? "" : "";
+    toast("Оплата картой появится после подключения сайта к backend");
   }
 }
 
-/* ================= navigation ================= */
+/* ================= пристрої ================= */
+function openAddDevice(){
+  haptic("light");
+  if (!state.api){ toast("Демо-режим: backend не подключён"); return; }
+  const sel = $("#addSrvSelect");
+  sel.innerHTML = state.servers.map(s=>`<option value="${s.id}">${s.flag} ${s.name}${s.online?"":" (скоро)"}</option>`).join("");
+  $("#addSheet").classList.add("show");
+}
+async function submitDevice(){
+  const server_id = parseInt($("#addSrvSelect").value);
+  const name = $("#addName").value.trim() || "Моё устройство";
+  try {
+    await api("/api/devices", {method:"POST", body: JSON.stringify({server_id, name})});
+    $("#addSheet").classList.remove("show");
+    toast("✅ Устройство добавлено — конфигурация готова");
+    await loadAll(); go("devices");
+  } catch(e){
+    if (e.status===403) toast("⚠️ " + e.message);
+    else toast("Ошибка: " + e.message);
+  }
+}
+async function delDevice(id){
+  haptic("light");
+  if (!confirm("Удалить устройство? VPN-доступ будет отозван.")) return;
+  try {
+    await api("/api/devices/"+id, {method:"DELETE"});
+    toast("Устройство удалено, peer отключён");
+    await loadAll();
+  } catch(e){ toast("Ошибка: " + e.message); }
+}
+async function openQr(id){
+  haptic("light");
+  if (!state.api){ toast("Демо-режим"); return; }
+  try {
+    const r = await api("/api/devices/"+id+"/config");
+    $("#qrImg").src = "data:image/png;base64," + r.qr_png_base64;
+    $("#confText").textContent = r.config;
+    $("#qrModal").classList.add("show");
+    window._qrConf = r.config;
+  } catch(e){ toast("Ошибка: " + e.message); }
+}
+function downloadConf(){
+  const blob = new Blob([window._qrConf||""], {type:"text/plain"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "chupik-vpn.conf"; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================= навігація ================= */
 function go(page){
   if (state.page===page) return;
   state.page = page;
@@ -594,8 +855,7 @@ function go(page){
   const el = $("#page-"+page);
   if (el) el.classList.add("active");
   document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.page===page));
-  $("#main").scrollTop = 0; window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
-  if (page==="devices") renderDevices();
+  window.scrollTo({top:0});
   if (page==="servers"){ sizeCanvas(); seedArcs(); }
   haptic("light");
 }
@@ -603,42 +863,46 @@ document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>go(t
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
 
 /* ================= events ================= */
-$("#copyRef").addEventListener("click", async ()=>{ haptic("light"); await copyText(refLinkFor()); toast("Ссылка скопирована"); });
-document.querySelectorAll("[data-copyref]").forEach(b=>b.addEventListener("click", async ()=>{ haptic("light"); await copyText(refLinkFor()); toast("Ссылка скопирована — отправьте её другу"); }));
+$("#copyRef").addEventListener("click", async ()=>{ haptic("light"); await copyText(state.me && state.me.referral ? state.me.referral.link : BOT_URL); toast("Ссылка скопирована"); });
+document.querySelectorAll("[data-copyref]").forEach(b=>b.addEventListener("click", async ()=>{ haptic("light"); await copyText(state.me && state.me.referral ? state.me.referral.link : BOT_URL); toast("Ссылка скопирована — отправьте её другу"); }));
 $("#supportBtn").addEventListener("click", ()=>{ haptic("light"); openBot("support"); });
 $("#openBotBtn").addEventListener("click", ()=>{ haptic("light"); openBot(); });
 $("#termsBtn").addEventListener("click", ()=>{ haptic("light"); openBot("terms"); });
 $("#groupBtn").addEventListener("click", ()=>{ haptic("light"); openBot("group"); });
-$("#addDeviceBtn").addEventListener("click", ()=>{ haptic("light"); toast("Выдача конфигураций начнётся после запуска VPN-серверов"); });
-$("#noTgLink").addEventListener("click", ()=>{});
+$("#addDeviceBtn").addEventListener("click", openAddDevice);
+$("#addCancel").addEventListener("click", ()=>$("#addSheet").classList.remove("show"));
+$("#addSubmit").addEventListener("click", submitDevice);
+$("#qrClose").addEventListener("click", ()=>$("#qrModal").classList.remove("show"));
+$("#qrCopy").addEventListener("click", async ()=>{ await copyText(window._qrConf||""); toast("Конфиг скопирован"); });
+$("#qrDownload").addEventListener("click", downloadConf);
+$("#qrModal").addEventListener("click", (e)=>{ if(e.target.id==="qrModal") $("#qrModal").classList.remove("show"); });
 
-/* ================= world map ================= */
+/* ================= карта світу ================= */
 const dots = MAP_DOTS.split(";").map(p=>{const [a,b]=p.split(",");return [parseFloat(a),parseFloat(b)];});
 const canvas = $("#mapCanvas");
 const ctx = canvas.getContext("2d");
 let W=0,H=0,DPR=1;
 function sizeCanvas(){
   DPR = Math.min(window.devicePixelRatio||1, 2);
-  const w = canvas.parentElement.clientWidth;
+  const w = canvas.parentElement.clientWidth; if (!w) return;
   W = Math.round(w); H = Math.round(w*0.5);
   canvas.width = W*DPR; canvas.height = H*DPR;
   canvas.style.height = H+"px";
 }
 const proj = (lon,lat)=>[ (lon+180)/360*W, (84-lat)/168*(H*0.92)+H*0.04 ];
-
 let arcs = [];
 function seedArcs(){
   arcs = [];
   const pairs = [["de","us-e"],["fr","sg"],["nl","ca"],["jp","us-w"],["ae","jp"],["pl","br"],["fr","ae"],["de","pl"]];
+  const get = (code) => state.servers.find(s=>s.code===code||String(s.id)===code);
   pairs.forEach((p,i)=>{
-    const a = SERVERS.find(s=>s.id===p[0]), b = SERVERS.find(s=>s.id===p[1]);
+    const a = get(p[0]), b = get(p[1]);
     if (a&&b) arcs.push({a,b,t:Math.random(),speed:0.0016+Math.random()*0.0012,off:i*0.8});
   });
 }
 function drawMap(ts){
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.clearRect(0,0,W,H);
-  // dots
   const tw = ts*0.0009;
   for (const [lon,lat] of dots){
     const [x,y] = proj(lon,lat);
@@ -646,15 +910,12 @@ function drawMap(ts){
     ctx.fillStyle = `rgba(168,85,255,${a.toFixed(3)})`;
     ctx.fillRect(x-0.7, y-0.7, 1.4, 1.4);
   }
-  // arcs
   for (const arc of arcs){
     const [x1,y1] = proj(arc.a.lon, arc.a.lat), [x2,y2] = proj(arc.b.lon, arc.b.lat);
     const mx = (x1+x2)/2, my = Math.min(y1,y2) - Math.max(24, Math.abs(x2-x1)*0.22);
     arc.t += arc.speed; if (arc.t>1.35) arc.t = -0.35;
-    // path
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2);
     ctx.strokeStyle = "rgba(168,85,255,0.10)"; ctx.lineWidth = 1; ctx.stroke();
-    // moving light
     const t = Math.max(0, Math.min(1, arc.t));
     const q = (p0,p1,p2,t)=>{const u=1-t;return u*u*p0+2*u*t*p1+t*t*p2;};
     const px = q(x1,mx,x2,t), py = q(y1,my,y2,t);
@@ -663,20 +924,20 @@ function drawMap(ts){
     ctx.fillStyle = `rgba(216,180,255,${(0.5*fade+0.1).toFixed(3)})`;
     ctx.fill();
   }
-  // markers
   const pulse = ts*0.002;
-  for (const s of SERVERS){
+  for (const s of state.servers){
+    if (s.lon==null || s.lat==null) continue;
     const [x,y] = proj(s.lon, s.lat);
-    const sel = state.selectedServer===s.id;
+    const sel = state.selectedServer===s.code || state.selectedServer===String(s.id);
     const r = sel ? 8 : 5;
-    // pulse ring
-    const pr = r + 4 + ((pulse + s.lon*0.01)%1)*10;
+    const pr = r + 4 + ((pulse + (s.lon||0)*0.01)%1)*10;
     ctx.beginPath(); ctx.arc(x,y,pr,0,Math.PI*2);
     ctx.strokeStyle = sel ? `rgba(0,229,155,${(0.45*(1-((pr-r-4)/10))).toFixed(3)})` : `rgba(168,85,255,${(0.35*(1-((pr-r-4)/10))).toFixed(3)})`;
     ctx.lineWidth = 1; ctx.stroke();
     ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fillStyle = sel ? "#00e59b" : "#c084fc";
-    ctx.shadowColor = sel ? "#00e59b" : "#a855ff"; ctx.shadowBlur = 12;
+    ctx.fillStyle = s.online ? (sel ? "#00e59b" : "#00e59b") : (sel ? "#00e59b" : "#c084fc");
+    if (!state.api && !sel) ctx.fillStyle = "#c084fc";
+    ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 12;
     ctx.fill(); ctx.shadowBlur = 0;
   }
   requestAnimationFrame(drawMap);
@@ -685,24 +946,23 @@ canvas.addEventListener("click", (e)=>{
   const rect = canvas.getBoundingClientRect();
   const cx = e.clientX-rect.left, cy = e.clientY-rect.top;
   let best=null, bd=26*26;
-  for (const s of SERVERS){
+  for (const s of state.servers){
+    if (s.lon==null || s.lat==null) continue;
     const [x,y] = proj(s.lon,s.lat);
     const d = (x-cx)*(x-cx)+(y-cy)*(y-cy);
     if (d<bd){bd=d;best=s;}
   }
-  if (best){ selectServer(best.id); haptic("light"); }
+  if (best){ selectServer(String(best.code||best.id)); haptic("light"); }
 });
 
 /* ================= init ================= */
 function init(){
-  initUser();
-  renderServers();
-  renderPlans();
-  renderRewards();
+  try { const fv = localStorage.getItem("chupik_first_visit") || new Date().toLocaleDateString("ru-RU"); localStorage.setItem("chupik_first_visit", fv);} catch(e){}
   renderLangs();
-  renderDevices();
   sizeCanvas(); seedArcs(); requestAnimationFrame(drawMap);
-  let rz; window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{sizeCanvas();},150)});
+  let rz; window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(sizeCanvas,150)});
+  renderAll();
+  loadAll();
 }
 init();
 </script>

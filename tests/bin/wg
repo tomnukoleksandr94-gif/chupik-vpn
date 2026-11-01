@@ -1,0 +1,34 @@
+#!/bin/bash
+# Фейковий wg для тестів: логує команди, імітує dump
+LOG="${WG_FAKE_LOG:-/tmp/wg_fake.log}"
+PEERS="${WG_FAKE_PEERS:-/tmp/wg_fake_peers.txt}"
+cmd="$1"
+if [ "$cmd" = "genkey" ]; then head -c 32 /dev/urandom | base64; exit 0; fi
+if [ "$cmd" = "pubkey" ]; then head -c 32 /dev/urandom | base64; exit 0; fi
+if [ "$cmd" = "set" ]; then
+  # wg set <iface> peer <pub> allowed-ips <ip>/32 | peer <pub> remove
+  echo "set $*" >> "$LOG"
+  shift # iface
+  if [ "$1" = "peer" ]; then
+    pub="$2"; rest="$3"
+    if [ "$rest" = "remove" ]; then
+      grep -v "^$pub " "$PEERS" > "$PEERS.tmp" 2>/dev/null; mv "$PEERS.tmp" "$PEERS" 2>/dev/null
+      echo "remove $pub" >> "$LOG"
+    else
+      ip="$4"; echo "$pub $ip" >> "$PEERS"
+    fi
+  fi
+  exit 0
+fi
+if [ "$cmd" = "show" ]; then
+  iface="$2"; mode="$3"
+  if [ "$mode" = "public-key" ]; then echo "SERVERPUBKEY123"; exit 0; fi
+  if [ "$mode" = "dump" ]; then
+    echo "$iface-privatekey 51820 off"
+    while read -r pub ip; do
+      [ -n "$pub" ] && echo -e "$pub\t(none)\t(none)\t${ip}/32\t$(date +%s)\t1024\t2048"
+    done < "$PEERS"
+    exit 0
+  fi
+fi
+exit 0

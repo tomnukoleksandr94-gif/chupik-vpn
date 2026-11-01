@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHUPIK ADMIN</title>
+<style>
+:root{--bg:#05030d;--card:#130b25;--purple:#7900ff;--neon:#a855ff;--muted:#a9a0bc;--green:#00e59b;--line:rgba(192,132,252,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:#fff;font-family:'Manrope',system-ui,sans-serif;line-height:1.6}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 80% -10%,rgba(121,0,255,.18),transparent 40%),radial-gradient(ellipse at -10% 50%,rgba(92,0,180,.12),transparent 42%)}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px}
+h1{font-size:20px;letter-spacing:-.02em;margin-bottom:4px}
+.sub{color:var(--muted);font-size:12px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:linear-gradient(145deg,rgba(26,15,43,.9),rgba(12,7,22,.9));border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat b{display:block;font-size:22px}
+.stat span{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.section{background:linear-gradient(145deg,rgba(26,15,43,.9),rgba(12,7,22,.9));border:1px solid var(--line);border-radius:20px;padding:22px;margin-bottom:20px}
+.section h2{font-size:15px;margin-bottom:14px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:8px 6px;border-bottom:1px solid var(--line)}
+td{padding:9px 6px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+input,select,button{font:inherit}
+input,select{background:rgba(121,0,255,.08);border:1px solid rgba(192,132,252,.3);color:#fff;border-radius:10px;padding:9px 11px;font-size:12px}
+button{background:linear-gradient(110deg,#6900e8,#9a38ff);border:0;color:#fff;border-radius:10px;padding:9px 14px;font-weight:700;font-size:11px;cursor:pointer;margin:2px}
+button.ghost{background:none;border:1px solid rgba(192,132,252,.3)}
+.pill{display:inline-block;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700}
+.ok{background:rgba(0,229,155,.12);color:var(--green)}
+.bad{background:rgba(255,80,80,.12);color:#ff8f8f}
+.warn{background:rgba(255,184,84,.12);color:#ffb454}
+#login{max-width:420px;margin:12vh auto}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tabs button{background:none;border:1px solid var(--line)}
+.tabs button.on{background:rgba(121,0,255,.2);border-color:var(--neon)}
+.hide{display:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app" style="display:none">
+  <h1>CHUPIK ADMIN</h1>
+  <div class="sub">Панель керування сервісом · події логуються</div>
+
+  <div class="tabs">
+    <button class="on" data-tab="dash">Дашборд</button>
+    <button data-tab="users">Пользователи</button>
+    <button data-tab="payments">Платежи</button>
+    <button data-tab="servers">Серверы</button>
+    <button data-tab="settings">Настройки</button>
+    <button data-tab="log">Журнал</button>
+  </div>
+
+  <div id="tab-dash">
+    <div class="grid" id="stats"></div>
+    <div class="section"><h2>Тарифы (активные подписки)</h2><div class="grid" id="plansGrid"></div></div>
+  </div>
+
+  <div id="tab-users" class="hide">
+    <div class="section">
+      <h2>Пользователи</h2>
+      <div class="row"><input id="uq" placeholder="Поиск по Telegram ID" style="width:220px"><button onclick="loadUsers()">Найти</button></div>
+      <div style="overflow-x:auto"><table id="usersT"></table></div>
+    </div>
+  </div>
+
+  <div id="tab-payments" class="hide">
+    <div class="section"><h2>Платежи (последние 200)</h2>
+      <div style="overflow-x:auto"><table id="payT"></table></div>
+    </div>
+  </div>
+
+  <div id="tab-servers" class="hide">
+    <div class="section"><h2>VPN-серверы</h2>
+      <div style="overflow-x:auto"><table id="srvT"></table></div>
+    </div>
+    <div class="section"><h2>Добавить сервер WireGuard</h2>
+      <div class="row"><input id="s_code" placeholder="код (de-1)" style="width:90px"><input id="s_name" placeholder="Германия · Франкфурт" style="width:180px"><input id="s_country" placeholder="Германия" style="width:110px"><input id="s_flag" placeholder="🇩🇪" style="width:60px"><input id="s_host" placeholder="IP / хост" style="width:140px"><input id="s_port" placeholder="51820" style="width:70px"><input id="s_subnet" placeholder="10.7.0.0/24" style="width:120px"></div>
+      <div class="row"><input id="s_lon" placeholder="lon 8.68" style="width:90px"><input id="s_lat" placeholder="lat 50.11" style="width:90px"><select id="s_driver"><option value="ssh">ssh</option><option value="local">local</option></select><button onclick="addServer()">Добавить</button></div>
+      <p style="font-size:11px;color:var(--muted)">Публичный ключ сервера подтянется автоматически по SSH (нужен WG_SSH_KEY в env backend).</p>
+    </div>
+  </div>
+
+  <div id="tab-settings" class="hide">
+    <div class="section"><h2>Настройки</h2>
+      <div class="row"><label style="font-size:12px">Stars: BASIC</label><input id="st_basic" style="width:90px"><label style="font-size:12px">PREMIUM</label><input id="st_premium" style="width:90px"><label style="font-size:12px">ULTIMATE</label><input id="st_ultimate" style="width:90px"><button onclick="saveSettings()">Сохранить</button></div>
+    </div>
+  </div>
+
+  <div id="tab-log" class="hide">
+    <div class="section"><h2>Журнал действий</h2>
+      <div style="overflow-x:auto"><table id="logT"></table></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap" id="login">
+  <div class="section" style="max-width:420px">
+    <h2>Вход в админ-панель</h2>
+    <div class="row"><input id="token" type="password" placeholder="ADMIN_TOKEN" style="flex:1"><button onclick="login()">Войти</button></div>
+    <p id="loginErr" style="color:#ff8f8f;font-size:12px"></p>
+  </div>
+</div>
+
+<script>
+let TOKEN = sessionStorage.getItem('chupik_admin') || '';
+const api = async (path, opts={}) => {
+  const r = await fetch('/admin/api/'+path, {...opts, headers:{'X-Admin-Token':TOKEN,'Content-Type':'application/json',...(opts.headers||{})}});
+  if (r.status === 401) { showLogin(); throw new Error('unauthorized'); }
+  return r.json();
+};
+function showLogin(){ document.getElementById('app').style.display='none'; document.getElementById('login').style.display='block'; }
+function login(){
+  TOKEN = document.getElementById('token').value.trim();
+  api('dashboard').then(()=>{ sessionStorage.setItem('chupik_admin',TOKEN);
+    document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; refresh(); })
+    .catch(()=>document.getElementById('loginErr').textContent='Неверный токен');
+}
+async function refresh(){
+  try{
+    const d = await api('dashboard');
+    const s = d.data || d;
+    const stats = [
+      ['Пользователей', s.users], ['Новых за сутки', s.new_users_day],
+      ['Активных подписок', s.active_subs], ['Покупок всего', s.purchases],
+      ['Доход €', (s.revenue_total||0).toFixed(2)], ['За день €', (s.revenue_day||0).toFixed(2)],
+      ['За неделю €', (s.revenue_week||0).toFixed(2)], ['За месяц €', (s.revenue_month||0).toFixed(2)],
+    ];
+    document.getElementById('stats').innerHTML = stats.map(([l,v])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+    document.getElementById('plansGrid').innerHTML =
+      `<div class="stat"><b>${s.plans?.basic||0}</b><span>BASIC</span></div>
+       <div class="stat"><b>${s.plans?.premium||0}</b><span>PREMIUM</span></div>
+       <div class="stat"><b>${s.plans?.ultimate||0}</b><span>ULTIMATE</span></div>`;
+    loadUsers(); loadPayments(); loadServers(); loadSettings(); loadLog();
+  }catch(e){}
+}
+async function loadUsers(){
+  const q = document.getElementById('uq').value.trim();
+  const d = await api('users'+(q?'?q_='+encodeURIComponent(q):''));
+  const rows = (d.data||d).users||[];
+  document.getElementById('usersT').innerHTML = '<tr><th>TG ID</th><th>Имя</th><th>Тариф</th><th>До</th><th>Бан</th><th>Действия</th></tr>'+
+    rows.map(u=>`<tr><td>${u.tg_id}</td><td>${u.first_name||''} ${u.username?'@'+u.username:''}</td>
+      <td>${u.plan}</td><td>${u.plan_expires_at?new Date(u.plan_expires_at*1000).toLocaleString():'—'}</td>
+      <td>${u.is_banned?'<span class="pill bad">бан</span>':'<span class="pill ok">ок</span>'}</td>
+      <td><button class="ghost" onclick="uAct(${u.tg_id},'ban')">Бан</button>
+          <button class="ghost" onclick="uAct(${u.tg_id},'unban')">Разбан</button>
+          <button onclick="uAct(${u.tg_id},'grant_plan','premium')">+PREMIUM</button>
+          <button class="ghost" onclick="uAct(${u.tg_id},'bonus_hours','3')">+3ч бонус</button></td></tr>`).join('');
+}
+async function uAct(tg_id, action, value){
+  await api('users/action',{method:'POST',body:JSON.stringify({tg_id,action,value})});
+  loadUsers();
+}
+async function loadPayments(){
+  const d = await api('payments'); const rows=(d.data||d).payments||[];
+  document.getElementById('payT').innerHTML='<tr><th>ID</th><th>Провайдер</th><th>TG</th><th>Тариф</th><th>Сумма</th><th>Статус</th><th>Дата</th><th>Ref</th></tr>'+
+    rows.map(p=>`<tr><td>${p.id}</td><td>${p.provider}</td><td>${p.tg_id}</td><td>${p.plan}</td>
+      <td>${p.amount} ${p.currency}</td><td><span class="pill ${p.status==='succeeded'?'ok':p.status==='refunded'?'warn':'bad'}">${p.status}</span></td>
+      <td>${new Date(p.created_at*1000).toLocaleString()}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${p.provider_ref}</td></tr>`).join('');
+}
+async function loadServers(){
+  const d = await api('dashboard'); const rows=(d.data||d).servers||[];
+  document.getElementById('srvT').innerHTML='<tr><th>ID</th><th>Сервер</th><th>Хост</th><th>Драйвер</th><th>Активен</th><th>Действия</th></tr>'+
+    rows.map(s=>`<tr><td>${s.id}</td><td>${s.flag} ${s.name}</td><td>${s.endpoint_host}</td><td>${s.driver}</td>
+      <td>${s.is_active?'<span class="pill ok">да</span>':'<span class="pill bad">нет</span>'}</td>
+      <td><button class="ghost" onclick="srvToggle(${s.id})">Вкл/Выкл</button></td></tr>`).join('');
+}
+async function srvToggle(id){ await fetch(`/admin/api/servers/${id}/toggle`,{method:'POST',headers:{'X-Admin-Token':TOKEN}}); loadServers(); }
+async function addServer(){
+  const body = {code:v('s_code'),name:v('s_name'),country:v('s_country'),flag:v('s_flag'),
+    endpoint_host:v('s_host'),endpoint_port:Number(v('s_port')||51820),subnet:v('s_subnet')||'10.7.0.0/24',
+    driver:v('s_driver'),lon:parseFloat(v('s_lon')||0),lat:parseFloat(v('s_lat')||0)};
+  await fetch('/admin/api/servers',{method:'POST',headers:{'X-Admin-Token':TOKEN,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  loadServers();
+}
+const v = id => document.getElementById(id).value.trim();
+async function loadSettings(){
+  const d = await api('settings'); const s=(d.data||d).settings||{};
+  document.getElementById('st_basic').value=s.stars_basic||''; document.getElementById('st_premium').value=s.stars_premium||''; document.getElementById('st_ultimate').value=s.stars_ultimate||'';
+}
+async function saveSettings(){
+  await api('settings',{method:'POST',body:JSON.stringify({stars_basic:v('st_basic'),stars_premium:v('st_premium'),stars_ultimate:v('st_ultimate')})});
+  alert('Сохранено');
+}
+async function loadLog(){
+  const d = await api('log'); const rows=(d.data||d).log||[];
+  document.getElementById('logT').innerHTML='<tr><th>Время</th><th>Кто</th><th>Событие</th><th>Детали</th></tr>'+
+    rows.map(l=>`<tr><td>${new Date(l.ts*1000).toLocaleString()}</td><td>${l.actor}</td><td>${l.action}</td><td>${l.details||''}</td></tr>`).join('');
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  ['dash','users','payments','servers','settings','log'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hide',t!==b.dataset.tab));
+}));
+if (TOKEN) { document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; refresh(); }
+</script>
+</body>
+</html>

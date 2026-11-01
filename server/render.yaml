@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: chupik-vpn-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r server/requirements.txt
+    startCommand: uvicorn server.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: BASE_URL
+        sync: false
+      - key: MINIAPP_URL
+        value: https://tomnukoleksandr94-gif.github.io/chupik-vpn/miniapp/
+      - key: BRAND_PHOTO_URL
+        value: https://tomnukoleksandr94-gif.github.io/chupik-vpn/miniapp/chupik-brand.jpg
+      - key: WG_SSH_KEY
+        sync: false
+      - key: WG_SSH_USER
+        value: root
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false

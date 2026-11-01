@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "wg-quick $*" >> "${WG_FAKE_LOG:-/tmp/wg_fake.log}"
+exit 0
