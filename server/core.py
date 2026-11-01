@@ -46,7 +46,7 @@ def upsert_user(tg_id: int, username=None, first_name=None, lang=None, referrer_
     from .db import log_admin
     if tg_id in settings.ADMIN_TG_IDS:
         cur = get_user(tg_id)
-        if cur and not cur.get("is_admin"):
+        if cur and not cur["is_admin"]:
             ex("UPDATE users SET is_admin=1 WHERE tg_id=?", (tg_id,))
             log_admin(0, f"auto-admin granted to {tg_id} via ADMIN_TG_IDS")
     return get_user(tg_id)

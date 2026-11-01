@@ -391,8 +391,11 @@ async def setup_bot():
         ("terms", "Условия"), ("paysupport", "Вопросы оплаты"), ("trial", "Пробный PREMIUM")]]
     await bot.set_my_commands(cmds, BotCommandScopeDefault())
     if settings.MINIAPP_URL:
+        url = settings.MINIAPP_URL
+        if settings.BASE_URL:  # LIVE-режим: мініапка одразу з живим API
+            url += ("&" if "?" in url else "?") + f"api={settings.BASE_URL}"
         await bot.set_chat_menu_button(menu_button=MenuButtonWebApp(
-            text="ЧУПИК VPN", web_app=WebAppInfo(url=settings.MINIAPP_URL)))
+            text="ЧУПИК VPN", web_app=WebAppInfo(url=url)))
     me = await bot.get_me()
     print(f"[bot] запущен: @{me.username}")
     return dp
