@@ -311,11 +311,6 @@ def menu_handler(key):
 for key in ("profile", "buy", "servers", "group", "referral", "support", "terms", "paysupport"):
     dp.message.register(menu_handler(key), Command(key))
     # кнопки меню на русском/украинском и т.д. маппим на тот же текст
-for lang_code in T:
-    for i, key in enumerate(("buy", "profile", "servers", "group", "referral", "support")):
-        dp.message.register(menu_handler(key), F.text == T[lang_code]["menu"][i])
-    dp.message.register(miniapp_handler, F.text == T[lang_code]["menu"][6])
-
 async def miniapp_handler(msg: Message):
     user_row = upsert_user(msg)
     lang = l(user_row)
@@ -324,6 +319,11 @@ async def miniapp_handler(msg: Message):
         await msg.answer(T[lang]["welcome"].format(name=msg.from_user.first_name), reply_markup=kb)
     else:
         await msg.answer(T[lang]["open_miniapp"])
+
+for lang_code in T:
+    for i, key in enumerate(("buy", "profile", "servers", "group", "referral", "support")):
+        dp.message.register(menu_handler(key), F.text == T[lang_code]["menu"][i])
+    dp.message.register(miniapp_handler, F.text == T[lang_code]["menu"][6])
 
 @dp.message(Command("help"))
 async def cmd_help(msg: Message):
