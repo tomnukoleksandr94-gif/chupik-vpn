@@ -93,6 +93,12 @@ def _user_payload(tg_id: int) -> dict:
     }
 
 
+@app.get("/api/health")
+async def api_health():
+    import time as _time
+    return {"ok": True, "ts": int(_time.time())}
+
+
 @app.get("/api/me")
 async def api_me(user=Depends(tg_user)):
     return {"ok": True, **_user_payload(user["id"])}

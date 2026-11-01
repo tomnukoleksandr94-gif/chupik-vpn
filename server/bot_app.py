@@ -5,6 +5,7 @@
 import json
 
 from aiogram import Bot, Dispatcher, F
+from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import (
@@ -21,7 +22,8 @@ from .i18n import LANG_NAMES, T
 BOT_USERNAME = "Chupik_vpnBot"
 
 if settings.BOT_TOKEN:
-    bot = Bot(token=settings.BOT_TOKEN, default=ParseMode.HTML)
+    bot = Bot(token=settings.BOT_TOKEN,
+              default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 else:  # тестовий режим без токена — API працює, бот ні
     bot = None
 
