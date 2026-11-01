@@ -320,6 +320,34 @@ async def cmd_grant(msg: Message):
     await msg.answer(f"✅ {core.PLANS[plan]['name']} до {fmt_date(sub['expires_at'])}")
 
 
+@dp.message(Command("admin"))
+async def cmd_admin(msg: Message):
+    user = core.get_user(msg.from_user.id)
+    if not (user and user["is_admin"]):
+        await msg.answer("⛔ Ця команда тільки для адміністраторів.")
+        return
+    from .config import settings
+    core.upsert_user(msg.from_user.id, msg.from_user.username, msg.from_user.first_name)
+    panel = f"{settings.BASE_URL}/admin?token={settings.ADMIN_TOKEN}" if settings.BASE_URL else "(BASE_URL не налаштовано)"
+    await msg.answer(
+        "👑 <b>Панель адміністратора</b>\n\n"
+        f"🔗 Адмін-панель: {panel}\n\n"
+        "<b>Команди:</b>\n"
+        "/grant <code><tg_id> <basic|premium|ultimate> [днів]</code> — видати підписку\n"
+        "/refund <code><tg_id> <charge_id></code> — повернути Stars\n"
+        "/users — кількість користувачів")
+
+
+@dp.message(Command("users"))
+async def cmd_users(msg: Message):
+    user = core.get_user(msg.from_user.id)
+    if not (user and user["is_admin"]):
+        return
+    n = core.q1("SELECT COUNT(*) AS c FROM users")["c"]
+    paid = core.q1("SELECT COUNT(DISTINCT tg_id) AS c FROM payments WHERE status='paid'")["c"]
+    await msg.answer(f"👥 Користувачів: <b>{n}</b>\n💳 Хоча б одна оплата: <b>{paid}</b>")
+
+
 # ---------------- кнопки меню ----------------
 async def miniapp_btn_handler(msg: Message):
     user = core.upsert_user(msg.from_user.id, msg.from_user.username, msg.from_user.first_name)

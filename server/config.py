@@ -15,6 +15,12 @@ class Settings:
     SECRET_KEY = os.environ.get("SECRET_KEY", "")          # підпис сесій + шифрування ключів WG
     ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")        # доступ до адмін-панелі
 
+    # Telegram ID, які АВТОМАТИЧНО стають адмінами (через кому)
+    ADMIN_TG_IDS = {
+        int(x) for x in os.environ.get("ADMIN_TG_IDS", "").replace(" ", "").split(",")
+        if x.strip().isdigit()
+    }
+
     # База
     DB_PATH = os.environ.get("DB_PATH", "chupik.db")
 
