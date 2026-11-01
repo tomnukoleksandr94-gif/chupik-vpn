@@ -12,6 +12,27 @@ GitHub Pages (безкоштовно)         Oracle Cloud Always Free (безк
 └─ адмінка /admin                  └─ SQLite на диску VPS (дані не зникають)
 ```
 
+## Варіант А: я налаштую сервер сам (потрібен лише VPS від тебе)
+
+1. Створи інстанс у Oracle Cloud (крок 1 нижче — реєстрація і карта потрібні особисто твої).
+   У полі **"Add SSH keys"** вибери "Paste key" і додай ДВА ключі (свій + мій, Oracle дозволяє кілька):
+   ```
+   ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhoFO9hIzJuf7suPoUIG/N87zBYvbwzhFBqZRxvrhrD chupik-deploy
+   ```
+   Це **публічний** ключ — його не потрібно ховати (секретним є тільки приватний, і він залишається у мене).
+2. Напиши мені IP сервера — я сам з'єднаюсь по SSH і виконаю налаштування: WireGuard, backend, systemd, адмінка, кнопка меню бота.
+   (Якщо вхідний SSH з моєї пісочниці буде заблокований мережею — перейдемо на варіант Б.)
+
+## Варіант Б: одна команда (інсталятор усе робить сам)
+
+На VPS від root:
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/tomnukoleksandr94-gif/chupik-vpn/main/install.sh)
+```
+Інсталятор поставить WireGuard + backend, згенерує SECRET_KEY/ADMIN_TOKEN сам, спитає тільки BOT_TOKEN,
+підніме systemd-сервіс з автозапуском і в кінці покаже IP, пароль адмінки і готову URL для кнопки меню бота.
+Далі лишиться: додати сервер в адмінці і виставити кнопку меню в BotFather (крок 3, пункт 2).
+
 ## Крок 1. Oracle Cloud (безкоштовний VPS)
 
 1. Зайди на [oracle.com/cloud/free](https://www.oracle.com/cloud/free/) → Start for free.
