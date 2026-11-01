@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#05030d">
+<meta name="description" content="ЧУПИК VPN Mini App — личный кабинет: тарифы, серверы, устройства, группы и рефералы.">
+<title>ЧУПИК VPN — Mini App</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a855ff' stroke-width='1.8'%3E%3Cpath d='M12 2 20 5v6c0 5-3.4 8.8-8 11-4.6-2.2-8-6-8-11V5l8-3Z'/%3E%3Cpath d='m8.5 12 2.2 2.2 4.8-5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#05030d; --bg2:#0b0618; --card:#130b25; --card2:linear-gradient(145deg,rgba(26,15,43,.9),rgba(12,7,22,.92));
+  --purple:#7900ff; --neon:#a855ff; --light:#c084fc; --muted:#a9a0bc; --muted2:#8e849f;
+  --green:#00e59b; --line:rgba(192,132,252,.15); --line2:rgba(192,132,252,.28);
+  --font:'Manrope',sans-serif; --display:'Unbounded',sans-serif;
+  --tabbar-h:64px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--bg);color:#fff;font-family:var(--font);line-height:1.6;
+  overflow-x:hidden; overscroll-behavior:none;
+}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;
+  background:radial-gradient(ellipse at 80% -10%,rgba(121,0,255,.22),transparent 40%),
+             radial-gradient(ellipse at -10% 50%,rgba(92,0,180,.14),transparent 42%),
+             linear-gradient(180deg,#070410,#05030d 55%,#080411)}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+::selection{background:rgba(168,85,255,.35)}
+
+/* ---------- shell ---------- */
+#app{max-width:520px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+@media(min-width:560px){
+  #app{border-left:1px solid var(--line);border-right:1px solid var(--line);min-height:100vh}
+}
+
+/* ---------- header ---------- */
+header.top{
+  position:sticky;top:0;z-index:30;padding:calc(env(safe-area-inset-top) + 12px) 18px 12px;
+  display:flex;align-items:center;gap:12px;
+  background:rgba(5,3,13,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--line);
+}
+.avatar{width:42px;height:42px;border-radius:14px;flex-shrink:0;display:grid;place-items:center;
+  background:linear-gradient(145deg,#a855ff,#4e00a8);font-weight:800;font-size:15px;
+  box-shadow:0 0 18px rgba(168,85,255,.35);overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.top-mid{flex:1;min-width:0}
+.top-hello{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.top-name{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.demo-pill{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:800;letter-spacing:.12em;
+  color:#e6c9ff;border:1px solid rgba(168,85,255,.35);background:rgba(121,0,255,.12);
+  padding:4px 9px;border-radius:100px}
+.demo-pill i{width:5px;height:5px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:blink 1.8s infinite}
+.top-id{font-size:9px;color:var(--muted2);font-weight:700}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ---------- pages ---------- */
+main{flex:1;position:relative;padding:18px 18px calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 26px)}
+.page{display:none;flex-direction:column;gap:16px}
+.page.active{display:flex;animation:pagein .38s cubic-bezier(.22,1,.36,1)}
+@keyframes pagein{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+.stagger>*{opacity:0;transform:translateY(14px)}
+.page.active .stagger>*{animation:rise .5s cubic-bezier(.22,1,.36,1) forwards}
+.page.active .stagger>*:nth-child(1){animation-delay:.03s}
+.page.active .stagger>*:nth-child(2){animation-delay:.08s}
+.page.active .stagger>*:nth-child(3){animation-delay:.13s}
+.page.active .stagger>*:nth-child(4){animation-delay:.18s}
+.page.active .stagger>*:nth-child(5){animation-delay:.23s}
+.page.active .stagger>*:nth-child(6){animation-delay:.28s}
+.page.active .stagger>*:nth-child(7){animation-delay:.33s}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* ---------- cards ---------- */
+.card{background:var(--card2);border:1px solid var(--line);border-radius:19px;padding:19px;position:relative;overflow:hidden}
+.card.glow:after{content:"";position:absolute;width:150px;height:150px;right:-70px;top:-70px;background:rgba(121,0,255,.14);filter:blur(34px);pointer-events:none}
+.h-title{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:-.03em}
+.h-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;color:#d7b6ff;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;border:1px solid rgba(168,85,255,.28);background:rgba(121,0,255,.09);padding:7px 11px;border-radius:100px}
+.eyebrow:before{content:"";width:5px;height:5px;border-radius:50%;background:var(--light);box-shadow:0 0 10px var(--neon)}
+
+/* hero status */
+.hero-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:28px 19px 22px;
+  background:radial-gradient(ellipse at 50% -30%,rgba(121,0,255,.3),transparent 55%),var(--card2)}
+.hero-shield{width:92px;height:102px;filter:drop-shadow(0 0 18px rgba(168,85,255,.55));animation:float 5.5s ease-in-out infinite}
+@keyframes float{0%,100%{translate:0 0}50%{translate:0 -9px}}
+.hero-status{font-size:14px;font-weight:800;margin-top:14px;display:flex;align-items:center;gap:8px}
+.hero-note{font-size:11px;color:var(--muted);margin-top:6px;max-width:270px}
+.badge-soon{display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#ffd9a8;border:1px solid rgba(255,184,84,.3);background:rgba(255,150,40,.08);padding:6px 11px;border-radius:100px}
+.badge-soon i{width:6px;height:6px;border-radius:50%;background:#ffb454;box-shadow:0 0 8px #ffb454}
+
+/* stats grid */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+.stat{background:rgba(19,11,37,.6);border:1px solid var(--line);border-radius:15px;padding:13px 8px;text-align:center}
+.stat b{display:block;font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.03em}
+.stat span{font-size:8.5px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase;display:block;margin-top:4px}
+.stat b .unit{font-size:10px;color:var(--muted)}
+
+/* quick actions */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qa{display:flex;align-items:center;gap:11px;padding:14px;border-radius:15px;border:1px solid var(--line);
+  background:rgba(19,11,37,.55);font-size:12px;font-weight:700;transition:.2s}
+.qa:active{transform:scale(.97);background:rgba(121,0,255,.14)}
+.qa svg{width:19px;height:19px;color:var(--light);flex-shrink:0}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 18px;border-radius:14px;
+  font-weight:800;font-size:12px;border:1px solid transparent;transition:.2s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{color:#fff;background:linear-gradient(110deg,#6900e8,#9a38ff);
+  box-shadow:0 8px 26px rgba(121,0,255,.3),inset 0 1px rgba(255,255,255,.25)}
+.btn-outline{border-color:var(--line2);background:rgba(255,255,255,.025);color:#e9dcfa}
+.btn-full{width:100%}
+.btn svg{width:16px;height:16px}
+
+/* ---------- map ---------- */
+.map-wrap{position:relative;border-radius:19px;overflow:hidden;border:1px solid var(--line);
+  background:radial-gradient(ellipse at 50% 0%,rgba(121,0,255,.14),transparent 60%),#070410}
+#mapCanvas{display:block;width:100%;height:auto;touch-action:pan-y}
+.map-hint{position:absolute;left:12px;bottom:10px;font-size:9px;color:var(--muted2);letter-spacing:.08em;text-transform:uppercase}
+.map-legend{position:absolute;right:12px;top:10px;display:flex;flex-direction:column;gap:5px;font-size:9px;color:var(--muted)}
+.map-legend span{display:flex;align-items:center;gap:6px}
+.map-legend i{width:6px;height:6px;border-radius:50%}
+.lg-soon{background:var(--neon);box-shadow:0 0 8px var(--neon)}
+.lg-sel{background:var(--green);box-shadow:0 0 8px var(--green)}
+
+/* server list */
+.srv{display:flex;align-items:center;gap:13px;padding:14px;border-radius:15px;border:1px solid var(--line);
+  background:rgba(19,11,37,.55);transition:.2s;cursor:pointer}
+.srv:active{transform:scale(.98)}
+.srv.selected{border-color:rgba(0,229,155,.5);background:rgba(0,229,155,.06)}
+.srv-flag{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:17px;flex-shrink:0;
+  background:rgba(121,0,255,.13);border:1px solid rgba(168,85,255,.3)}
+.srv-mid{flex:1;min-width:0;display:block}
+.srv-name{font-size:13px;font-weight:800;display:block}
+.srv-meta{font-size:10px;color:var(--muted);margin-top:2px;display:block}
+.srv-right{text-align:right;flex-shrink:0}
+.srv-status{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#e8b3ff}
+.srv.selected .srv-status{color:var(--green)}
+.srv-ping{font-size:9px;color:var(--muted2);margin-top:2px}
+.srv.selected .srv-ping{color:var(--green)}
+
+/* ---------- tariffs ---------- */
+.plan-card{border:1px solid var(--line);border-radius:19px;padding:21px;position:relative;overflow:hidden;transition:.25s;
+  background:var(--card2)}
+.plan-card.current{border-color:rgba(0,229,155,.45)}
+.plan-card.popular{border-color:rgba(168,85,255,.6);box-shadow:0 0 34px rgba(121,0,255,.14)}
+.plan-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.plan-name{font-family:var(--display);font-size:16px;font-weight:700;letter-spacing:-.03em}
+.tag{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:100px;padding:5px 9px}
+.tag-pop{background:linear-gradient(90deg,#7900ff,#a855ff);color:#fff}
+.tag-cur{background:rgba(0,229,155,.12);color:var(--green);border:1px solid rgba(0,229,155,.35)}
+.plan-price{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:-.05em;margin:14px 0 2px}
+.plan-price small{font-family:var(--font);font-size:10px;color:var(--muted);font-weight:600}
+.plan-desc{font-size:10.5px;color:var(--muted)}
+.plan-feats{list-style:none;border-top:1px solid var(--line);margin:16px 0 0;padding-top:14px;display:grid;gap:9px}
+.plan-feats li{font-size:11px;color:#d4c9df;display:flex;gap:8px;align-items:center}
+.plan-feats li svg{width:13px;height:13px;color:var(--green);flex-shrink:0}
+.plan-feats li.dim{color:var(--muted2)}
+.plan-btn{margin-top:16px}
+.pay-note{font-size:9.5px;color:var(--muted2);line-height:1.7}
+
+/* ---------- devices ---------- */
+.limit-head{display:flex;justify-content:space-between;align-items:baseline}
+.limit-val{font-family:var(--display);font-size:13px}
+.progress{height:6px;border-radius:100px;background:rgba(255,255,255,.07);margin-top:12px;overflow:hidden}
+.progress i{display:block;height:100%;width:0;border-radius:100px;background:linear-gradient(90deg,#7900ff,#a855ff);box-shadow:0 0 10px rgba(168,85,255,.5);transition:width .9s cubic-bezier(.22,1,.36,1)}
+.device{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.device:last-child{border-bottom:0}
+.dev-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(121,0,255,.13);border:1px solid rgba(168,85,255,.3);color:var(--light)}
+.dev-icon svg{width:18px;height:18px}
+.dev-name{font-size:13px;font-weight:800}
+.dev-meta{font-size:10px;color:var(--muted);margin-top:2px}
+.empty{text-align:center;padding:30px 16px}
+.empty svg{width:52px;height:52px;color:#4d3f66;margin-bottom:12px}
+.empty b{display:block;font-size:13px}
+.empty p{font-size:11px;color:var(--muted);margin-top:6px;max-width:250px;margin-inline:auto}
+
+/* ---------- profile ---------- */
+.prof-row{display:flex;align-items:center;gap:13px}
+.prof-row-label{font-size:11px;color:var(--muted)}
+.prof-row-val{font-size:12px;font-weight:700;text-align:right;word-break:break-all}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--muted)}
+.kv b{font-weight:700}
+.ref-link{display:flex;align-items:center;gap:10px;margin-top:14px;background:rgba(5,3,13,.7);
+  border:1px solid var(--line2);border-radius:13px;padding:12px 14px}
+.ref-link code{flex:1;font-size:10.5px;color:#d9c5ef;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.copy-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(121,0,255,.16);color:#d9c5ef;flex-shrink:0;transition:.15s}
+.copy-ic:active{transform:scale(.9)}
+.copy-ic svg{width:15px;height:15px}
+.rewards{display:grid;gap:9px;margin-top:15px}
+.reward{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:13px;padding:10px 13px;background:rgba(19,11,37,.5)}
+.reward .r-n{font-family:var(--display);font-size:10px;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;background:rgba(121,0,255,.13);color:var(--light)}
+.reward .r-t{flex:1;font-size:11px;font-weight:700}
+.reward .r-p{font-size:10px;color:var(--muted2);font-weight:700}
+.reward.done{border-color:rgba(0,229,155,.35)}
+.reward.done .r-n{background:rgba(0,229,155,.12);color:var(--green)}
+.langs{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+.lang-chip{font-size:11px;font-weight:700;padding:9px 13px;border-radius:100px;border:1px solid var(--line);color:var(--muted);transition:.15s}
+.lang-chip.active{border-color:rgba(168,85,255,.6);background:rgba(121,0,255,.16);color:#fff}
+
+/* ---------- tabbar ---------- */
+nav.tabbar{position:fixed;z-index:40;bottom:0;left:0;right:0;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(7,4,16,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+.tabbar-inner{max-width:520px;margin:0 auto;display:flex}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 2px 9px;
+  color:var(--muted2);font-size:9px;font-weight:700;position:relative;transition:color .2s;letter-spacing:.02em}
+.tab svg{width:20px;height:20px}
+.tab.active{color:#fff}
+.tab .t-dot{position:absolute;top:6px;width:4px;height:4px;border-radius:50%;background:var(--neon);opacity:0;box-shadow:0 0 8px var(--neon)}
+.tab.active .t-dot{opacity:1;animation:blink 1.6s infinite}
+.tab:active{transform:scale(.94)}
+
+/* ---------- toast & banner ---------- */
+.toast{position:fixed;z-index:100;bottom:calc(var(--tabbar-h) + env(safe-area-inset-bottom) + 18px);left:50%;
+  transform:translate(-50%,16px);background:#211333;border:1px solid rgba(168,85,255,.4);border-radius:13px;
+  padding:12px 17px;color:#eee;font-size:11.5px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;
+  box-shadow:0 12px 35px #0009;max-width:85vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.no-tg{display:none;margin:0 18px 16px;border:1px solid rgba(255,184,84,.3);background:rgba(255,150,40,.07);
+  border-radius:15px;padding:12px 15px;font-size:11px;color:#ffe3c2;display:flex;align-items:center;gap:10px}
+.no-tg.show{display:flex}
+.no-tg a{font-weight:800;color:#fff;background:linear-gradient(110deg,#6900e8,#9a38ff);padding:8px 13px;border-radius:10px;font-size:10.5px;flex-shrink:0}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="avatar" id="avatar">Ч</div>
+    <div class="top-mid">
+      <div class="top-hello" id="hello">Добро пожаловать</div>
+      <div class="top-name" id="topName">ЧУПИК VPN</div>
+    </div>
+    <div class="top-right">
+      <span class="demo-pill"><i></i>DEMO</span>
+      <span class="top-id" id="topId"></span>
+    </div>
+  </header>
+
+  <div class="no-tg" id="noTg">
+    <span>Открой Mini App через Telegram-бота — там доступен весь функционал.</span>
+    <a href="https://t.me/Chupik_vpnBot" id="noTgLink">Открыть бота</a>
+  </div>
+
+  <main id="main">
+
+    <!-- ================= ГЛАВНАЯ ================= -->
+    <section class="page active" id="page-home">
+      <div class="stagger">
+        <div class="card hero-card">
+          <svg class="hero-shield" viewBox="0 0 100 110" fill="none" aria-hidden="true">
+            <path d="M50 4 91 20v29c0 27-17 45-41 57C26 94 9 76 9 49V20L50 4Z" stroke="#bd8aff" stroke-width="3" fill="#6d22b5" fill-opacity=".15"/>
+            <path d="m34 54 11 11 23-25" stroke="#e9d7ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div class="hero-status"><i style="width:8px;height:8px;border-radius:50%;background:#ffb454;box-shadow:0 0 10px #ffb454"></i>Сервис подключается</div>
+          <p class="hero-note">Mini App готово. VPN-подключение станет доступным после запуска серверов WireGuard.</p>
+          <span class="badge-soon"><i></i>Этап: инфраструктура</span>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><b id="stPlan">FREE</b><span>Тариф</span></div>
+          <div class="stat"><b id="stDevices">0<span class="unit">/1</span></b><span>Устройства</span></div>
+          <div class="stat"><b id="stDays">—</b><span>Дней</span></div>
+          <div class="stat"><b id="stTraffic">—</b><span>Трафик</span></div>
+        </div>
+
+        <div class="qa-grid">
+          <button class="qa" data-goto="tariffs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Купить VPN</button>
+          <button class="qa" data-goto="servers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Серверы</button>
+          <button class="qa" data-goto="devices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>Устройства</button>
+          <button class="qa" data-copyref="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Пригласить друга</button>
+        </div>
+
+        <div class="card glow">
+          <span class="eyebrow">Чупик Group</span>
+          <h3 class="h-title" style="margin-top:12px">VPN для себя и друзей</h3>
+          <p class="h-sub">Пригласите друзей в свою группу: BASIC — 1 друг, PREMIUM — 3, ULTIMATE — 5. У каждого друга — свой аккаунт и 1 устройство.</p>
+          <button class="btn btn-outline btn-full plan-btn" data-goto="profile">Моя группа</button>
+        </div>
+
+        <div class="card">
+          <span class="eyebrow">Поддержка</span>
+          <p class="h-sub" style="margin-top:12px">Вопросы по оплате, подключению и сотрудничеству — в один клик.</p>
+          <button class="btn btn-primary btn-full plan-btn" id="supportBtn" style="margin-top:14px">Написать в поддержку
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 3 9 15m12-12-7 18-5-8-8-5 20-5Z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= СЕРВЕРЫ ================= -->
+    <section class="page" id="page-servers">
+      <div class="stagger">
+        <div class="map-wrap">
+          <canvas id="mapCanvas"></canvas>
+          <div class="map-legend">
+            <span><i class="lg-soon"></i>Локация</span>
+            <span><i class="lg-sel"></i>Выбрана</span>
+          </div>
+          <div class="map-hint">CHUPIK NETWORK · WORLD MAP</div>
+        </div>
+        <div class="card">
+          <h3 class="h-title">Локации серверов</h3>
+          <p class="h-sub">Список ниже — план запуска. Реальные статусы и нагрузка появятся после запуска WireGuard-серверов. Нажмите на сервер или точку на карте, чтобы выбрать.</p>
+        </div>
+        <div id="srvList" style="display:flex;flex-direction:column;gap:9px"></div>
+        <p class="pay-note">* Mini App управляет аккаунтом и выдаёт конфигурацию. Для подключения нужен клиент WireGuard — само приложение туннель не создаёт.</p>
+      </div>
+    </section>
+
+    <!-- ================= УСТРОЙСТВА ================= -->
+    <section class="page" id="page-devices">
+      <div class="stagger">
+        <div class="card glow">
+          <div class="limit-head">
+            <h3 class="h-title">Мои устройства</h3>
+            <span class="limit-val" id="devLimit">0 / 1</span>
+          </div>
+          <p class="h-sub">Лимит устройств зависит от тарифа: FREE — 1, BASIC — 2, PREMIUM — 4, ULTIMATE — 5.</p>
+          <div class="progress"><i id="devProgress"></i></div>
+        </div>
+        <div class="card" id="deviceListCard">
+          <div class="empty" id="deviceEmpty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>
+            <b>Пока нет устройств</b>
+            <p>Конфигурация WireGuard выдаётся ботом после покупки подписки и запуска серверов.</p>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" id="addDeviceBtn">Добавить устройство</button>
+      </div>
+    </section>
+
+    <!-- ================= ТАРИФЫ ================= -->
+    <section class="page" id="page-tariffs">
+      <div class="stagger">
+        <div class="card">
+          <span class="eyebrow">Тарифы</span>
+          <h3 class="h-title" style="margin-top:12px">Выберите свой формат</h3>
+          <p class="h-sub">Все подписки — на 1 месяц. Оплата: Telegram Stars (XTR) в боте или банковской картой на сайте. Активация — только после подтверждения платежа.</p>
+        </div>
+        <div id="planList" style="display:flex;flex-direction:column;gap:13px"></div>
+        <p class="pay-note">* Автопродление доступно, если его поддерживает выбранный платёжный процесс. Конкретные лимиты скорости и трафика задаёт администратор под реальную инфраструктуру.</p>
+      </div>
+    </section>
+
+    <!-- ================= ПРОФИЛЬ ================= -->
+    <section class="page" id="page-profile">
+      <div class="stagger">
+        <div class="card glow">
+          <div class="prof-row">
+            <div class="avatar" id="profAvatar" style="width:52px;height:52px;border-radius:16px;font-size:17px">Ч</div>
+            <div style="flex:1;min-width:0">
+              <div class="top-name" id="profName" style="font-size:16px">ЧУПИК VPN</div>
+              <div class="top-id" id="profUsername" style="margin-top:2px"></div>
+            </div>
+          </div>
+          <div style="margin-top:14px">
+            <div class="kv"><span>Telegram ID</span><b id="profId">—</b></div>
+            <div class="kv"><span>Тариф</span><b id="profPlan">FREE</b></div>
+            <div class="kv"><span>Дата регистрации</span><b id="profReg">—</b></div>
+            <div class="kv"><span>Подписка до</span><b id="profSub">—</b></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="h-title">Пригласить друга</h3>
+          <p class="h-sub">Бонус получает только пригласивший: 1 друг — 3 часа PREMIUM, 3 — 12 часов, 5 — 24 часа, 10 — 3 дня, 20 — 7 дней.</p>
+          <div class="ref-link">
+            <code id="refLink">t.me/Chupik_vpnBot</code>
+            <button class="copy-ic" id="copyRef" aria-label="Скопировать ссылку">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+          </div>
+          <div class="rewards" id="rewardList"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="h-title">Моя группа</h3>
+          <p class="h-sub" id="groupStatus">Группы доступны с тарифа BASIC. Создайте группу и пригласите друзей — у каждого будет свой аккаунт и VPN-доступ.</p>
+          <button class="btn btn-outline btn-full" id="groupBtn" style="margin-top:14px">Создать группу</button>
+        </div>
+
+        <div class="card">
+          <h3 class="h-title">Язык / Мова / Language</h3>
+          <div class="langs" id="langChips"></div>
+        </div>
+
+        <button class="btn btn-outline btn-full" id="termsBtn">Условия использования</button>
+        <button class="btn btn-primary btn-full" id="openBotBtn">Открыть бота в Telegram</button>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar">
+    <div class="tabbar-inner">
+      <button class="tab active" data-page="home"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3v-10.5Z"/></svg>Главная</button>
+      <button class="tab" data-page="servers"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>Серверы</button>
+      <button class="tab" data-page="devices"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg>Устройства</button>
+      <button class="tab" data-page="tariffs"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="15" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Тарифы</button>
+      <button class="tab" data-page="profile"><span class="t-dot"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>Профиль</button>
+    </div>
+  </nav>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ================= данные ================= */
+const BOT_URL = "https://t.me/Chupik_vpnBot";
+const BOT_USERNAME = "Chupik_vpnBot";
+
+const SERVERS = [
+  {id:"de", name:"Германия · Франкфурт", flag:"🇩🇪", lon:8.68, lat:50.11},
+  {id:"nl", name:"Нидерланды · Амстердам", flag:"🇳🇱", lon:4.90, lat:52.37},
+  {id:"fr", name:"Франция · Париж", flag:"🇫🇷", lon:2.35, lat:48.86},
+  {id:"uk", name:"Британия · Лондон", flag:"🇬🇧", lon:-0.13, lat:51.51},
+  {id:"pl", name:"Польша · Варшава", flag:"🇵🇱", lon:21.01, lat:52.23},
+  {id:"us-e", name:"США · Нью-Йорк", flag:"🇺🇸", lon:-74.01, lat:40.71},
+  {id:"us-w", name:"США · Лос-Анджелес", flag:"🇺🇸", lon:-118.24, lat:34.05},
+  {id:"ca", name:"Канада · Торонто", flag:"🇨🇦", lon:-79.38, lat:43.65},
+  {id:"ae", name:"ОАЭ · Дубай", flag:"🇦🇪", lon:55.27, lat:25.20},
+  {id:"sg", name:"Сингапур", flag:"🇸🇬", lon:103.82, lat:1.35},
+  {id:"jp", name:"Япония · Токио", flag:"🇯🇵", lon:139.69, lat:35.69},
+  {id:"br", name:"Бразилия · Сан-Паулу", flag:"🇧🇷", lon:-46.63, lat:-23.55}
+];
+
+const PLANS = [
+  {id:"free", name:"FREE", price:"€0", desc:"Знакомство с сервисом", devices:1, popular:false,
+   feats:["1 личное устройство","Ограниченный выбор серверов","Базовый приоритет","Личный кабинет","Без групп"]},
+  {id:"basic", name:"BASIC", price:"€1.99", desc:"Базовый комфорт", devices:2, popular:false,
+   feats:["2 личных устройства","Расширенный выбор серверов","Выше лимит трафика","1 друг в группе"]},
+  {id:"premium", name:"PREMIUM", price:"€4.99", desc:"Лучший баланс", devices:4, popular:true,
+   feats:["4 личных устройства","Все стандартные серверы","Повышенный приоритет","Расширенная статистика","До 3 друзей в группе","Приоритетная поддержка"]},
+  {id:"ultimate", name:"ULTIMATE", price:"€7.99", desc:"Максимум возможностей", devices:5, popular:false,
+   feats:["5 личных устройств","Все доступные серверы","Наивысший приоритет","Полная статистика","До 5 друзей в группе","Приоритетная поддержка"]}
+];
+
+const REF_TIERS = [
+  {n:1, label:"3 часа PREMIUM"},
+  {n:3, label:"12 часов PREMIUM"},
+  {n:5, label:"24 часа PREMIUM"},
+  {n:10, label:"3 дня PREMIUM"},
+  {n:20, label:"7 дней PREMIUM"}
+];
+
+const LANGS = [
+  {code:"ru", name:"Русский"}, {code:"uk", name:"Українська"}, {code:"fr", name:"Français"},
+  {code:"en", name:"English"}, {code:"es", name:"Español"}, {code:"de", name:"Deutsch"},
+  {code:"it", name:"Italiano"}, {code:"zh", name:"中文"}
+];
+
+const MAP_DOTS = "-180.0,66.0;-180.0,68.0;-178.0,66.0;-178.0,68.0;-176.0,66.0;-174.0,66.0;-172.0,66.0;-170.0,-84.0;-170.0,66.0;-166.0,60.0;-166.0,66.0;-164.0,60.0;-164.0,62.0;-164.0,66.0;-164.0,68.0;-162.0,60.0;-162.0,62.0;-162.0,66.0;-162.0,68.0;-162.0,70.0;-160.0,56.0;-160.0,60.0;-160.0,62.0;-160.0,64.0;-160.0,66.0;-160.0,68.0;-160.0,70.0;-158.0,-78.0;-158.0,60.0;-158.0,62.0;-158.0,64.0;-158.0,66.0;-158.0,68.0;-158.0,70.0;-156.0,-78.0;-156.0,58.0;-156.0,60.0;-156.0,62.0;-156.0,64.0;-156.0,66.0;-156.0,68.0;-156.0,70.0;-154.0,-78.0;-154.0,60.0;-154.0,62.0;-154.0,64.0;-154.0,66.0;-154.0,68.0;-154.0,70.0;-152.0,-82.0;-152.0,-78.0;-152.0,62.0;-152.0,64.0;-152.0,66.0;-152.0,68.0;-152.0,70.0;-150.0,-84.0;-150.0,-82.0;-150.0,-78.0;-150.0,60.0;-150.0,62.0;-150.0,64.0;-150.0,66.0;-150.0,68.0;-150.0,70.0;-148.0,-84.0;-148.0,-82.0;-148.0,-78.0;-148.0,62.0;-148.0,64.0;-148.0,66.0;-148.0,68.0;-148.0,70.0;-146.0,-84.0;-146.0,-82.0;-146.0,-80.0;-146.0,-78.0;-146.0,-76.0;-146.0,62.0;-146.0,64.0;-146.0,66.0;-146.0,68.0;-146.0,70.0;-144.0,-84.0;-144.0,-82.0;-144.0,-80.0;-144.0,-78.0;-144.0,-76.0;-144.0,62.0;-144.0,64.0;-144.0,66.0;-144.0,68.0;-144.0,70.0;-142.0,-84.0;-142.0,-82.0;-142.0,-80.0;-142.0,-78.0;-142.0,-76.0;-142.0,60.0;-142.0,62.0;-142.0,64.0;-142.0,66.0;-142.0,68.0;-140.0,-84.0;-140.0,-82.0;-140.0,-80.0;-140.0,-78.0;-140.0,-76.0;-140.0,60.0;-140.0,62.0;-140.0,64.0;-140.0,66.0;-140.0,68.0;-138.0,-84.0;-138.0,-82.0;-138.0,-80.0;-138.0,-78.0;-138.0,-76.0;-138.0,60.0;-138.0,62.0;-138.0,64.0;-138.0,66.0;-138.0,68.0;-136.0,-84.0;-136.0,-82.0;-136.0,-80.0;-136.0,-78.0;-136.0,-76.0;-136.0,60.0;-136.0,62.0;-136.0,64.0;-136.0,66.0;-136.0,68.0;-134.0,-84.0;-134.0,-82.0;-134.0,-80.0;-134.0,-78.0;-134.0,-76.0;-134.0,58.0;-134.0,60.0;-134.0,62.0;-134.0,64.0;-134.0,66.0;-134.0,68.0;-132.0,-84.0;-132.0,-82.0;-132.0,-80.0;-132.0,-78.0;-132.0,-76.0;-132.0,54.0;-132.0,56.0;-132.0,58.0;-132.0,60.0;-132.0,62.0;-132.0,64.0;-132.0,66.0;-132.0,68.0;-130.0,-84.0;-130.0,-82.0;-130.0,-80.0;-130.0,-78.0;-130.0,-76.0;-130.0,54.0;-130.0,56.0;-130.0,58.0;-130.0,60.0;-130.0,62.0;-130.0,64.0;-130.0,66.0;-130.0,68.0;-130.0,70.0;-128.0,-84.0;-128.0,-82.0;-128.0,-80.0;-128.0,-78.0;-128.0,-76.0;-128.0,50.0;-128.0,54.0;-128.0,56.0;-128.0,58.0;-128.0,60.0;-128.0,62.0;-128.0,64.0;-128.0,66.0;-128.0,68.0;-128.0,70.0;-126.0,-84.0;-126.0,-82.0;-126.0,-80.0;-126.0,-78.0;-126.0,-76.0;-126.0,50.0;-126.0,52.0;-126.0,54.0;-126.0,56.0;-126.0,58.0;-126.0,60.0;-126.0,62.0;-126.0,64.0;-126.0,66.0;-126.0,68.0;-124.0,-84.0;-124.0,-82.0;-124.0,-80.0;-124.0,-78.0;-124.0,-76.0;-124.0,40.0;-124.0,42.0;-124.0,44.0;-124.0,48.0;-124.0,52.0;-124.0,54.0;-124.0,56.0;-124.0,58.0;-124.0,60.0;-124.0,62.0;-124.0,64.0;-124.0,66.0;-124.0,68.0;-124.0,72.0;-124.0,74.0;-122.0,-84.0;-122.0,-82.0;-122.0,-80.0;-122.0,-78.0;-122.0,-76.0;-122.0,38.0;-122.0,40.0;-122.0,42.0;-122.0,44.0;-122.0,46.0;-122.0,48.0;-122.0,50.0;-122.0,52.0;-122.0,54.0;-122.0,56.0;-122.0,58.0;-122.0,60.0;-122.0,62.0;-122.0,64.0;-122.0,66.0;-122.0,68.0;-122.0,72.0;-122.0,74.0;-122.0,76.0;-120.0,-84.0;-120.0,-82.0;-120.0,-80.0;-120.0,-78.0;-120.0,-76.0;-120.0,-74.0;-120.0,36.0;-120.0,38.0;-120.0,40.0;-120.0,42.0;-120.0,44.0;-120.0,46.0;-120.0,48.0;-120.0,50.0;-120.0,52.0;-120.0,54.0;-120.0,56.0;-120.0,58.0;-120.0,60.0;-120.0,62.0;-120.0,64.0;-120.0,66.0;-120.0,68.0;-120.0,74.0;-118.0,-84.0;-118.0,-82.0;-118.0,-80.0;-118.0,-78.0;-118.0,-76.0;-118.0,34.0;-118.0,36.0;-118.0,38.0;-118.0,40.0;-118.0,42.0;-118.0,44.0;-118.0,46.0;-118.0,48.0;-118.0,50.0;-118.0,52.0;-118.0,54.0;-118.0,56.0;-118.0,58.0;-118.0,60.0;-118.0,62.0;-118.0,64.0;-118.0,66.0;-118.0,68.0;-118.0,72.0;-118.0,74.0;-116.0,-84.0;-116.0,-82.0;-116.0,-80.0;-116.0,-78.0;-116.0,-76.0;-116.0,32.0;-116.0,34.0;-116.0,36.0;-116.0,38.0;-116.0,40.0;-116.0,42.0;-116.0,44.0;-116.0,46.0;-116.0,48.0;-116.0,50.0;-116.0,52.0;-116.0,54.0;-116.0,56.0;-116.0,58.0;-116.0,60.0;-116.0,62.0;-116.0,64.0;-116.0,66.0;-116.0,68.0;-116.0,72.0;-116.0,76.0;-114.0,-84.0;-114.0,-82.0;-114.0,-80.0;-114.0,-78.0;-114.0,-76.0;-114.0,-74.0;-114.0,28.0;-114.0,32.0;-114.0,34.0;-114.0,36.0;-114.0,38.0;-114.0,40.0;-114.0,42.0;-114.0,44.0;-114.0,46.0;-114.0,48.0;-114.0,50.0;-114.0,52.0;-114.0,54.0;-114.0,56.0;-114.0,58.0;-114.0,60.0;-114.0,62.0;-114.0,64.0;-114.0,66.0;-114.0,72.0;-114.0,76.0;-112.0,-84.0;-112.0,-82.0;-112.0,-80.0;-112.0,-78.0;-112.0,-76.0;-112.0,26.0;-112.0,30.0;-112.0,32.0;-112.0,34.0;-112.0,36.0;-112.0,38.0;-112.0,40.0;-112.0,42.0;-112.0,44.0;-112.0,46.0;-112.0,48.0;-112.0,50.0;-112.0,52.0;-112.0,54.0;-112.0,56.0;-112.0,58.0;-112.0,60.0;-112.0,62.0;-112.0,64.0;-112.0,66.0;-112.0,72.0;-112.0,78.0;-110.0,-84.0;-110.0,-82.0;-110.0,-80.0;-110.0,-78.0;-110.0,-76.0;-110.0,24.0;-110.0,28.0;-110.0,30.0;-110.0,32.0;-110.0,34.0;-110.0,36.0;-110.0,38.0;-110.0,40.0;-110.0,42.0;-110.0,44.0;-110.0,46.0;-110.0,48.0;-110.0,50.0;-110.0,52.0;-110.0,54.0;-110.0,56.0;-110.0,58.0;-110.0,60.0;-110.0,62.0;-110.0,64.0;-110.0,66.0;-110.0,72.0;-110.0,78.0;-108.0,-84.0;-108.0,-82.0;-108.0,-80.0;-108.0,-78.0;-108.0,-76.0;-108.0,26.0;-108.0,28.0;-108.0,30.0;-108.0,32.0;-108.0,34.0;-108.0,36.0;-108.0,38.0;-108.0,40.0;-108.0,42.0;-108.0,44.0;-108.0,46.0;-108.0,48.0;-108.0,50.0;-108.0,52.0;-108.0,54.0;-108.0,56.0;-108.0,58.0;-108.0,60.0;-108.0,62.0;-108.0,64.0;-108.0,66.0;-108.0,68.0;-108.0,76.0;-106.0,-84.0;-106.0,-82.0;-106.0,-80.0;-106.0,-78.0;-106.0,-76.0;-106.0,24.0;-106.0,26.0;-106.0,28.0;-106.0,30.0;-106.0,32.0;-106.0,34.0;-106.0,36.0;-106.0,38.0;-106.0,40.0;-106.0,42.0;-106.0,44.0;-106.0,46.0;-106.0,48.0;-106.0,50.0;-106.0,52.0;-106.0,54.0;-106.0,56.0;-106.0,58.0;-106.0,60.0;-106.0,62.0;-106.0,64.0;-106.0,66.0;-106.0,68.0;-106.0,72.0;-104.0,-84.0;-104.0,-82.0;-104.0,-80.0;-104.0,-78.0;-104.0,-76.0;-104.0,20.0;-104.0,22.0;-104.0,24.0;-104.0,26.0;-104.0,28.0;-104.0,30.0;-104.0,32.0;-104.0,34.0;-104.0,36.0;-104.0,38.0;-104.0,40.0;-104.0,42.0;-104.0,44.0;-104.0,46.0;-104.0,48.0;-104.0,50.0;-104.0,52.0;-104.0,54.0;-104.0,56.0;-104.0,58.0;-104.0,60.0;-104.0,62.0;-104.0,64.0;-104.0,66.0;-104.0,68.0;-102.0,-84.0;-102.0,-82.0;-102.0,-80.0;-102.0,-78.0;-102.0,-76.0;-102.0,-74.0;-102.0,-72.0;-102.0,18.0;-102.0,20.0;-102.0,22.0;-102.0,24.0;-102.0,26.0;-102.0,28.0;-102.0,30.0;-102.0,32.0;-102.0,34.0;-102.0,36.0;-102.0,38.0;-102.0,40.0;-102.0,42.0;-102.0,44.0;-102.0,46.0;-102.0,48.0;-102.0,50.0;-102.0,52.0;-102.0,54.0;-102.0,56.0;-102.0,58.0;-102.0,60.0;-102.0,62.0;-102.0,64.0;-102.0,66.0;-102.0,76.0;-100.0,-84.0;-100.0,-82.0;-100.0,-80.0;-100.0,-78.0;-100.0,-76.0;-100.0,-74.0;-100.0,-72.0;-100.0,18.0;-100.0,20.0;-100.0,22.0;-100.0,24.0;-100.0,26.0;-100.0,28.0;-100.0,30.0;-100.0,32.0;-100.0,34.0;-100.0,36.0;-100.0,38.0;-100.0,40.0;-100.0,42.0;-100.0,44.0;-100.0,46.0;-100.0,48.0;-100.0,50.0;-100.0,52.0;-100.0,54.0;-100.0,56.0;-100.0,58.0;-100.0,60.0;-100.0,62.0;-100.0,64.0;-100.0,66.0;-100.0,72.0;-100.0,76.0;-100.0,78.0;-98.0,-84.0;-98.0,-82.0;-98.0,-80.0;-98.0,-78.0;-98.0,-76.0;-98.0,-74.0;-98.0,18.0;-98.0,20.0;-98.0,22.0;-98.0,24.0;-98.0,26.0;-98.0,28.0;-98.0,30.0;-98.0,32.0;-98.0,34.0;-98.0,36.0;-98.0,38.0;-98.0,40.0;-98.0,42.0;-98.0,44.0;-98.0,46.0;-98.0,48.0;-98.0,50.0;-98.0,52.0;-98.0,54.0;-98.0,56.0;-98.0,58.0;-98.0,60.0;-98.0,62.0;-98.0,64.0;-98.0,66.0;-98.0,68.0;-98.0,70.0;-98.0,72.0;-98.0,76.0;-96.0,-84.0;-96.0,-82.0;-96.0,-80.0;-96.0,-78.0;-96.0,-76.0;-96.0,-74.0;-96.0,16.0;-96.0,18.0;-96.0,30.0;-96.0,32.0;-96.0,34.0;-96.0,36.0;-96.0,38.0;-96.0,40.0;-96.0,42.0;-96.0,44.0;-96.0,46.0;-96.0,48.0;-96.0,50.0;-96.0,52.0;-96.0,54.0;-96.0,56.0;-96.0,58.0;-96.0,60.0;-96.0,62.0;-96.0,64.0;-96.0,66.0;-96.0,80.0;-94.0,-84.0;-94.0,-82.0;-94.0,-80.0;-94.0,-78.0;-94.0,-76.0;-94.0,-74.0;-94.0,16.0;-94.0,18.0;-94.0,30.0;-94.0,32.0;-94.0,34.0;-94.0,36.0;-94.0,38.0;-94.0,40.0;-94.0,42.0;-94.0,44.0;-94.0,46.0;-94.0,48.0;-94.0,50.0;-94.0,52.0;-94.0,54.0;-94.0,56.0;-94.0,58.0;-94.0,62.0;-94.0,64.0;-94.0,66.0;-94.0,68.0;-94.0,70.0;-94.0,74.0;-94.0,80.0;-92.0,-84.0;-92.0,-82.0;-92.0,-80.0;-92.0,-78.0;-92.0,-76.0;-92.0,-74.0;-92.0,16.0;-92.0,18.0;-92.0,30.0;-92.0,32.0;-92.0,34.0;-92.0,36.0;-92.0,38.0;-92.0,40.0;-92.0,42.0;-92.0,44.0;-92.0,46.0;-92.0,48.0;-92.0,50.0;-92.0,52.0;-92.0,54.0;-92.0,56.0;-92.0,64.0;-92.0,66.0;-92.0,68.0;-92.0,70.0;-92.0,74.0;-92.0,76.0;-92.0,80.0;-90.0,-84.0;-90.0,-82.0;-90.0,-80.0;-90.0,-78.0;-90.0,-76.0;-90.0,-74.0;-90.0,14.0;-90.0,16.0;-90.0,18.0;-90.0,20.0;-90.0,30.0;-90.0,32.0;-90.0,34.0;-90.0,36.0;-90.0,38.0;-90.0,40.0;-90.0,42.0;-90.0,44.0;-90.0,46.0;-90.0,48.0;-90.0,50.0;-90.0,52.0;-90.0,54.0;-90.0,56.0;-90.0,64.0;-90.0,66.0;-90.0,68.0;-90.0,72.0;-90.0,80.0;-90.0,82.0;-88.0,-84.0;-88.0,-82.0;-88.0,-80.0;-88.0,-78.0;-88.0,-76.0;-88.0,-74.0;-88.0,14.0;-88.0,20.0;-88.0,32.0;-88.0,34.0;-88.0,36.0;-88.0,38.0;-88.0,40.0;-88.0,42.0;-88.0,44.0;-88.0,46.0;-88.0,48.0;-88.0,50.0;-88.0,52.0;-88.0,54.0;-88.0,56.0;-88.0,66.0;-88.0,72.0;-88.0,80.0;-88.0,82.0;-86.0,-84.0;-86.0,-82.0;-86.0,-80.0;-86.0,-78.0;-86.0,-76.0;-86.0,-74.0;-86.0,12.0;-86.0,14.0;-86.0,16.0;-86.0,32.0;-86.0,34.0;-86.0,36.0;-86.0,38.0;-86.0,40.0;-86.0,42.0;-86.0,44.0;-86.0,46.0;-86.0,48.0;-86.0,50.0;-86.0,52.0;-86.0,54.0;-86.0,64.0;-86.0,68.0;-86.0,72.0;-86.0,82.0;-84.0,-84.0;-84.0,-82.0;-84.0,-80.0;-84.0,-78.0;-84.0,-76.0;-84.0,-74.0;-84.0,10.0;-84.0,12.0;-84.0,14.0;-84.0,22.0;-84.0,32.0;-84.0,34.0;-84.0,36.0;-84.0,38.0;-84.0,40.0;-84.0,42.0;-84.0,44.0;-84.0,46.0;-84.0,48.0;-84.0,50.0;-84.0,52.0;-84.0,54.0;-84.0,64.0;-84.0,68.0;-84.0,72.0;-84.0,78.0;-84.0,80.0;-84.0,82.0;-82.0,-84.0;-82.0,-82.0;-82.0,-80.0;-82.0,-78.0;-82.0,-76.0;-82.0,-74.0;-82.0,28.0;-82.0,30.0;-82.0,32.0;-82.0,34.0;-82.0,36.0;-82.0,38.0;-82.0,40.0;-82.0,42.0;-82.0,44.0;-82.0,46.0;-82.0,48.0;-82.0,50.0;-82.0,52.0;-82.0,64.0;-82.0,68.0;-82.0,72.0;-82.0,78.0;-82.0,80.0;-82.0,82.0;-80.0,-84.0;-80.0,-82.0;-80.0,-80.0;-80.0,-78.0;-80.0,-76.0;-80.0,-74.0;-80.0,-6.0;-80.0,-4.0;-80.0,-2.0;-80.0,0.0;-80.0,22.0;-80.0,34.0;-80.0,36.0;-80.0,38.0;-80.0,40.0;-80.0,42.0;-80.0,44.0;-80.0,46.0;-80.0,48.0;-80.0,50.0;-80.0,62.0;-80.0,72.0;-80.0,78.0;-80.0,80.0;-80.0,82.0;-78.0,-84.0;-78.0,-82.0;-78.0,-80.0;-78.0,-78.0;-78.0,-76.0;-78.0,-74.0;-78.0,-10.0;-78.0,-8.0;-78.0,-6.0;-78.0,-4.0;-78.0,-2.0;-78.0,0.0;-78.0,2.0;-78.0,8.0;-78.0,22.0;-78.0,34.0;-78.0,36.0;-78.0,38.0;-78.0,40.0;-78.0,42.0;-78.0,44.0;-78.0,46.0;-78.0,48.0;-78.0,50.0;-78.0,52.0;-78.0,54.0;-78.0,62.0;-78.0,72.0;-78.0,78.0;-78.0,80.0;-78.0,82.0;-76.0,-84.0;-76.0,-82.0;-76.0,-78.0;-76.0,-76.0;-76.0,-74.0;-76.0,-14.0;-76.0,-12.0;-76.0,-10.0;-76.0,-8.0;-76.0,-6.0;-76.0,-4.0;-76.0,-2.0;-76.0,0.0;-76.0,2.0;-76.0,4.0;-76.0,6.0;-76.0,8.0;-76.0,20.0;-76.0,36.0;-76.0,40.0;-76.0,42.0;-76.0,44.0;-76.0,46.0;-76.0,48.0;-76.0,50.0;-76.0,52.0;-76.0,54.0;-76.0,56.0;-76.0,58.0;-76.0,60.0;-76.0,62.0;-76.0,68.0;-76.0,72.0;-76.0,80.0;-76.0,82.0;-74.0,-84.0;-74.0,-82.0;-74.0,-78.0;-74.0,-76.0;-74.0,-74.0;-74.0,-72.0;-74.0,-52.0;-74.0,-50.0;-74.0,-48.0;-74.0,-46.0;-74.0,-42.0;-74.0,-16.0;-74.0,-14.0;-74.0,-12.0;-74.0,-10.0;-74.0,-8.0;-74.0,-6.0;-74.0,-4.0;-74.0,-2.0;-74.0,0.0;-74.0,2.0;-74.0,4.0;-74.0,6.0;-74.0,8.0;-74.0,10.0;-74.0,42.0;-74.0,44.0;-74.0,46.0;-74.0,48.0;-74.0,50.0;-74.0,52.0;-74.0,54.0;-74.0,56.0;-74.0,58.0;-74.0,60.0;-74.0,62.0;-74.0,80.0;-74.0,82.0;-72.0,-84.0;-72.0,-82.0;-72.0,-76.0;-72.0,-74.0;-72.0,-72.0;-72.0,-54.0;-72.0,-52.0;-72.0,-50.0;-72.0,-48.0;-72.0,-46.0;-72.0,-44.0;-72.0,-42.0;-72.0,-40.0;-72.0,-38.0;-72.0,-36.0;-72.0,-16.0;-72.0,-14.0;-72.0,-12.0;-72.0,-10.0;-72.0,-8.0;-72.0,-6.0;-72.0,-4.0;-72.0,-2.0;-72.0,0.0;-72.0,2.0;-72.0,4.0;-72.0,6.0;-72.0,8.0;-72.0,10.0;-72.0,12.0;-72.0,42.0;-72.0,44.0;-72.0,46.0;-72.0,48.0;-72.0,50.0;-72.0,52.0;-72.0,54.0;-72.0,56.0;-72.0,58.0;-72.0,60.0;-72.0,80.0;-72.0,82.0;-70.0,-84.0;-70.0,-82.0;-70.0,-76.0;-70.0,-74.0;-70.0,-72.0;-70.0,-70.0;-70.0,-54.0;-70.0,-52.0;-70.0,-50.0;-70.0,-48.0;-70.0,-46.0;-70.0,-44.0;-70.0,-42.0;-70.0,-40.0;-70.0,-38.0;-70.0,-36.0;-70.0,-34.0;-70.0,-32.0;-70.0,-30.0;-70.0,-28.0;-70.0,-26.0;-70.0,-24.0;-70.0,-22.0;-70.0,-20.0;-70.0,-18.0;-70.0,-16.0;-70.0,-14.0;-70.0,-12.0;-70.0,-10.0;-70.0,-8.0;-70.0,-6.0;-70.0,-4.0;-70.0,-2.0;-70.0,0.0;-70.0,2.0;-70.0,4.0;-70.0,6.0;-70.0,8.0;-70.0,10.0;-70.0,12.0;-70.0,42.0;-70.0,44.0;-70.0,46.0;-70.0,48.0;-70.0,50.0;-70.0,52.0;-70.0,54.0;-70.0,56.0;-70.0,58.0;-70.0,60.0;-70.0,82.0;-68.0,-84.0;-68.0,-82.0;-68.0,-74.0;-68.0,-70.0;-68.0,-54.0;-68.0,-48.0;-68.0,-46.0;-68.0,-44.0;-68.0,-42.0;-68.0,-40.0;-68.0,-38.0;-68.0,-36.0;-68.0,-34.0;-68.0,-32.0;-68.0,-30.0;-68.0,-28.0;-68.0,-26.0;-68.0,-24.0;-68.0,-22.0;-68.0,-20.0;-68.0,-18.0;-68.0,-16.0;-68.0,-14.0;-68.0,-12.0;-68.0,-10.0;-68.0,-8.0;-68.0,-6.0;-68.0,-4.0;-68.0,-2.0;-68.0,0.0;-68.0,2.0;-68.0,4.0;-68.0,6.0;-68.0,8.0;-68.0,10.0;-68.0,46.0;-68.0,48.0;-68.0,50.0;-68.0,52.0;-68.0,54.0;-68.0,56.0;-68.0,58.0;-68.0,82.0;-66.0,-84.0;-66.0,-82.0;-66.0,-74.0;-66.0,-72.0;-66.0,-70.0;-66.0,-68.0;-66.0,-48.0;-66.0,-44.0;-66.0,-42.0;-66.0,-40.0;-66.0,-38.0;-66.0,-36.0;-66.0,-34.0;-66.0,-32.0;-66.0,-30.0;-66.0,-28.0;-66.0,-26.0;-66.0,-24.0;-66.0,-22.0;-66.0,-20.0;-66.0,-18.0;-66.0,-16.0;-66.0,-14.0;-66.0,-12.0;-66.0,-10.0;-66.0,-8.0;-66.0,-6.0;-66.0,-4.0;-66.0,-2.0;-66.0,0.0;-66.0,2.0;-66.0,4.0;-66.0,6.0;-66.0,8.0;-66.0,10.0;-66.0,18.0;-66.0,44.0;-66.0,46.0;-66.0,48.0;-66.0,52.0;-66.0,54.0;-66.0,56.0;-66.0,58.0;-66.0,82.0;-64.0,-84.0;-64.0,-82.0;-64.0,-74.0;-64.0,-72.0;-64.0,-70.0;-64.0,-66.0;-64.0,-40.0;-64.0,-38.0;-64.0,-36.0;-64.0,-34.0;-64.0,-32.0;-64.0,-30.0;-64.0,-28.0;-64.0,-26.0;-64.0,-24.0;-64.0,-22.0;-64.0,-20.0;-64.0,-18.0;-64.0,-16.0;-64.0,-14.0;-64.0,-12.0;-64.0,-10.0;-64.0,-8.0;-64.0,-6.0;-64.0,-4.0;-64.0,-2.0;-64.0,0.0;-64.0,2.0;-64.0,4.0;-64.0,6.0;-64.0,8.0;-64.0,10.0;-64.0,52.0;-64.0,54.0;-64.0,56.0;-64.0,58.0;-64.0,82.0;-62.0,-84.0;-62.0,-82.0;-62.0,-74.0;-62.0,-72.0;-62.0,-38.0;-62.0,-36.0;-62.0,-34.0;-62.0,-32.0;-62.0,-30.0;-62.0,-28.0;-62.0,-26.0;-62.0,-24.0;-62.0,-22.0;-62.0,-20.0;-62.0,-18.0;-62.0,-16.0;-62.0,-14.0;-62.0,-12.0;-62.0,-10.0;-62.0,-8.0;-62.0,-6.0;-62.0,-4.0;-62.0,-2.0;-62.0,0.0;-62.0,2.0;-62.0,4.0;-62.0,6.0;-62.0,8.0;-62.0,52.0;-62.0,54.0;-62.0,56.0;-60.0,-84.0;-60.0,-80.0;-60.0,-64.0;-60.0,-38.0;-60.0,-36.0;-60.0,-34.0;-60.0,-32.0;-60.0,-30.0;-60.0,-28.0;-60.0,-26.0;-60.0,-24.0;-60.0,-22.0;-60.0,-20.0;-60.0,-18.0;-60.0,-16.0;-60.0,-14.0;-60.0,-12.0;-60.0,-10.0;-60.0,-8.0;-60.0,-6.0;-60.0,-4.0;-60.0,-2.0;-60.0,0.0;-60.0,2.0;-60.0,4.0;-60.0,6.0;-60.0,8.0;-60.0,46.0;-60.0,52.0;-60.0,54.0;-60.0,76.0;-60.0,78.0;-60.0,80.0;-60.0,82.0;-58.0,-84.0;-58.0,-38.0;-58.0,-36.0;-58.0,-34.0;-58.0,-32.0;-58.0,-30.0;-58.0,-28.0;-58.0,-26.0;-58.0,-24.0;-58.0,-22.0;-58.0,-20.0;-58.0,-18.0;-58.0,-16.0;-58.0,-14.0;-58.0,-12.0;-58.0,-10.0;-58.0,-8.0;-58.0,-6.0;-58.0,-4.0;-58.0,-2.0;-58.0,0.0;-58.0,2.0;-58.0,4.0;-58.0,6.0;-58.0,48.0;-58.0,52.0;-58.0,54.0;-58.0,76.0;-58.0,78.0;-58.0,80.0;-58.0,82.0;-56.0,-84.0;-56.0,-34.0;-56.0,-32.0;-56.0,-30.0;-56.0,-28.0;-56.0,-26.0;-56.0,-24.0;-56.0,-22.0;-56.0,-20.0;-56.0,-18.0;-56.0,-16.0;-56.0,-14.0;-56.0,-12.0;-56.0,-10.0;-56.0,-8.0;-56.0,-6.0;-56.0,-4.0;-56.0,-2.0;-56.0,0.0;-56.0,2.0;-56.0,4.0;-56.0,48.0;-56.0,50.0;-56.0,52.0;-56.0,74.0;-56.0,76.0;-56.0,78.0;-56.0,80.0;-56.0,82.0;-54.0,-84.0;-54.0,-34.0;-54.0,-32.0;-54.0,-30.0;-54.0,-28.0;-54.0,-26.0;-54.0,-24.0;-54.0,-22.0;-54.0,-20.0;-54.0,-18.0;-54.0,-16.0;-54.0,-14.0;-54.0,-12.0;-54.0,-10.0;-54.0,-8.0;-54.0,-6.0;-54.0,-4.0;-54.0,-2.0;-54.0,0.0;-54.0,2.0;-54.0,4.0;-54.0,48.0;-54.0,72.0;-54.0,74.0;-54.0,76.0;-54.0,78.0;-54.0,80.0;-54.0,82.0;-52.0,-84.0;-52.0,-80.0;-52.0,-32.0;-52.0,-30.0;-52.0,-28.0;-52.0,-26.0;-52.0,-24.0;-52.0,-22.0;-52.0,-20.0;-52.0,-18.0;-52.0,-16.0;-52.0,-14.0;-52.0,-12.0;-52.0,-10.0;-52.0,-8.0;-52.0,-6.0;-52.0,-4.0;-52.0,-2.0;-52.0,0.0;-52.0,2.0;-52.0,4.0;-52.0,72.0;-52.0,74.0;-52.0,76.0;-52.0,78.0;-52.0,80.0;-52.0,82.0;-50.0,-84.0;-50.0,-82.0;-50.0,-80.0;-50.0,-28.0;-50.0,-26.0;-50.0,-24.0;-50.0,-22.0;-50.0,-20.0;-50.0,-18.0;-50.0,-16.0;-50.0,-14.0;-50.0,-12.0;-50.0,-10.0;-50.0,-8.0;-50.0,-6.0;-50.0,-4.0;-50.0,-2.0;-50.0,72.0;-50.0,74.0;-50.0,76.0;-50.0,78.0;-50.0,80.0;-50.0,82.0;-48.0,-84.0;-48.0,-82.0;-48.0,-80.0;-48.0,-24.0;-48.0,-22.0;-48.0,-20.0;-48.0,-18.0;-48.0,-16.0;-48.0,-14.0;-48.0,-12.0;-48.0,-10.0;-48.0,-8.0;-48.0,-6.0;-48.0,-4.0;-48.0,-2.0;-48.0,72.0;-48.0,74.0;-48.0,76.0;-48.0,78.0;-48.0,80.0;-48.0,82.0;-46.0,-84.0;-46.0,-82.0;-46.0,-80.0;-46.0,-78.0;-46.0,-22.0;-46.0,-20.0;-46.0,-18.0;-46.0,-16.0;-46.0,-14.0;-46.0,-12.0;-46.0,-10.0;-46.0,-8.0;-46.0,-6.0;-46.0,-4.0;-46.0,-2.0;-46.0,72.0;-46.0,74.0;-46.0,76.0;-46.0,78.0;-46.0,80.0;-46.0,82.0;-44.0,-84.0;-44.0,-82.0;-44.0,-80.0;-44.0,-22.0;-44.0,-20.0;-44.0,-18.0;-44.0,-16.0;-44.0,-14.0;-44.0,-12.0;-44.0,-10.0;-44.0,-8.0;-44.0,-6.0;-44.0,-4.0;-44.0,72.0;-44.0,74.0;-44.0,76.0;-44.0,78.0;-44.0,80.0;-44.0,82.0;-42.0,-84.0;-42.0,-82.0;-42.0,-22.0;-42.0,-20.0;-42.0,-18.0;-42.0,-16.0;-42.0,-14.0;-42.0,-12.0;-42.0,-10.0;-42.0,-8.0;-42.0,-6.0;-42.0,-4.0;-42.0,72.0;-42.0,74.0;-42.0,76.0;-42.0,78.0;-42.0,80.0;-42.0,82.0;-40.0,-84.0;-40.0,-82.0;-40.0,-18.0;-40.0,-16.0;-40.0,-14.0;-40.0,-12.0;-40.0,-10.0;-40.0,-8.0;-40.0,-6.0;-40.0,-4.0;-40.0,72.0;-40.0,74.0;-40.0,76.0;-40.0,78.0;-40.0,80.0;-40.0,82.0;-38.0,-84.0;-38.0,-82.0;-38.0,-12.0;-38.0,-10.0;-38.0,-8.0;-38.0,-6.0;-38.0,72.0;-38.0,74.0;-38.0,76.0;-38.0,78.0;-38.0,80.0;-38.0,82.0;-36.0,-84.0;-36.0,-82.0;-36.0,-10.0;-36.0,-8.0;-36.0,-6.0;-36.0,72.0;-36.0,74.0;-36.0,76.0;-36.0,78.0;-36.0,80.0;-36.0,82.0;-34.0,-84.0;-34.0,-82.0;-34.0,-78.0;-34.0,68.0;-34.0,70.0;-34.0,72.0;-34.0,74.0;-34.0,76.0;-34.0,78.0;-34.0,80.0;-34.0,82.0;-32.0,-84.0;-32.0,-82.0;-32.0,-78.0;-32.0,70.0;-32.0,72.0;-32.0,74.0;-32.0,76.0;-32.0,78.0;-32.0,80.0;-32.0,82.0;-30.0,-84.0;-30.0,-82.0;-30.0,-78.0;-30.0,70.0;-30.0,72.0;-30.0,74.0;-30.0,76.0;-30.0,78.0;-30.0,80.0;-30.0,82.0;-28.0,-84.0;-28.0,-82.0;-28.0,-80.0;-28.0,-78.0;-28.0,70.0;-28.0,72.0;-28.0,74.0;-28.0,76.0;-28.0,78.0;-28.0,80.0;-28.0,82.0;-26.0,-84.0;-26.0,-82.0;-26.0,-80.0;-26.0,-78.0;-26.0,70.0;-26.0,72.0;-26.0,74.0;-26.0,76.0;-26.0,78.0;-26.0,80.0;-24.0,-84.0;-24.0,-82.0;-24.0,-80.0;-24.0,-78.0;-24.0,70.0;-24.0,72.0;-24.0,74.0;-24.0,76.0;-24.0,78.0;-24.0,80.0;-22.0,-84.0;-22.0,-82.0;-22.0,-80.0;-22.0,-78.0;-22.0,64.0;-22.0,66.0;-22.0,74.0;-22.0,76.0;-22.0,78.0;-22.0,80.0;-20.0,-84.0;-20.0,-82.0;-20.0,-80.0;-20.0,-78.0;-20.0,-76.0;-20.0,64.0;-20.0,76.0;-20.0,78.0;-20.0,80.0;-18.0,-84.0;-18.0,-82.0;-18.0,-80.0;-18.0,-78.0;-18.0,-76.0;-18.0,64.0;-18.0,66.0;-18.0,80.0;-16.0,-84.0;-16.0,-82.0;-16.0,-80.0;-16.0,-78.0;-16.0,-76.0;-16.0,12.0;-16.0,14.0;-16.0,16.0;-16.0,18.0;-16.0,20.0;-16.0,22.0;-16.0,66.0;-14.0,-84.0;-14.0,-82.0;-14.0,-80.0;-14.0,-78.0;-14.0,-76.0;-14.0,-74.0;-14.0,10.0;-14.0,12.0;-14.0,14.0;-14.0,16.0;-14.0,18.0;-14.0,20.0;-14.0,22.0;-14.0,24.0;-14.0,26.0;-12.0,-84.0;-12.0,-82.0;-12.0,-80.0;-12.0,-78.0;-12.0,-76.0;-12.0,-74.0;-12.0,8.0;-12.0,10.0;-12.0,12.0;-12.0,14.0;-12.0,16.0;-12.0,18.0;-12.0,20.0;-12.0,22.0;-12.0,24.0;-12.0,26.0;-12.0,28.0;-10.0,-84.0;-10.0,-82.0;-10.0,-80.0;-10.0,-78.0;-10.0,-76.0;-10.0,-74.0;-10.0,-72.0;-10.0,6.0;-10.0,8.0;-10.0,10.0;-10.0,12.0;-10.0,14.0;-10.0,16.0;-10.0,18.0;-10.0,20.0;-10.0,22.0;-10.0,24.0;-10.0,26.0;-10.0,28.0;-8.0,-84.0;-8.0,-82.0;-8.0,-80.0;-8.0,-78.0;-8.0,-76.0;-8.0,-74.0;-8.0,-72.0;-8.0,6.0;-8.0,8.0;-8.0,10.0;-8.0,12.0;-8.0,14.0;-8.0,16.0;-8.0,18.0;-8.0,20.0;-8.0,22.0;-8.0,24.0;-8.0,26.0;-8.0,28.0;-8.0,30.0;-8.0,32.0;-8.0,38.0;-8.0,40.0;-8.0,42.0;-8.0,52.0;-8.0,54.0;-6.0,-84.0;-6.0,-82.0;-6.0,-80.0;-6.0,-78.0;-6.0,-76.0;-6.0,-74.0;-6.0,-72.0;-6.0,6.0;-6.0,8.0;-6.0,10.0;-6.0,12.0;-6.0,14.0;-6.0,16.0;-6.0,18.0;-6.0,20.0;-6.0,22.0;-6.0,24.0;-6.0,26.0;-6.0,28.0;-6.0,30.0;-6.0,32.0;-6.0,34.0;-6.0,38.0;-6.0,40.0;-6.0,42.0;-4.0,-84.0;-4.0,-82.0;-4.0,-80.0;-4.0,-78.0;-4.0,-76.0;-4.0,-74.0;-4.0,-72.0;-4.0,6.0;-4.0,8.0;-4.0,10.0;-4.0,12.0;-4.0,14.0;-4.0,16.0;-4.0,18.0;-4.0,20.0;-4.0,22.0;-4.0,24.0;-4.0,26.0;-4.0,28.0;-4.0,30.0;-4.0,32.0;-4.0,34.0;-4.0,38.0;-4.0,40.0;-4.0,42.0;-4.0,48.0;-4.0,52.0;-4.0,56.0;-4.0,58.0;-2.0,-84.0;-2.0,-82.0;-2.0,-80.0;-2.0,-78.0;-2.0,-76.0;-2.0,-74.0;-2.0,-72.0;-2.0,6.0;-2.0,8.0;-2.0,10.0;-2.0,12.0;-2.0,14.0;-2.0,16.0;-2.0,18.0;-2.0,20.0;-2.0,22.0;-2.0,24.0;-2.0,26.0;-2.0,28.0;-2.0,30.0;-2.0,32.0;-2.0,34.0;-2.0,38.0;-2.0,40.0;-2.0,42.0;-2.0,48.0;-2.0,52.0;-2.0,54.0;0.0,-84.0;0.0,-82.0;0.0,-80.0;0.0,-78.0;0.0,-76.0;0.0,-74.0;0.0,-72.0;0.0,6.0;0.0,8.0;0.0,10.0;0.0,12.0;0.0,14.0;0.0,16.0;0.0,18.0;0.0,20.0;0.0,22.0;0.0,24.0;0.0,26.0;0.0,28.0;0.0,30.0;0.0,32.0;0.0,34.0;0.0,40.0;0.0,42.0;0.0,44.0;0.0,46.0;0.0,48.0;0.0,52.0;2.0,-84.0;2.0,-82.0;2.0,-80.0;2.0,-78.0;2.0,-76.0;2.0,-74.0;2.0,-72.0;2.0,8.0;2.0,10.0;2.0,12.0;2.0,14.0;2.0,16.0;2.0,18.0;2.0,20.0;2.0,22.0;2.0,24.0;2.0,26.0;2.0,28.0;2.0,30.0;2.0,32.0;2.0,34.0;2.0,36.0;2.0,42.0;2.0,44.0;2.0,46.0;2.0,48.0;2.0,50.0;4.0,-84.0;4.0,-82.0;4.0,-80.0;4.0,-78.0;4.0,-76.0;4.0,-74.0;4.0,-72.0;4.0,8.0;4.0,10.0;4.0,12.0;4.0,14.0;4.0,16.0;4.0,18.0;4.0,20.0;4.0,22.0;4.0,24.0;4.0,26.0;4.0,28.0;4.0,30.0;4.0,32.0;4.0,34.0;4.0,36.0;4.0,44.0;4.0,46.0;4.0,48.0;4.0,50.0;6.0,-84.0;6.0,-82.0;6.0,-80.0;6.0,-78.0;6.0,-76.0;6.0,-74.0;6.0,-72.0;6.0,6.0;6.0,8.0;6.0,10.0;6.0,12.0;6.0,14.0;6.0,16.0;6.0,18.0;6.0,20.0;6.0,22.0;6.0,24.0;6.0,26.0;6.0,28.0;6.0,30.0;6.0,32.0;6.0,34.0;6.0,36.0;6.0,44.0;6.0,46.0;6.0,48.0;6.0,50.0;6.0,52.0;6.0,60.0;6.0,62.0;8.0,-84.0;8.0,-82.0;8.0,-80.0;8.0,-78.0;8.0,-76.0;8.0,-74.0;8.0,-72.0;8.0,-70.0;8.0,6.0;8.0,8.0;8.0,10.0;8.0,12.0;8.0,14.0;8.0,16.0;8.0,18.0;8.0,20.0;8.0,22.0;8.0,24.0;8.0,26.0;8.0,28.0;8.0,30.0;8.0,32.0;8.0,34.0;8.0,36.0;8.0,44.0;8.0,46.0;8.0,48.0;8.0,50.0;8.0,52.0;8.0,60.0;8.0,62.0;10.0,-84.0;10.0,-82.0;10.0,-80.0;10.0,-78.0;10.0,-76.0;10.0,-74.0;10.0,-72.0;10.0,-2.0;10.0,0.0;10.0,2.0;10.0,4.0;10.0,6.0;10.0,8.0;10.0,10.0;10.0,12.0;10.0,14.0;10.0,16.0;10.0,18.0;10.0,20.0;10.0,22.0;10.0,24.0;10.0,26.0;10.0,28.0;10.0,30.0;10.0,32.0;10.0,34.0;10.0,36.0;10.0,44.0;10.0,46.0;10.0,48.0;10.0,50.0;10.0,52.0;10.0,54.0;10.0,56.0;10.0,60.0;10.0,62.0;10.0,64.0;12.0,-84.0;12.0,-82.0;12.0,-80.0;12.0,-78.0;12.0,-76.0;12.0,-74.0;12.0,-72.0;12.0,-18.0;12.0,-16.0;12.0,-4.0;12.0,-2.0;12.0,0.0;12.0,2.0;12.0,4.0;12.0,6.0;12.0,8.0;12.0,10.0;12.0,12.0;12.0,14.0;12.0,16.0;12.0,18.0;12.0,20.0;12.0,22.0;12.0,24.0;12.0,26.0;12.0,28.0;12.0,30.0;12.0,32.0;12.0,42.0;12.0,44.0;12.0,46.0;12.0,48.0;12.0,50.0;12.0,52.0;12.0,54.0;12.0,56.0;12.0,58.0;12.0,60.0;12.0,62.0;12.0,64.0;14.0,-84.0;14.0,-82.0;14.0,-80.0;14.0,-78.0;14.0,-76.0;14.0,-74.0;14.0,-72.0;14.0,-70.0;14.0,-20.0;14.0,-18.0;14.0,-16.0;14.0,-14.0;14.0,-12.0;14.0,-10.0;14.0,-8.0;14.0,-6.0;14.0,-4.0;14.0,-2.0;14.0,0.0;14.0,2.0;14.0,4.0;14.0,6.0;14.0,8.0;14.0,10.0;14.0,12.0;14.0,14.0;14.0,16.0;14.0,18.0;14.0,20.0;14.0,22.0;14.0,24.0;14.0,26.0;14.0,28.0;14.0,30.0;14.0,32.0;14.0,38.0;14.0,42.0;14.0,46.0;14.0,48.0;14.0,50.0;14.0,52.0;14.0,56.0;14.0,58.0;14.0,60.0;14.0,62.0;14.0,64.0;14.0,66.0;14.0,78.0;16.0,-84.0;16.0,-82.0;16.0,-80.0;16.0,-78.0;16.0,-76.0;16.0,-74.0;16.0,-72.0;16.0,-28.0;16.0,-26.0;16.0,-24.0;16.0,-22.0;16.0,-20.0;16.0,-18.0;16.0,-16.0;16.0,-14.0;16.0,-12.0;16.0,-10.0;16.0,-8.0;16.0,-6.0;16.0,-4.0;16.0,-2.0;16.0,0.0;16.0,2.0;16.0,4.0;16.0,6.0;16.0,8.0;16.0,10.0;16.0,12.0;16.0,14.0;16.0,16.0;16.0,18.0;16.0,20.0;16.0,22.0;16.0,24.0;16.0,26.0;16.0,28.0;16.0,30.0;16.0,38.0;16.0,40.0;16.0,44.0;16.0,46.0;16.0,48.0;16.0,50.0;16.0,52.0;16.0,54.0;16.0,58.0;16.0,60.0;16.0,62.0;16.0,64.0;16.0,66.0;16.0,68.0;16.0,78.0;16.0,80.0;18.0,-84.0;18.0,-82.0;18.0,-80.0;18.0,-78.0;18.0,-76.0;18.0,-74.0;18.0,-72.0;18.0,-70.0;18.0,-30.0;18.0,-28.0;18.0,-26.0;18.0,-24.0;18.0,-22.0;18.0,-20.0;18.0,-18.0;18.0,-16.0;18.0,-14.0;18.0,-12.0;18.0,-10.0;18.0,-8.0;18.0,-6.0;18.0,-4.0;18.0,-2.0;18.0,0.0;18.0,2.0;18.0,4.0;18.0,6.0;18.0,8.0;18.0,10.0;18.0,12.0;18.0,14.0;18.0,16.0;18.0,18.0;18.0,20.0;18.0,22.0;18.0,24.0;18.0,26.0;18.0,28.0;18.0,30.0;18.0,44.0;18.0,46.0;18.0,48.0;18.0,50.0;18.0,52.0;18.0,54.0;18.0,60.0;18.0,64.0;18.0,66.0;18.0,68.0;18.0,78.0;20.0,-84.0;20.0,-82.0;20.0,-80.0;20.0,-78.0;20.0,-76.0;20.0,-74.0;20.0,-72.0;20.0,-70.0;20.0,-34.0;20.0,-32.0;20.0,-30.0;20.0,-28.0;20.0,-26.0;20.0,-24.0;20.0,-22.0;20.0,-20.0;20.0,-18.0;20.0,-16.0;20.0,-14.0;20.0,-12.0;20.0,-10.0;20.0,-8.0;20.0,-6.0;20.0,-4.0;20.0,-2.0;20.0,0.0;20.0,2.0;20.0,4.0;20.0,6.0;20.0,8.0;20.0,10.0;20.0,12.0;20.0,14.0;20.0,16.0;20.0,18.0;20.0,20.0;20.0,22.0;20.0,24.0;20.0,26.0;20.0,28.0;20.0,30.0;20.0,32.0;20.0,40.0;20.0,42.0;20.0,44.0;20.0,46.0;20.0,48.0;20.0,50.0;20.0,52.0;20.0,54.0;20.0,64.0;20.0,66.0;20.0,68.0;22.0,-84.0;22.0,-82.0;22.0,-80.0;22.0,-78.0;22.0,-76.0;22.0,-74.0;22.0,-72.0;22.0,-34.0;22.0,-32.0;22.0,-30.0;22.0,-28.0;22.0,-26.0;22.0,-24.0;22.0,-22.0;22.0,-20.0;22.0,-18.0;22.0,-16.0;22.0,-14.0;22.0,-12.0;22.0,-10.0;22.0,-8.0;22.0,-6.0;22.0,-4.0;22.0,-2.0;22.0,0.0;22.0,2.0;22.0,4.0;22.0,6.0;22.0,8.0;22.0,10.0;22.0,12.0;22.0,14.0;22.0,16.0;22.0,18.0;22.0,20.0;22.0,22.0;22.0,24.0;22.0,26.0;22.0,28.0;22.0,30.0;22.0,32.0;22.0,38.0;22.0,40.0;22.0,42.0;22.0,44.0;22.0,46.0;22.0,48.0;22.0,50.0;22.0,52.0;22.0,54.0;22.0,56.0;22.0,62.0;22.0,66.0;22.0,68.0;22.0,70.0;22.0,78.0;22.0,80.0;24.0,-84.0;24.0,-82.0;24.0,-80.0;24.0,-78.0;24.0,-76.0;24.0,-74.0;24.0,-72.0;24.0,-32.0;24.0,-30.0;24.0,-28.0;24.0,-26.0;24.0,-24.0;24.0,-22.0;24.0,-20.0;24.0,-18.0;24.0,-16.0;24.0,-14.0;24.0,-12.0;24.0,-10.0;24.0,-8.0;24.0,-6.0;24.0,-4.0;24.0,-2.0;24.0,0.0;24.0,2.0;24.0,4.0;24.0,6.0;24.0,8.0;24.0,10.0;24.0,12.0;24.0,14.0;24.0,16.0;24.0,18.0;24.0,20.0;24.0,22.0;24.0,24.0;24.0,26.0;24.0,28.0;24.0,30.0;24.0,32.0;24.0,38.0;24.0,40.0;24.0,42.0;24.0,44.0;24.0,46.0;24.0,48.0;24.0,50.0;24.0,52.0;24.0,54.0;24.0,56.0;24.0,60.0;24.0,62.0;24.0,64.0;24.0,66.0;24.0,68.0;24.0,70.0;24.0,80.0;26.0,-84.0;26.0,-82.0;26.0,-80.0;26.0,-78.0;26.0,-76.0;26.0,-74.0;26.0,-72.0;26.0,-32.0;26.0,-30.0;26.0,-28.0;26.0,-26.0;26.0,-24.0;26.0,-22.0;26.0,-20.0;26.0,-18.0;26.0,-16.0;26.0,-14.0;26.0,-12.0;26.0,-10.0;26.0,-8.0;26.0,-6.0;26.0,-4.0;26.0,-2.0;26.0,0.0;26.0,2.0;26.0,4.0;26.0,6.0;26.0,8.0;26.0,10.0;26.0,12.0;26.0,14.0;26.0,16.0;26.0,18.0;26.0,20.0;26.0,22.0;26.0,24.0;26.0,26.0;26.0,28.0;26.0,30.0;26.0,42.0;26.0,44.0;26.0,46.0;26.0,48.0;26.0,50.0;26.0,52.0;26.0,54.0;26.0,56.0;26.0,58.0;26.0,62.0;26.0,64.0;26.0,66.0;26.0,68.0;26.0,70.0;26.0,80.0;28.0,-84.0;28.0,-82.0;28.0,-80.0;28.0,-78.0;28.0,-76.0;28.0,-74.0;28.0,-72.0;28.0,-32.0;28.0,-30.0;28.0,-28.0;28.0,-26.0;28.0,-24.0;28.0,-22.0;28.0,-20.0;28.0,-18.0;28.0,-16.0;28.0,-14.0;28.0,-12.0;28.0,-10.0;28.0,-8.0;28.0,-6.0;28.0,-4.0;28.0,-2.0;28.0,0.0;28.0,2.0;28.0,4.0;28.0,6.0;28.0,8.0;28.0,10.0;28.0,12.0;28.0,14.0;28.0,16.0;28.0,18.0;28.0,20.0;28.0,22.0;28.0,24.0;28.0,26.0;28.0,28.0;28.0,30.0;28.0,38.0;28.0,40.0;28.0,44.0;28.0,46.0;28.0,48.0;28.0,50.0;28.0,52.0;28.0,54.0;28.0,56.0;28.0,58.0;28.0,62.0;28.0,64.0;28.0,66.0;28.0,68.0;28.0,70.0;30.0,-84.0;30.0,-82.0;30.0,-80.0;30.0,-78.0;30.0,-76.0;30.0,-74.0;30.0,-72.0;30.0,-70.0;30.0,-30.0;30.0,-28.0;30.0,-26.0;30.0,-24.0;30.0,-22.0;30.0,-20.0;30.0,-18.0;30.0,-16.0;30.0,-14.0;30.0,-12.0;30.0,-10.0;30.0,-8.0;30.0,-6.0;30.0,-4.0;30.0,-2.0;30.0,0.0;30.0,2.0;30.0,4.0;30.0,6.0;30.0,8.0;30.0,10.0;30.0,12.0;30.0,14.0;30.0,16.0;30.0,18.0;30.0,20.0;30.0,22.0;30.0,24.0;30.0,26.0;30.0,28.0;30.0,30.0;30.0,38.0;30.0,40.0;30.0,46.0;30.0,48.0;30.0,50.0;30.0,52.0;30.0,54.0;30.0,56.0;30.0,58.0;30.0,60.0;30.0,62.0;30.0,64.0;30.0,66.0;30.0,68.0;30.0,70.0;32.0,-84.0;32.0,-82.0;32.0,-80.0;32.0,-78.0;32.0,-76.0;32.0,-74.0;32.0,-72.0;32.0,-70.0;32.0,-28.0;32.0,-26.0;32.0,-24.0;32.0,-22.0;32.0,-20.0;32.0,-18.0;32.0,-16.0;32.0,-14.0;32.0,-12.0;32.0,-10.0;32.0,-8.0;32.0,-6.0;32.0,-4.0;32.0,-2.0;32.0,0.0;32.0,2.0;32.0,4.0;32.0,6.0;32.0,8.0;32.0,10.0;32.0,12.0;32.0,14.0;32.0,16.0;32.0,18.0;32.0,20.0;32.0,22.0;32.0,24.0;32.0,26.0;32.0,28.0;32.0,30.0;32.0,38.0;32.0,40.0;32.0,48.0;32.0,50.0;32.0,52.0;32.0,54.0;32.0,56.0;32.0,58.0;32.0,60.0;32.0,62.0;32.0,64.0;32.0,66.0;32.0,68.0;34.0,-84.0;34.0,-82.0;34.0,-80.0;34.0,-78.0;34.0,-76.0;34.0,-74.0;34.0,-72.0;34.0,-70.0;34.0,-24.0;34.0,-22.0;34.0,-20.0;34.0,-18.0;34.0,-16.0;34.0,-14.0;34.0,-12.0;34.0,-10.0;34.0,-8.0;34.0,-6.0;34.0,-4.0;34.0,-2.0;34.0,0.0;34.0,2.0;34.0,4.0;34.0,6.0;34.0,8.0;34.0,10.0;34.0,12.0;34.0,14.0;34.0,16.0;34.0,18.0;34.0,20.0;34.0,22.0;34.0,24.0;34.0,26.0;34.0,28.0;34.0,30.0;34.0,38.0;34.0,40.0;34.0,42.0;34.0,46.0;34.0,48.0;34.0,50.0;34.0,52.0;34.0,54.0;34.0,56.0;34.0,58.0;34.0,60.0;34.0,62.0;34.0,64.0;34.0,66.0;34.0,68.0;36.0,-84.0;36.0,-82.0;36.0,-80.0;36.0,-78.0;36.0,-76.0;36.0,-74.0;36.0,-72.0;36.0,-70.0;36.0,-18.0;36.0,-16.0;36.0,-14.0;36.0,-12.0;36.0,-10.0;36.0,-8.0;36.0,-6.0;36.0,-4.0;36.0,-2.0;36.0,0.0;36.0,2.0;36.0,4.0;36.0,6.0;36.0,8.0;36.0,10.0;36.0,12.0;36.0,14.0;36.0,16.0;36.0,18.0;36.0,20.0;36.0,22.0;36.0,28.0;36.0,30.0;36.0,32.0;36.0,34.0;36.0,38.0;36.0,40.0;36.0,48.0;36.0,50.0;36.0,52.0;36.0,54.0;36.0,56.0;36.0,58.0;36.0,60.0;36.0,62.0;36.0,64.0;36.0,68.0;38.0,-84.0;38.0,-82.0;38.0,-80.0;38.0,-78.0;38.0,-76.0;38.0,-74.0;38.0,-72.0;38.0,-70.0;38.0,-16.0;38.0,-14.0;38.0,-12.0;38.0,-10.0;38.0,-8.0;38.0,-6.0;38.0,-4.0;38.0,-2.0;38.0,0.0;38.0,2.0;38.0,4.0;38.0,6.0;38.0,8.0;38.0,10.0;38.0,12.0;38.0,14.0;38.0,16.0;38.0,18.0;38.0,26.0;38.0,28.0;38.0,30.0;38.0,32.0;38.0,34.0;38.0,36.0;38.0,38.0;38.0,40.0;38.0,46.0;38.0,48.0;38.0,50.0;38.0,52.0;38.0,54.0;38.0,56.0;38.0,58.0;38.0,60.0;38.0,62.0;38.0,64.0;38.0,68.0;40.0,-84.0;40.0,-82.0;40.0,-80.0;40.0,-78.0;40.0,-76.0;40.0,-74.0;40.0,-72.0;40.0,-70.0;40.0,-16.0;40.0,-14.0;40.0,-12.0;40.0,-2.0;40.0,0.0;40.0,2.0;40.0,4.0;40.0,6.0;40.0,8.0;40.0,10.0;40.0,12.0;40.0,14.0;40.0,22.0;40.0,24.0;40.0,26.0;40.0,28.0;40.0,30.0;40.0,32.0;40.0,34.0;40.0,36.0;40.0,38.0;40.0,40.0;40.0,44.0;40.0,46.0;40.0,48.0;40.0,50.0;40.0,52.0;40.0,54.0;40.0,56.0;40.0,58.0;40.0,60.0;40.0,62.0;40.0,64.0;40.0,68.0;42.0,-84.0;42.0,-82.0;42.0,-80.0;42.0,-78.0;42.0,-76.0;42.0,-74.0;42.0,-72.0;42.0,-70.0;42.0,0.0;42.0,2.0;42.0,4.0;42.0,6.0;42.0,8.0;42.0,10.0;42.0,12.0;42.0,18.0;42.0,20.0;42.0,22.0;42.0,24.0;42.0,26.0;42.0,28.0;42.0,30.0;42.0,32.0;42.0,34.0;42.0,36.0;42.0,38.0;42.0,40.0;42.0,42.0;42.0,44.0;42.0,46.0;42.0,48.0;42.0,50.0;42.0,52.0;42.0,54.0;42.0,56.0;42.0,58.0;42.0,60.0;42.0,62.0;42.0,64.0;42.0,66.0;44.0,-84.0;44.0,-82.0;44.0,-80.0;44.0,-78.0;44.0,-76.0;44.0,-74.0;44.0,-72.0;44.0,-70.0;44.0,-24.0;44.0,-22.0;44.0,2.0;44.0,4.0;44.0,6.0;44.0,8.0;44.0,10.0;44.0,14.0;44.0,16.0;44.0,18.0;44.0,20.0;44.0,22.0;44.0,24.0;44.0,26.0;44.0,28.0;44.0,30.0;44.0,32.0;44.0,34.0;44.0,36.0;44.0,38.0;44.0,40.0;44.0,42.0;44.0,44.0;44.0,46.0;44.0,48.0;44.0,50.0;44.0,52.0;44.0,54.0;44.0,56.0;44.0,58.0;44.0,60.0;44.0,62.0;44.0,64.0;44.0,66.0;46.0,-84.0;46.0,-82.0;46.0,-80.0;46.0,-78.0;46.0,-76.0;46.0,-74.0;46.0,-72.0;46.0,-70.0;46.0,-68.0;46.0,-24.0;46.0,-22.0;46.0,-20.0;46.0,-18.0;46.0,-16.0;46.0,4.0;46.0,6.0;46.0,8.0;46.0,10.0;46.0,14.0;46.0,16.0;46.0,18.0;46.0,20.0;46.0,22.0;46.0,24.0;46.0,26.0;46.0,28.0;46.0,30.0;46.0,32.0;46.0,34.0;46.0,36.0;46.0,38.0;46.0,40.0;46.0,42.0;46.0,44.0;46.0,46.0;46.0,48.0;46.0,50.0;46.0,52.0;46.0,54.0;46.0,56.0;46.0,58.0;46.0,60.0;46.0,62.0;46.0,64.0;46.0,66.0;46.0,68.0;48.0,-84.0;48.0,-82.0;48.0,-80.0;48.0,-78.0;48.0,-76.0;48.0,-74.0;48.0,-72.0;48.0,-70.0;48.0,-68.0;48.0,-22.0;48.0,-20.0;48.0,-18.0;48.0,-16.0;48.0,-14.0;48.0,6.0;48.0,8.0;48.0,10.0;48.0,14.0;48.0,16.0;48.0,18.0;48.0,20.0;48.0,22.0;48.0,24.0;48.0,26.0;48.0,28.0;48.0,30.0;48.0,32.0;48.0,34.0;48.0,36.0;48.0,38.0;48.0,40.0;48.0,42.0;48.0,46.0;48.0,48.0;48.0,50.0;48.0,52.0;48.0,54.0;48.0,56.0;48.0,58.0;48.0,60.0;48.0,62.0;48.0,64.0;48.0,66.0;50.0,-84.0;50.0,-82.0;50.0,-80.0;50.0,-78.0;50.0,-76.0;50.0,-74.0;50.0,-72.0;50.0,-70.0;50.0,-68.0;50.0,-14.0;50.0,8.0;50.0,10.0;50.0,16.0;50.0,18.0;50.0,20.0;50.0,22.0;50.0,24.0;50.0,26.0;50.0,32.0;50.0,34.0;50.0,36.0;50.0,48.0;50.0,50.0;50.0,52.0;50.0,54.0;50.0,56.0;50.0,58.0;50.0,60.0;50.0,62.0;50.0,64.0;50.0,66.0;52.0,-84.0;52.0,-82.0;52.0,-80.0;52.0,-78.0;52.0,-76.0;52.0,-74.0;52.0,-72.0;52.0,-70.0;52.0,-68.0;52.0,16.0;52.0,18.0;52.0,20.0;52.0,22.0;52.0,24.0;52.0,28.0;52.0,30.0;52.0,32.0;52.0,34.0;52.0,36.0;52.0,44.0;52.0,48.0;52.0,50.0;52.0,52.0;52.0,54.0;52.0,56.0;52.0,58.0;52.0,60.0;52.0,62.0;52.0,64.0;52.0,66.0;52.0,68.0;52.0,72.0;54.0,-84.0;54.0,-82.0;54.0,-80.0;54.0,-78.0;54.0,-76.0;54.0,-74.0;54.0,-72.0;54.0,-70.0;54.0,-68.0;54.0,-66.0;54.0,18.0;54.0,20.0;54.0,22.0;54.0,24.0;54.0,28.0;54.0,30.0;54.0,32.0;54.0,34.0;54.0,36.0;54.0,38.0;54.0,40.0;54.0,42.0;54.0,44.0;54.0,46.0;54.0,48.0;54.0,50.0;54.0,52.0;54.0,54.0;54.0,56.0;54.0,58.0;54.0,60.0;54.0,62.0;54.0,64.0;54.0,66.0;54.0,68.0;54.0,72.0;56.0,-84.0;56.0,-82.0;56.0,-80.0;56.0,-78.0;56.0,-76.0;56.0,-74.0;56.0,-72.0;56.0,-70.0;56.0,-68.0;56.0,-66.0;56.0,18.0;56.0,20.0;56.0,22.0;56.0,24.0;56.0,28.0;56.0,30.0;56.0,32.0;56.0,34.0;56.0,36.0;56.0,38.0;56.0,40.0;56.0,42.0;56.0,44.0;56.0,46.0;56.0,48.0;56.0,50.0;56.0,52.0;56.0,54.0;56.0,56.0;56.0,58.0;56.0,60.0;56.0,62.0;56.0,64.0;56.0,66.0;56.0,68.0;56.0,74.0;58.0,-84.0;58.0,-82.0;58.0,-80.0;58.0,-78.0;58.0,-76.0;58.0,-74.0;58.0,-72.0;58.0,-70.0;58.0,-68.0;58.0,22.0;58.0,26.0;58.0,28.0;58.0,30.0;58.0,32.0;58.0,34.0;58.0,36.0;58.0,38.0;58.0,40.0;58.0,42.0;58.0,44.0;58.0,46.0;58.0,48.0;58.0,50.0;58.0,52.0;58.0,54.0;58.0,56.0;58.0,58.0;58.0,60.0;58.0,62.0;58.0,64.0;58.0,66.0;58.0,68.0;58.0,74.0;60.0,-84.0;60.0,-82.0;60.0,-80.0;60.0,-78.0;60.0,-76.0;60.0,-74.0;60.0,-72.0;60.0,-70.0;60.0,-68.0;60.0,26.0;60.0,28.0;60.0,30.0;60.0,32.0;60.0,34.0;60.0,36.0;60.0,38.0;60.0,40.0;60.0,42.0;60.0,44.0;60.0,46.0;60.0,48.0;60.0,50.0;60.0,52.0;60.0,54.0;60.0,56.0;60.0,58.0;60.0,60.0;60.0,62.0;60.0,64.0;60.0,66.0;60.0,68.0;60.0,76.0;62.0,-84.0;62.0,-82.0;62.0,-80.0;62.0,-78.0;62.0,-76.0;62.0,-74.0;62.0,-72.0;62.0,-70.0;62.0,-68.0;62.0,26.0;62.0,28.0;62.0,30.0;62.0,32.0;62.0,34.0;62.0,36.0;62.0,38.0;62.0,40.0;62.0,42.0;62.0,44.0;62.0,46.0;62.0,48.0;62.0,50.0;62.0,52.0;62.0,54.0;62.0,56.0;62.0,58.0;62.0,60.0;62.0,62.0;62.0,64.0;62.0,66.0;62.0,68.0;62.0,76.0;64.0,-84.0;64.0,-82.0;64.0,-80.0;64.0,-78.0;64.0,-76.0;64.0,-74.0;64.0,-72.0;64.0,-70.0;64.0,-68.0;64.0,26.0;64.0,28.0;64.0,30.0;64.0,32.0;64.0,34.0;64.0,36.0;64.0,38.0;64.0,40.0;64.0,42.0;64.0,44.0;64.0,46.0;64.0,48.0;64.0,50.0;64.0,52.0;64.0,54.0;64.0,56.0;64.0,58.0;64.0,60.0;64.0,62.0;64.0,64.0;64.0,66.0;64.0,68.0;64.0,76.0;66.0,-84.0;66.0,-82.0;66.0,-80.0;66.0,-78.0;66.0,-76.0;66.0,-74.0;66.0,-72.0;66.0,-70.0;66.0,-68.0;66.0,26.0;66.0,28.0;66.0,30.0;66.0,32.0;66.0,34.0;66.0,36.0;66.0,38.0;66.0,40.0;66.0,42.0;66.0,44.0;66.0,46.0;66.0,48.0;66.0,50.0;66.0,52.0;66.0,54.0;66.0,56.0;66.0,58.0;66.0,60.0;66.0,62.0;66.0,64.0;66.0,66.0;66.0,68.0;66.0,76.0;68.0,-84.0;68.0,-82.0;68.0,-80.0;68.0,-78.0;68.0,-76.0;68.0,-74.0;68.0,-72.0;68.0,-70.0;68.0,-68.0;68.0,24.0;68.0,26.0;68.0,28.0;68.0,30.0;68.0,32.0;68.0,34.0;68.0,36.0;68.0,38.0;68.0,40.0;68.0,42.0;68.0,44.0;68.0,46.0;68.0,48.0;68.0,50.0;68.0,52.0;68.0,54.0;68.0,56.0;68.0,58.0;68.0,60.0;68.0,62.0;68.0,64.0;68.0,66.0;68.0,68.0;68.0,70.0;70.0,-84.0;70.0,-82.0;70.0,-80.0;70.0,-78.0;70.0,-76.0;70.0,-74.0;70.0,22.0;70.0,24.0;70.0,26.0;70.0,28.0;70.0,30.0;70.0,32.0;70.0,34.0;70.0,36.0;70.0,38.0;70.0,40.0;70.0,42.0;70.0,44.0;70.0,46.0;70.0,48.0;70.0,50.0;70.0,52.0;70.0,54.0;70.0,56.0;70.0,58.0;70.0,60.0;70.0,62.0;70.0,64.0;70.0,66.0;70.0,68.0;70.0,70.0;70.0,72.0;72.0,-84.0;72.0,-82.0;72.0,-80.0;72.0,-78.0;72.0,-76.0;72.0,-74.0;72.0,-72.0;72.0,22.0;72.0,24.0;72.0,26.0;72.0,28.0;72.0,30.0;72.0,32.0;72.0,34.0;72.0,36.0;72.0,38.0;72.0,40.0;72.0,42.0;72.0,44.0;72.0,46.0;72.0,48.0;72.0,50.0;72.0,52.0;72.0,54.0;72.0,56.0;72.0,58.0;72.0,60.0;72.0,62.0;72.0,64.0;72.0,66.0;72.0,68.0;72.0,70.0;72.0,72.0;74.0,-84.0;74.0,-82.0;74.0,-80.0;74.0,-78.0;74.0,-76.0;74.0,-74.0;74.0,-72.0;74.0,-70.0;74.0,16.0;74.0,18.0;74.0,20.0;74.0,22.0;74.0,24.0;74.0,26.0;74.0,28.0;74.0,30.0;74.0,32.0;74.0,34.0;74.0,36.0;74.0,38.0;74.0,40.0;74.0,42.0;74.0,44.0;74.0,46.0;74.0,48.0;74.0,50.0;74.0,52.0;74.0,54.0;74.0,56.0;74.0,58.0;74.0,60.0;74.0,62.0;74.0,64.0;74.0,66.0;74.0,70.0;76.0,-84.0;76.0,-82.0;76.0,-80.0;76.0,-78.0;76.0,-76.0;76.0,-74.0;76.0,-72.0;76.0,-70.0;76.0,12.0;76.0,14.0;76.0,16.0;76.0,18.0;76.0,20.0;76.0,22.0;76.0,24.0;76.0,26.0;76.0,28.0;76.0,30.0;76.0,32.0;76.0,34.0;76.0,36.0;76.0,38.0;76.0,40.0;76.0,42.0;76.0,44.0;76.0,46.0;76.0,48.0;76.0,50.0;76.0,52.0;76.0,54.0;76.0,56.0;76.0,58.0;76.0,60.0;76.0,62.0;76.0,64.0;76.0,66.0;76.0,68.0;76.0,70.0;78.0,-84.0;78.0,-82.0;78.0,-80.0;78.0,-78.0;78.0,-76.0;78.0,-74.0;78.0,-72.0;78.0,-70.0;78.0,10.0;78.0,12.0;78.0,14.0;78.0,16.0;78.0,18.0;78.0,20.0;78.0,22.0;78.0,24.0;78.0,26.0;78.0,28.0;78.0,30.0;78.0,32.0;78.0,34.0;78.0,36.0;78.0,38.0;78.0,40.0;78.0,42.0;78.0,44.0;78.0,46.0;78.0,48.0;78.0,50.0;78.0,52.0;78.0,54.0;78.0,56.0;78.0,58.0;78.0,60.0;78.0,62.0;78.0,64.0;78.0,66.0;78.0,68.0;78.0,70.0;78.0,72.0;80.0,-84.0;80.0,-82.0;80.0,-80.0;80.0,-78.0;80.0,-76.0;80.0,-74.0;80.0,-72.0;80.0,-70.0;80.0,8.0;80.0,14.0;80.0,16.0;80.0,18.0;80.0,20.0;80.0,22.0;80.0,24.0;80.0,26.0;80.0,28.0;80.0,30.0;80.0,32.0;80.0,34.0;80.0,36.0;80.0,38.0;80.0,40.0;80.0,42.0;80.0,44.0;80.0,46.0;80.0,48.0;80.0,50.0;80.0,52.0;80.0,54.0;80.0,56.0;80.0,58.0;80.0,60.0;80.0,62.0;80.0,64.0;80.0,66.0;80.0,68.0;80.0,70.0;80.0,72.0;82.0,-84.0;82.0,-82.0;82.0,-80.0;82.0,-78.0;82.0,-76.0;82.0,-74.0;82.0,-72.0;82.0,-70.0;82.0,-68.0;82.0,18.0;82.0,20.0;82.0,22.0;82.0,24.0;82.0,26.0;82.0,28.0;82.0,30.0;82.0,32.0;82.0,34.0;82.0,36.0;82.0,38.0;82.0,40.0;82.0,42.0;82.0,44.0;82.0,46.0;82.0,48.0;82.0,50.0;82.0,52.0;82.0,54.0;82.0,56.0;82.0,58.0;82.0,60.0;82.0,62.0;82.0,64.0;82.0,66.0;82.0,68.0;82.0,70.0;82.0,72.0;84.0,-84.0;84.0,-82.0;84.0,-80.0;84.0,-78.0;84.0,-76.0;84.0,-74.0;84.0,-72.0;84.0,-70.0;84.0,-68.0;84.0,20.0;84.0,22.0;84.0,24.0;84.0,26.0;84.0,28.0;84.0,30.0;84.0,32.0;84.0,34.0;84.0,36.0;84.0,38.0;84.0,40.0;84.0,42.0;84.0,44.0;84.0,46.0;84.0,48.0;84.0,50.0;84.0,52.0;84.0,54.0;84.0,56.0;84.0,58.0;84.0,60.0;84.0,62.0;84.0,64.0;84.0,66.0;84.0,68.0;84.0,70.0;84.0,72.0;86.0,-84.0;86.0,-82.0;86.0,-80.0;86.0,-78.0;86.0,-76.0;86.0,-74.0;86.0,-72.0;86.0,-70.0;86.0,-68.0;86.0,20.0;86.0,22.0;86.0,24.0;86.0,26.0;86.0,28.0;86.0,30.0;86.0,32.0;86.0,34.0;86.0,36.0;86.0,38.0;86.0,40.0;86.0,42.0;86.0,44.0;86.0,46.0;86.0,48.0;86.0,50.0;86.0,52.0;86.0,54.0;86.0,56.0;86.0,58.0;86.0,60.0;86.0,62.0;86.0,64.0;86.0,66.0;86.0,68.0;86.0,70.0;86.0,72.0;88.0,-84.0;88.0,-82.0;88.0,-80.0;88.0,-78.0;88.0,-76.0;88.0,-74.0;88.0,-72.0;88.0,-70.0;88.0,-68.0;88.0,22.0;88.0,24.0;88.0,26.0;88.0,28.0;88.0,30.0;88.0,32.0;88.0,34.0;88.0,36.0;88.0,38.0;88.0,40.0;88.0,42.0;88.0,44.0;88.0,46.0;88.0,48.0;88.0,50.0;88.0,52.0;88.0,54.0;88.0,56.0;88.0,58.0;88.0,60.0;88.0,62.0;88.0,64.0;88.0,66.0;88.0,68.0;88.0,70.0;88.0,72.0;88.0,74.0;90.0,-84.0;90.0,-82.0;90.0,-80.0;90.0,-78.0;90.0,-76.0;90.0,-74.0;90.0,-72.0;90.0,-70.0;90.0,-68.0;90.0,22.0;90.0,24.0;90.0,26.0;90.0,28.0;90.0,30.0;90.0,32.0;90.0,34.0;90.0,36.0;90.0,38.0;90.0,40.0;90.0,42.0;90.0,44.0;90.0,46.0;90.0,48.0;90.0,50.0;90.0,52.0;90.0,54.0;90.0,56.0;90.0,58.0;90.0,60.0;90.0,62.0;90.0,64.0;90.0,66.0;90.0,68.0;90.0,70.0;90.0,72.0;90.0,74.0;92.0,-84.0;92.0,-82.0;92.0,-80.0;92.0,-78.0;92.0,-76.0;92.0,-74.0;92.0,-72.0;92.0,-70.0;92.0,-68.0;92.0,22.0;92.0,24.0;92.0,26.0;92.0,28.0;92.0,30.0;92.0,32.0;92.0,34.0;92.0,36.0;92.0,38.0;92.0,40.0;92.0,42.0;92.0,44.0;92.0,46.0;92.0,48.0;92.0,50.0;92.0,52.0;92.0,54.0;92.0,56.0;92.0,58.0;92.0,60.0;92.0,62.0;92.0,64.0;92.0,66.0;92.0,68.0;92.0,70.0;92.0,72.0;92.0,74.0;94.0,-84.0;94.0,-82.0;94.0,-80.0;94.0,-78.0;94.0,-76.0;94.0,-74.0;94.0,-72.0;94.0,-70.0;94.0,-68.0;94.0,20.0;94.0,22.0;94.0,24.0;94.0,26.0;94.0,28.0;94.0,30.0;94.0,32.0;94.0,34.0;94.0,36.0;94.0,38.0;94.0,40.0;94.0,42.0;94.0,44.0;94.0,46.0;94.0,48.0;94.0,50.0;94.0,52.0;94.0,54.0;94.0,56.0;94.0,58.0;94.0,60.0;94.0,62.0;94.0,64.0;94.0,66.0;94.0,68.0;94.0,70.0;94.0,72.0;94.0,74.0;94.0,76.0;94.0,80.0;96.0,-84.0;96.0,-82.0;96.0,-80.0;96.0,-78.0;96.0,-76.0;96.0,-74.0;96.0,-72.0;96.0,-70.0;96.0,-68.0;96.0,18.0;96.0,20.0;96.0,22.0;96.0,24.0;96.0,26.0;96.0,28.0;96.0,30.0;96.0,32.0;96.0,34.0;96.0,36.0;96.0,38.0;96.0,40.0;96.0,42.0;96.0,44.0;96.0,46.0;96.0,48.0;96.0,50.0;96.0,52.0;96.0,54.0;96.0,56.0;96.0,58.0;96.0,60.0;96.0,62.0;96.0,64.0;96.0,66.0;96.0,68.0;96.0,70.0;96.0,72.0;96.0,74.0;96.0,76.0;96.0,80.0;98.0,-84.0;98.0,-82.0;98.0,-80.0;98.0,-78.0;98.0,-76.0;98.0,-74.0;98.0,-72.0;98.0,-70.0;98.0,-68.0;98.0,4.0;98.0,16.0;98.0,18.0;98.0,20.0;98.0,22.0;98.0,24.0;98.0,26.0;98.0,28.0;98.0,30.0;98.0,32.0;98.0,34.0;98.0,36.0;98.0,38.0;98.0,40.0;98.0,42.0;98.0,44.0;98.0,46.0;98.0,48.0;98.0,50.0;98.0,52.0;98.0,54.0;98.0,56.0;98.0,58.0;98.0,60.0;98.0,62.0;98.0,64.0;98.0,66.0;98.0,68.0;98.0,70.0;98.0,72.0;98.0,74.0;98.0,76.0;98.0,80.0;100.0,-84.0;100.0,-82.0;100.0,-80.0;100.0,-78.0;100.0,-76.0;100.0,-74.0;100.0,-72.0;100.0,-70.0;100.0,-68.0;100.0,0.0;100.0,2.0;100.0,8.0;100.0,14.0;100.0,16.0;100.0,18.0;100.0,20.0;100.0,22.0;100.0,24.0;100.0,26.0;100.0,28.0;100.0,30.0;100.0,32.0;100.0,34.0;100.0,36.0;100.0,38.0;100.0,40.0;100.0,42.0;100.0,44.0;100.0,46.0;100.0,48.0;100.0,50.0;100.0,52.0;100.0,54.0;100.0,56.0;100.0,58.0;100.0,60.0;100.0,62.0;100.0,64.0;100.0,66.0;100.0,68.0;100.0,70.0;100.0,72.0;100.0,74.0;100.0,76.0;100.0,78.0;102.0,-84.0;102.0,-82.0;102.0,-80.0;102.0,-78.0;102.0,-76.0;102.0,-74.0;102.0,-72.0;102.0,-70.0;102.0,-68.0;102.0,-2.0;102.0,0.0;102.0,6.0;102.0,14.0;102.0,16.0;102.0,18.0;102.0,20.0;102.0,22.0;102.0,24.0;102.0,26.0;102.0,28.0;102.0,30.0;102.0,32.0;102.0,34.0;102.0,36.0;102.0,38.0;102.0,40.0;102.0,42.0;102.0,44.0;102.0,46.0;102.0,48.0;102.0,50.0;102.0,52.0;102.0,54.0;102.0,56.0;102.0,58.0;102.0,60.0;102.0,62.0;102.0,64.0;102.0,66.0;102.0,68.0;102.0,70.0;102.0,72.0;102.0,74.0;102.0,76.0;104.0,-84.0;104.0,-82.0;104.0,-80.0;104.0,-78.0;104.0,-76.0;104.0,-74.0;104.0,-72.0;104.0,-70.0;104.0,-68.0;104.0,-66.0;104.0,-4.0;104.0,-2.0;104.0,12.0;104.0,14.0;104.0,16.0;104.0,18.0;104.0,20.0;104.0,22.0;104.0,24.0;104.0,26.0;104.0,28.0;104.0,30.0;104.0,32.0;104.0,34.0;104.0,36.0;104.0,38.0;104.0,40.0;104.0,42.0;104.0,44.0;104.0,46.0;104.0,48.0;104.0,50.0;104.0,52.0;104.0,54.0;104.0,56.0;104.0,58.0;104.0,60.0;104.0,62.0;104.0,64.0;104.0,66.0;104.0,68.0;104.0,70.0;104.0,72.0;104.0,74.0;104.0,76.0;106.0,-84.0;106.0,-82.0;106.0,-80.0;106.0,-78.0;106.0,-76.0;106.0,-74.0;106.0,-72.0;106.0,-70.0;106.0,-68.0;106.0,-6.0;106.0,10.0;106.0,12.0;106.0,14.0;106.0,16.0;106.0,18.0;106.0,20.0;106.0,22.0;106.0,24.0;106.0,26.0;106.0,28.0;106.0,30.0;106.0,32.0;106.0,34.0;106.0,36.0;106.0,38.0;106.0,40.0;106.0,42.0;106.0,44.0;106.0,46.0;106.0,48.0;106.0,50.0;106.0,52.0;106.0,54.0;106.0,56.0;106.0,58.0;106.0,60.0;106.0,62.0;106.0,64.0;106.0,66.0;106.0,68.0;106.0,70.0;106.0,72.0;106.0,74.0;106.0,76.0;108.0,-84.0;108.0,-82.0;108.0,-80.0;108.0,-78.0;108.0,-76.0;108.0,-74.0;108.0,-72.0;108.0,-70.0;108.0,-68.0;108.0,12.0;108.0,14.0;108.0,16.0;108.0,22.0;108.0,24.0;108.0,26.0;108.0,28.0;108.0,30.0;108.0,32.0;108.0,34.0;108.0,36.0;108.0,38.0;108.0,40.0;108.0,42.0;108.0,44.0;108.0,46.0;108.0,48.0;108.0,50.0;108.0,52.0;108.0,54.0;108.0,56.0;108.0,58.0;108.0,60.0;108.0,62.0;108.0,64.0;108.0,66.0;108.0,68.0;108.0,70.0;108.0,72.0;108.0,74.0;108.0,76.0;110.0,-84.0;110.0,-82.0;110.0,-80.0;110.0,-78.0;110.0,-76.0;110.0,-74.0;110.0,-72.0;110.0,-70.0;110.0,-68.0;110.0,0.0;110.0,20.0;110.0,22.0;110.0,24.0;110.0,26.0;110.0,28.0;110.0,30.0;110.0,32.0;110.0,34.0;110.0,36.0;110.0,38.0;110.0,40.0;110.0,42.0;110.0,44.0;110.0,46.0;110.0,48.0;110.0,50.0;110.0,52.0;110.0,54.0;110.0,56.0;110.0,58.0;110.0,60.0;110.0,62.0;110.0,64.0;110.0,66.0;110.0,68.0;110.0,70.0;110.0,72.0;110.0,74.0;110.0,76.0;112.0,-84.0;112.0,-82.0;112.0,-80.0;112.0,-78.0;112.0,-76.0;112.0,-74.0;112.0,-72.0;112.0,-70.0;112.0,-68.0;112.0,-8.0;112.0,-2.0;112.0,0.0;112.0,2.0;112.0,22.0;112.0,24.0;112.0,26.0;112.0,28.0;112.0,30.0;112.0,32.0;112.0,34.0;112.0,36.0;112.0,38.0;112.0,40.0;112.0,42.0;112.0,44.0;112.0,46.0;112.0,48.0;112.0,50.0;112.0,52.0;112.0,54.0;112.0,56.0;112.0,58.0;112.0,60.0;112.0,62.0;112.0,64.0;112.0,66.0;112.0,68.0;112.0,70.0;112.0,72.0;112.0,76.0;114.0,-84.0;114.0,-82.0;114.0,-80.0;114.0,-78.0;114.0,-76.0;114.0,-74.0;114.0,-72.0;114.0,-70.0;114.0,-68.0;114.0,-66.0;114.0,-26.0;114.0,-24.0;114.0,-8.0;114.0,-2.0;114.0,0.0;114.0,2.0;114.0,4.0;114.0,24.0;114.0,26.0;114.0,28.0;114.0,30.0;114.0,32.0;114.0,34.0;114.0,36.0;114.0,38.0;114.0,40.0;114.0,42.0;114.0,44.0;114.0,46.0;114.0,48.0;114.0,50.0;114.0,52.0;114.0,54.0;114.0,56.0;114.0,58.0;114.0,60.0;114.0,62.0;114.0,64.0;114.0,66.0;114.0,68.0;114.0,70.0;114.0,72.0;116.0,-84.0;116.0,-82.0;116.0,-80.0;116.0,-78.0;116.0,-76.0;116.0,-74.0;116.0,-72.0;116.0,-70.0;116.0,-68.0;116.0,-34.0;116.0,-32.0;116.0,-30.0;116.0,-28.0;116.0,-26.0;116.0,-24.0;116.0,-22.0;116.0,-2.0;116.0,0.0;116.0,2.0;116.0,4.0;116.0,24.0;116.0,26.0;116.0,28.0;116.0,30.0;116.0,32.0;116.0,34.0;116.0,36.0;116.0,38.0;116.0,40.0;116.0,42.0;116.0,44.0;116.0,46.0;116.0,48.0;116.0,50.0;116.0,52.0;116.0,54.0;116.0,56.0;116.0,58.0;116.0,60.0;116.0,62.0;116.0,64.0;116.0,66.0;116.0,68.0;116.0,70.0;116.0,72.0;118.0,-84.0;118.0,-82.0;118.0,-80.0;118.0,-78.0;118.0,-76.0;118.0,-74.0;118.0,-72.0;118.0,-70.0;118.0,-68.0;118.0,-34.0;118.0,-32.0;118.0,-30.0;118.0,-28.0;118.0,-26.0;118.0,-24.0;118.0,-22.0;118.0,26.0;118.0,28.0;118.0,30.0;118.0,32.0;118.0,34.0;118.0,36.0;118.0,38.0;118.0,40.0;118.0,42.0;118.0,44.0;118.0,46.0;118.0,48.0;118.0,50.0;118.0,52.0;118.0,54.0;118.0,56.0;118.0,58.0;118.0,60.0;118.0,62.0;118.0,64.0;118.0,66.0;118.0,68.0;118.0,70.0;118.0,72.0;120.0,-84.0;120.0,-82.0;120.0,-80.0;120.0,-78.0;120.0,-76.0;120.0,-74.0;120.0,-72.0;120.0,-70.0;120.0,-68.0;120.0,-32.0;120.0,-30.0;120.0,-28.0;120.0,-26.0;120.0,-24.0;120.0,-22.0;120.0,-20.0;120.0,-10.0;120.0,-4.0;120.0,-2.0;120.0,0.0;120.0,16.0;120.0,28.0;120.0,30.0;120.0,32.0;120.0,34.0;120.0,36.0;120.0,42.0;120.0,44.0;120.0,46.0;120.0,48.0;120.0,50.0;120.0,52.0;120.0,54.0;120.0,56.0;120.0,58.0;120.0,60.0;120.0,62.0;120.0,64.0;120.0,66.0;120.0,68.0;120.0,70.0;120.0,72.0;122.0,-84.0;122.0,-82.0;122.0,-80.0;122.0,-78.0;122.0,-76.0;122.0,-74.0;122.0,-72.0;122.0,-70.0;122.0,-68.0;122.0,-32.0;122.0,-30.0;122.0,-28.0;122.0,-26.0;122.0,-24.0;122.0,-22.0;122.0,-20.0;122.0,-4.0;122.0,14.0;122.0,18.0;122.0,40.0;122.0,42.0;122.0,44.0;122.0,46.0;122.0,48.0;122.0,50.0;122.0,52.0;122.0,54.0;122.0,56.0;122.0,58.0;122.0,60.0;122.0,62.0;122.0,64.0;122.0,66.0;122.0,68.0;122.0,70.0;122.0,72.0;124.0,-84.0;124.0,-82.0;124.0,-80.0;124.0,-78.0;124.0,-76.0;124.0,-74.0;124.0,-72.0;124.0,-70.0;124.0,-68.0;124.0,-32.0;124.0,-30.0;124.0,-28.0;124.0,-26.0;124.0,-24.0;124.0,-22.0;124.0,-20.0;124.0,-18.0;124.0,-10.0;124.0,8.0;124.0,40.0;124.0,42.0;124.0,44.0;124.0,46.0;124.0,48.0;124.0,50.0;124.0,52.0;124.0,54.0;124.0,56.0;124.0,58.0;124.0,60.0;124.0,62.0;124.0,64.0;124.0,66.0;124.0,68.0;124.0,70.0;124.0,72.0;126.0,-84.0;126.0,-82.0;126.0,-80.0;126.0,-78.0;126.0,-76.0;126.0,-74.0;126.0,-72.0;126.0,-70.0;126.0,-68.0;126.0,-32.0;126.0,-30.0;126.0,-28.0;126.0,-26.0;126.0,-24.0;126.0,-22.0;126.0,-20.0;126.0,-18.0;126.0,-16.0;126.0,8.0;126.0,38.0;126.0,40.0;126.0,42.0;126.0,44.0;126.0,46.0;126.0,48.0;126.0,50.0;126.0,52.0;126.0,54.0;126.0,56.0;126.0,58.0;126.0,60.0;126.0,62.0;126.0,64.0;126.0,66.0;126.0,68.0;126.0,70.0;126.0,72.0;128.0,-84.0;128.0,-82.0;128.0,-80.0;128.0,-78.0;128.0,-76.0;128.0,-74.0;128.0,-72.0;128.0,-70.0;128.0,-68.0;128.0,-32.0;128.0,-30.0;128.0,-28.0;128.0,-26.0;128.0,-24.0;128.0,-22.0;128.0,-20.0;128.0,-18.0;128.0,-16.0;128.0,0.0;128.0,36.0;128.0,38.0;128.0,42.0;128.0,44.0;128.0,46.0;128.0,48.0;128.0,50.0;128.0,52.0;128.0,54.0;128.0,56.0;128.0,58.0;128.0,60.0;128.0,62.0;128.0,64.0;128.0,66.0;128.0,68.0;128.0,70.0;128.0,72.0;130.0,-84.0;130.0,-82.0;130.0,-80.0;130.0,-78.0;130.0,-76.0;130.0,-74.0;130.0,-72.0;130.0,-70.0;130.0,-68.0;130.0,-30.0;130.0,-28.0;130.0,-26.0;130.0,-24.0;130.0,-22.0;130.0,-20.0;130.0,-18.0;130.0,-16.0;130.0,-14.0;130.0,42.0;130.0,44.0;130.0,46.0;130.0,48.0;130.0,50.0;130.0,52.0;130.0,54.0;130.0,56.0;130.0,58.0;130.0,60.0;130.0,62.0;130.0,64.0;130.0,66.0;130.0,68.0;130.0,70.0;132.0,-84.0;132.0,-82.0;132.0,-80.0;132.0,-78.0;132.0,-76.0;132.0,-74.0;132.0,-72.0;132.0,-70.0;132.0,-68.0;132.0,-30.0;132.0,-28.0;132.0,-26.0;132.0,-24.0;132.0,-22.0;132.0,-20.0;132.0,-18.0;132.0,-16.0;132.0,-14.0;132.0,34.0;132.0,44.0;132.0,46.0;132.0,48.0;132.0,50.0;132.0,52.0;132.0,54.0;132.0,56.0;132.0,58.0;132.0,60.0;132.0,62.0;132.0,64.0;132.0,66.0;132.0,68.0;132.0,70.0;134.0,-84.0;134.0,-82.0;134.0,-80.0;134.0,-78.0;134.0,-76.0;134.0,-74.0;134.0,-72.0;134.0,-70.0;134.0,-68.0;134.0,-32.0;134.0,-30.0;134.0,-28.0;134.0,-26.0;134.0,-24.0;134.0,-22.0;134.0,-20.0;134.0,-18.0;134.0,-16.0;134.0,-14.0;134.0,-12.0;134.0,-2.0;134.0,34.0;134.0,44.0;134.0,46.0;134.0,48.0;134.0,50.0;134.0,52.0;134.0,54.0;134.0,56.0;134.0,58.0;134.0,60.0;134.0,62.0;134.0,64.0;134.0,66.0;134.0,68.0;134.0,70.0;136.0,-84.0;136.0,-82.0;136.0,-80.0;136.0,-78.0;136.0,-76.0;136.0,-74.0;136.0,-72.0;136.0,-70.0;136.0,-68.0;136.0,-34.0;136.0,-32.0;136.0,-30.0;136.0,-28.0;136.0,-26.0;136.0,-24.0;136.0,-22.0;136.0,-20.0;136.0,-18.0;136.0,-16.0;136.0,-12.0;136.0,-4.0;136.0,34.0;136.0,36.0;136.0,46.0;136.0,48.0;136.0,50.0;136.0,52.0;136.0,54.0;136.0,56.0;136.0,58.0;136.0,60.0;136.0,62.0;136.0,64.0;136.0,66.0;136.0,68.0;136.0,70.0;138.0,-84.0;138.0,-82.0;138.0,-80.0;138.0,-78.0;138.0,-76.0;138.0,-74.0;138.0,-72.0;138.0,-70.0;138.0,-68.0;138.0,-34.0;138.0,-32.0;138.0,-30.0;138.0,-28.0;138.0,-26.0;138.0,-24.0;138.0,-22.0;138.0,-20.0;138.0,-18.0;138.0,-8.0;138.0,-4.0;138.0,-2.0;138.0,36.0;138.0,48.0;138.0,50.0;138.0,52.0;138.0,58.0;138.0,60.0;138.0,62.0;138.0,64.0;138.0,66.0;138.0,68.0;138.0,70.0;138.0,76.0;140.0,-84.0;140.0,-82.0;140.0,-80.0;140.0,-78.0;140.0,-76.0;140.0,-74.0;140.0,-72.0;140.0,-70.0;140.0,-68.0;140.0,-36.0;140.0,-34.0;140.0,-32.0;140.0,-30.0;140.0,-28.0;140.0,-26.0;140.0,-24.0;140.0,-22.0;140.0,-20.0;140.0,-18.0;140.0,-8.0;140.0,-6.0;140.0,-4.0;140.0,36.0;140.0,38.0;140.0,40.0;140.0,42.0;140.0,50.0;140.0,52.0;140.0,54.0;140.0,58.0;140.0,60.0;140.0,62.0;140.0,64.0;140.0,66.0;140.0,68.0;140.0,70.0;140.0,72.0;140.0,76.0;142.0,-84.0;142.0,-82.0;142.0,-80.0;142.0,-78.0;142.0,-76.0;142.0,-74.0;142.0,-72.0;142.0,-70.0;142.0,-68.0;142.0,-38.0;142.0,-36.0;142.0,-34.0;142.0,-32.0;142.0,-30.0;142.0,-28.0;142.0,-26.0;142.0,-24.0;142.0,-22.0;142.0,-20.0;142.0,-18.0;142.0,-16.0;142.0,-14.0;142.0,-12.0;142.0,-8.0;142.0,-6.0;142.0,-4.0;142.0,44.0;142.0,48.0;142.0,52.0;142.0,60.0;142.0,62.0;142.0,64.0;142.0,66.0;142.0,68.0;142.0,70.0;142.0,72.0;142.0,76.0;144.0,-84.0;144.0,-82.0;144.0,-80.0;144.0,-78.0;144.0,-76.0;144.0,-74.0;144.0,-72.0;144.0,-70.0;144.0,-68.0;144.0,-38.0;144.0,-36.0;144.0,-34.0;144.0,-32.0;144.0,-30.0;144.0,-28.0;144.0,-26.0;144.0,-24.0;144.0,-22.0;144.0,-20.0;144.0,-18.0;144.0,-16.0;144.0,-6.0;144.0,-4.0;144.0,44.0;144.0,50.0;144.0,60.0;144.0,62.0;144.0,64.0;144.0,66.0;144.0,68.0;144.0,70.0;144.0,72.0;146.0,-84.0;146.0,-82.0;146.0,-80.0;146.0,-78.0;146.0,-76.0;146.0,-74.0;146.0,-72.0;146.0,-70.0;146.0,-68.0;146.0,-42.0;146.0,-38.0;146.0,-36.0;146.0,-34.0;146.0,-32.0;146.0,-30.0;146.0,-28.0;146.0,-26.0;146.0,-24.0;146.0,-22.0;146.0,-20.0;146.0,-18.0;146.0,-8.0;146.0,-6.0;146.0,60.0;146.0,62.0;146.0,64.0;146.0,66.0;146.0,68.0;146.0,70.0;146.0,72.0;148.0,-84.0;148.0,-82.0;148.0,-80.0;148.0,-78.0;148.0,-76.0;148.0,-74.0;148.0,-72.0;148.0,-70.0;148.0,-42.0;148.0,-36.0;148.0,-34.0;148.0,-32.0;148.0,-30.0;148.0,-28.0;148.0,-26.0;148.0,-24.0;148.0,-22.0;148.0,-20.0;148.0,-10.0;148.0,-8.0;148.0,60.0;148.0,62.0;148.0,64.0;148.0,66.0;148.0,68.0;148.0,70.0;148.0,72.0;150.0,-84.0;150.0,-82.0;150.0,-80.0;150.0,-78.0;150.0,-76.0;150.0,-74.0;150.0,-72.0;150.0,-70.0;150.0,-36.0;150.0,-34.0;150.0,-32.0;150.0,-30.0;150.0,-28.0;150.0,-26.0;150.0,-24.0;150.0,-10.0;150.0,-6.0;150.0,60.0;150.0,62.0;150.0,64.0;150.0,66.0;150.0,68.0;150.0,70.0;152.0,-84.0;152.0,-82.0;152.0,-80.0;152.0,-78.0;152.0,-76.0;152.0,-74.0;152.0,-72.0;152.0,-70.0;152.0,-32.0;152.0,-30.0;152.0,-28.0;152.0,-26.0;152.0,60.0;152.0,62.0;152.0,64.0;152.0,66.0;152.0,68.0;152.0,70.0;154.0,-84.0;154.0,-82.0;154.0,-80.0;154.0,-78.0;154.0,-76.0;154.0,-74.0;154.0,-72.0;154.0,-70.0;154.0,60.0;154.0,62.0;154.0,64.0;154.0,66.0;154.0,68.0;154.0,70.0;156.0,-84.0;156.0,-82.0;156.0,-80.0;156.0,-78.0;156.0,-76.0;156.0,-74.0;156.0,-72.0;156.0,-70.0;156.0,54.0;156.0,56.0;156.0,62.0;156.0,64.0;156.0,66.0;156.0,68.0;156.0,70.0;158.0,-84.0;158.0,-82.0;158.0,-80.0;158.0,-78.0;158.0,-76.0;158.0,-74.0;158.0,-72.0;158.0,-70.0;158.0,52.0;158.0,54.0;158.0,56.0;158.0,58.0;158.0,62.0;158.0,64.0;158.0,66.0;158.0,68.0;158.0,70.0;160.0,-84.0;160.0,-82.0;160.0,-80.0;160.0,-78.0;160.0,-76.0;160.0,-74.0;160.0,-72.0;160.0,54.0;160.0,56.0;160.0,58.0;160.0,62.0;160.0,64.0;160.0,66.0;160.0,68.0;162.0,-84.0;162.0,-82.0;162.0,-78.0;162.0,-76.0;162.0,-74.0;162.0,-72.0;162.0,56.0;162.0,58.0;162.0,60.0;162.0,62.0;162.0,64.0;162.0,66.0;162.0,68.0;164.0,-84.0;164.0,-78.0;164.0,-74.0;164.0,-72.0;164.0,60.0;164.0,64.0;164.0,66.0;164.0,68.0;166.0,-84.0;166.0,-74.0;166.0,-72.0;166.0,-22.0;166.0,62.0;166.0,64.0;166.0,66.0;166.0,68.0;168.0,-84.0;168.0,-72.0;168.0,-46.0;168.0,62.0;168.0,64.0;168.0,66.0;168.0,68.0;170.0,-84.0;170.0,-72.0;170.0,-46.0;170.0,-44.0;170.0,62.0;170.0,64.0;170.0,66.0;170.0,68.0;172.0,-44.0;172.0,-42.0;172.0,62.0;172.0,64.0;172.0,66.0;172.0,68.0;174.0,-42.0;174.0,-36.0;174.0,62.0;174.0,64.0;174.0,66.0;174.0,68.0;176.0,-40.0;176.0,-38.0;176.0,64.0;176.0,66.0;176.0,68.0;178.0,-38.0;178.0,-18.0;178.0,64.0;178.0,66.0;178.0,68.0";
+
+/* ================= Telegram ================= */
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+let user = null;
+if (tg) {
+  tg.ready();
+  tg.expand();
+  try { tg.setHeaderColor && tg.setHeaderColor("#05030d"); tg.setBackgroundColor && tg.setBackgroundColor("#05030d"); } catch(e){}
+  if (tg.initDataUnsafe && tg.initDataUnsafe.user) user = tg.initDataUnsafe.user;
+}
+const haptic = (style) => { try { tg && tg.HapticFeedback && tg.HapticFeedback.impactOccurred(style || "light"); } catch(e){} };
+
+const state = {
+  page: "home",
+  selectedServer: null,
+  invited: 0,
+  lang: "ru",
+  plan: "free",
+  devices: 0
+};
+
+/* ================= helpers ================= */
+const $ = (s) => document.querySelector(s);
+const toastEl = $("#toast");
+let toastTimer;
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2600); }
+function openBot(start){ const url = start ? BOT_URL + "?start=" + start : BOT_URL; if (tg && tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url, "_blank"); }
+async function copyText(t){ try { await navigator.clipboard.writeText(t); } catch(e){ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); try{document.execCommand("copy")}catch(_){} ta.remove(); } }
+
+/* ================= header / profile ================= */
+function initUser(){
+  const name = user ? [user.first_name, user.last_name].filter(Boolean).join(" ") : "Гость";
+  const initials = (user && user.first_name ? user.first_name[0] : "Ч").toUpperCase();
+  const avatarHTML = (user && user.photo_url) ? `<img src="${user.photo_url}" alt="">` : initials;
+  $("#avatar").innerHTML = avatarHTML;
+  $("#profAvatar").innerHTML = avatarHTML;
+  $("#topName").textContent = name;
+  $("#profName").textContent = name;
+  const idStr = user ? String(user.id) : "—";
+  $("#topId").textContent = "ID " + idStr;
+  $("#profId").textContent = idStr;
+  $("#profUsername").textContent = user && user.username ? "@" + user.username : "";
+  if (!tg) $("#noTg").classList.add("show");
+  // реальная дата первого входа — сохраняем локально
+  let first = null;
+  try { first = localStorage.getItem("chupik_first_visit"); if (!first) { first = new Date().toLocaleDateString("ru-RU"); localStorage.setItem("chupik_first_visit", first);} } catch(e){ first = "—"; }
+  $("#profReg").textContent = first;
+}
+
+function refLinkFor(){
+  return user ? `t.me/${BOT_USERNAME}?start=ref_${user.id}` : `t.me/${BOT_USERNAME}`;
+}
+
+function renderRewards(){
+  const el = $("#rewardList");
+  el.innerHTML = REF_TIERS.map(t=>{
+    const done = state.invited >= t.n;
+    return `<div class="reward ${done?'done':''}"><span class="r-n">${t.n}</span><span class="r-t">${t.label}</span><span class="r-p">${done?'Получено':state.invited+'/'+t.n}</span></div>`;
+  }).join("");
+}
+
+function renderLangs(){
+  $("#langChips").innerHTML = LANGS.map(l=>
+    `<button class="lang-chip ${l.code===state.lang?'active':''}" data-lang="${l.code}">${l.name}</button>`).join("");
+  $("#langChips").querySelectorAll(".lang-chip").forEach(b=>b.addEventListener("click",()=>{
+    state.lang = b.dataset.lang; haptic("light"); renderLangs();
+    toast("Язык сохранён: " + LANGS.find(x=>x.code===state.lang).name);
+  }));
+}
+
+/* ================= servers ================= */
+function renderServers(){
+  const el = $("#srvList");
+  el.innerHTML = SERVERS.map(s=>{
+    const sel = state.selectedServer===s.id;
+    return `<div class="srv ${sel?'selected':''}" data-srv="${s.id}" role="button" tabindex="0">
+      <span class="srv-flag">${s.flag}</span>
+      <span class="srv-mid"><span class="srv-name">${s.name}</span><span class="srv-meta">WireGuard · план запуска</span></span>
+      <span class="srv-right"><span class="srv-status">${sel?'Выбран':'Скоро'}</span><span class="srv-ping">${sel?'—':'— ms'}</span></span>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".srv").forEach(c=>c.addEventListener("click",()=>{ selectServer(c.dataset.srv); haptic("light"); }));
+}
+function selectServer(id){
+  state.selectedServer = (state.selectedServer===id) ? null : id;
+  renderServers();
+}
+
+/* ================= tariffs ================= */
+function renderPlans(){
+  const el = $("#planList");
+  el.innerHTML = PLANS.map(p=>{
+    const cur = state.plan===p.id;
+    return `<div class="plan-card ${p.popular?'popular':''} ${cur?'current':''}">
+      <div class="plan-top">
+        <span class="plan-name">${p.name}</span>
+        ${cur?'<span class="tag tag-cur">Текущий</span>':(p.popular?'<span class="tag tag-pop">Популярный</span>':'')}
+      </div>
+      <div class="plan-price">${p.price} <small>/ месяц</small></div>
+      <div class="plan-desc">${p.desc}</div>
+      <ul class="plan-feats">${p.feats.map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${f}</li>`).join("")}</ul>
+      <button class="btn ${cur?'btn-outline':'btn-primary'} btn-full plan-btn" data-plan="${p.id}" ${cur?'disabled style="opacity:.55"':''}>${cur?'Ваш тариф':'Выбрать '+p.name}</button>
+    </div>`;
+  }).join("");
+  el.querySelectorAll(".plan-btn").forEach(b=>b.addEventListener("click",()=>{
+    haptic("medium");
+    openBot("buy_" + b.dataset.plan);
+  }));
+}
+
+/* ================= devices ================= */
+function renderDevices(){
+  const max = PLANS.find(p=>p.id===state.plan).devices;
+  $("#devLimit").textContent = `${state.devices} / ${max}`;
+  requestAnimationFrame(()=>{ $("#devProgress").style.width = Math.min(100, state.devices/max*100) + "%"; });
+  const card = $("#deviceListCard");
+  if (state.devices===0){
+    card.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/></svg><b>Пока нет устройств</b><p>Конфигурация WireGuard выдаётся ботом после покупки подписки и запуска серверов.</p></div>`;
+  } else {
+    card.innerHTML = state.devicesDummy ? "" : "";
+  }
+}
+
+/* ================= navigation ================= */
+function go(page){
+  if (state.page===page) return;
+  state.page = page;
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const el = $("#page-"+page);
+  if (el) el.classList.add("active");
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active", t.dataset.page===page));
+  $("#main").scrollTop = 0; window.scrollTo({top:0, behavior:"instant" in window ? "instant" : "auto"});
+  if (page==="devices") renderDevices();
+  if (page==="servers"){ sizeCanvas(); seedArcs(); }
+  haptic("light");
+}
+document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click",()=>go(t.dataset.page)));
+document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
+
+/* ================= events ================= */
+$("#copyRef").addEventListener("click", async ()=>{ haptic("light"); await copyText(refLinkFor()); toast("Ссылка скопирована"); });
+document.querySelectorAll("[data-copyref]").forEach(b=>b.addEventListener("click", async ()=>{ haptic("light"); await copyText(refLinkFor()); toast("Ссылка скопирована — отправьте её другу"); }));
+$("#supportBtn").addEventListener("click", ()=>{ haptic("light"); openBot("support"); });
+$("#openBotBtn").addEventListener("click", ()=>{ haptic("light"); openBot(); });
+$("#termsBtn").addEventListener("click", ()=>{ haptic("light"); openBot("terms"); });
+$("#groupBtn").addEventListener("click", ()=>{ haptic("light"); openBot("group"); });
+$("#addDeviceBtn").addEventListener("click", ()=>{ haptic("light"); toast("Выдача конфигураций начнётся после запуска VPN-серверов"); });
+$("#noTgLink").addEventListener("click", ()=>{});
+
+/* ================= world map ================= */
+const dots = MAP_DOTS.split(";").map(p=>{const [a,b]=p.split(",");return [parseFloat(a),parseFloat(b)];});
+const canvas = $("#mapCanvas");
+const ctx = canvas.getContext("2d");
+let W=0,H=0,DPR=1;
+function sizeCanvas(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  const w = canvas.parentElement.clientWidth;
+  W = Math.round(w); H = Math.round(w*0.5);
+  canvas.width = W*DPR; canvas.height = H*DPR;
+  canvas.style.height = H+"px";
+}
+const proj = (lon,lat)=>[ (lon+180)/360*W, (84-lat)/168*(H*0.92)+H*0.04 ];
+
+let arcs = [];
+function seedArcs(){
+  arcs = [];
+  const pairs = [["de","us-e"],["fr","sg"],["nl","ca"],["jp","us-w"],["ae","jp"],["pl","br"],["fr","ae"],["de","pl"]];
+  pairs.forEach((p,i)=>{
+    const a = SERVERS.find(s=>s.id===p[0]), b = SERVERS.find(s=>s.id===p[1]);
+    if (a&&b) arcs.push({a,b,t:Math.random(),speed:0.0016+Math.random()*0.0012,off:i*0.8});
+  });
+}
+function drawMap(ts){
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  // dots
+  const tw = ts*0.0009;
+  for (const [lon,lat] of dots){
+    const [x,y] = proj(lon,lat);
+    const a = 0.30 + 0.22*Math.sin(tw + x*0.05 + y*0.07);
+    ctx.fillStyle = `rgba(168,85,255,${a.toFixed(3)})`;
+    ctx.fillRect(x-0.7, y-0.7, 1.4, 1.4);
+  }
+  // arcs
+  for (const arc of arcs){
+    const [x1,y1] = proj(arc.a.lon, arc.a.lat), [x2,y2] = proj(arc.b.lon, arc.b.lat);
+    const mx = (x1+x2)/2, my = Math.min(y1,y2) - Math.max(24, Math.abs(x2-x1)*0.22);
+    arc.t += arc.speed; if (arc.t>1.35) arc.t = -0.35;
+    // path
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.quadraticCurveTo(mx,my,x2,y2);
+    ctx.strokeStyle = "rgba(168,85,255,0.10)"; ctx.lineWidth = 1; ctx.stroke();
+    // moving light
+    const t = Math.max(0, Math.min(1, arc.t));
+    const q = (p0,p1,p2,t)=>{const u=1-t;return u*u*p0+2*u*t*p1+t*t*p2;};
+    const px = q(x1,mx,x2,t), py = q(y1,my,y2,t);
+    const fade = Math.sin(Math.PI*t);
+    ctx.beginPath(); ctx.arc(px,py, 1.6+fade*0.8, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(216,180,255,${(0.5*fade+0.1).toFixed(3)})`;
+    ctx.fill();
+  }
+  // markers
+  const pulse = ts*0.002;
+  for (const s of SERVERS){
+    const [x,y] = proj(s.lon, s.lat);
+    const sel = state.selectedServer===s.id;
+    const r = sel ? 8 : 5;
+    // pulse ring
+    const pr = r + 4 + ((pulse + s.lon*0.01)%1)*10;
+    ctx.beginPath(); ctx.arc(x,y,pr,0,Math.PI*2);
+    ctx.strokeStyle = sel ? `rgba(0,229,155,${(0.45*(1-((pr-r-4)/10))).toFixed(3)})` : `rgba(168,85,255,${(0.35*(1-((pr-r-4)/10))).toFixed(3)})`;
+    ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle = sel ? "#00e59b" : "#c084fc";
+    ctx.shadowColor = sel ? "#00e59b" : "#a855ff"; ctx.shadowBlur = 12;
+    ctx.fill(); ctx.shadowBlur = 0;
+  }
+  requestAnimationFrame(drawMap);
+}
+canvas.addEventListener("click", (e)=>{
+  const rect = canvas.getBoundingClientRect();
+  const cx = e.clientX-rect.left, cy = e.clientY-rect.top;
+  let best=null, bd=26*26;
+  for (const s of SERVERS){
+    const [x,y] = proj(s.lon,s.lat);
+    const d = (x-cx)*(x-cx)+(y-cy)*(y-cy);
+    if (d<bd){bd=d;best=s;}
+  }
+  if (best){ selectServer(best.id); haptic("light"); }
+});
+
+/* ================= init ================= */
+function init(){
+  initUser();
+  renderServers();
+  renderPlans();
+  renderRewards();
+  renderLangs();
+  renderDevices();
+  sizeCanvas(); seedArcs(); requestAnimationFrame(drawMap);
+  let rz; window.addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{sizeCanvas();},150)});
+}
+init();
+</script>
+</body>
+</html>

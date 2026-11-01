@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tomnukoleksandr94-gif.github.io/chupik-vpn/sitemap.xml

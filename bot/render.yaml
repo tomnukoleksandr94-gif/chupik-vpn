@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: chupik-vpn-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: MINIAPP_URL
+        value: https://tomnukoleksandr94-gif.github.io/chupik-vpn/miniapp/
+      - key: BRAND_PHOTO_URL
+        value: https://tomnukoleksandr94-gif.github.io/chupik-vpn/miniapp/chupik-brand.jpg
