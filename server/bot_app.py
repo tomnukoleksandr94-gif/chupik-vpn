@@ -320,15 +320,30 @@ async def cmd_grant(msg: Message):
     await msg.answer(f"✅ {core.PLANS[plan]['name']} до {fmt_date(sub['expires_at'])}")
 
 
+def _panel_url() -> str:
+    """Актуальна адреса адмін-панелі: спершу файл keeper-а (тунель ротує URL),
+    потім BASE_URL."""
+    if settings.PANEL_URL_FILE:
+        try:
+            with open(settings.PANEL_URL_FILE) as f:
+                base = f.read().strip()
+            if base.startswith("https"):
+                return f"{base}/admin?token={settings.ADMIN_TOKEN}"
+        except Exception:
+            pass
+    if settings.BASE_URL:
+        return f"{settings.BASE_URL}/admin?token={settings.ADMIN_TOKEN}"
+    return "(адреса панелі не налаштована)"
+
+
 @dp.message(Command("admin"))
 async def cmd_admin(msg: Message):
     user = core.get_user(msg.from_user.id)
     if not (user and user["is_admin"]):
         await msg.answer("⛔ Ця команда тільки для адміністраторів.")
         return
-    from .config import settings
     core.upsert_user(msg.from_user.id, msg.from_user.username, msg.from_user.first_name)
-    panel = f"{settings.BASE_URL}/admin?token={settings.ADMIN_TOKEN}" if settings.BASE_URL else "(BASE_URL не налаштовано)"
+    panel = _panel_url()
     await msg.answer(
         "👑 <b>Панель адміністратора</b>\n\n"
         f"🔗 Адмін-панель: {panel}\n\n"

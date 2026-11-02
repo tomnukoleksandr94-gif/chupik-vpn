@@ -21,6 +21,9 @@ class Settings:
         if x.strip().isdigit()
     }
 
+    # Файл з актуальною публічною URL (пишеться keeper-ом тунелю; для /admin-посилань)
+    PANEL_URL_FILE = os.environ.get("PANEL_URL_FILE", "")
+
     # База
     DB_PATH = os.environ.get("DB_PATH", "chupik.db")
 
