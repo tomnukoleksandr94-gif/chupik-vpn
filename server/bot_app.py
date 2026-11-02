@@ -292,7 +292,7 @@ async def cmd_refund(msg: Message):
         return
     parts = (msg.text or "").split()
     if len(parts) < 3:
-        await msg.answer("Використання: /refund <tg_id> <charge_id>")
+        await msg.answer("Використання: /refund [tg_id] [charge_id]")
         return
     ok = await payments.refund_stars(bot, int(parts[1]), parts[2])
     await msg.answer("✅ Повернено" if ok else "❌ Не вдалося — деталі в адмін-панелі")
@@ -306,7 +306,7 @@ async def cmd_grant(msg: Message):
         return
     parts = (msg.text or "").split()
     if len(parts) < 3:
-        await msg.answer("Використання: /grant <tg_id> <basic|premium|ultimate> [days]")
+        await msg.answer("Використання: /grant [tg_id] [basic|premium|ultimate] [days]")
         return
     tg_id, plan = int(parts[1]), parts[2].lower()
     days = int(parts[3]) if len(parts) > 3 else 30
@@ -348,8 +348,8 @@ async def cmd_admin(msg: Message):
         "👑 <b>Панель адміністратора</b>\n\n"
         f"🔗 Адмін-панель: {panel}\n\n"
         "<b>Команди:</b>\n"
-        "/grant <code><tg_id> <basic|premium|ultimate> [днів]</code> — видати підписку\n"
-        "/refund <code><tg_id> <charge_id></code> — повернути Stars\n"
+        "/grant [tg_id] [basic|premium|ultimate] [днів] — видати підписку\n"
+        "/refund [tg_id] [charge_id] — повернути Stars\n"
         "/users — кількість користувачів")
 
 
