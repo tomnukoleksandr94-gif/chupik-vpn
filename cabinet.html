@@ -235,13 +235,16 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
 <script>
 "use strict";
 /* ---------- база API ---------- */
+// Адреса backend за замовчуванням (щоб кабінет працював одразу, без ручного налаштування).
+// Якщо сервер недоступний — з'явиться екран підключення з можливістю вказати іншу адресу.
+const DEFAULT_API = "https://d25b0907ad27c6.lhr.life";
 function getApiBase(){
   const p = new URLSearchParams(location.search);
   if (p.get("api")) { localStorage.setItem("chupik_api", p.get("api").replace(/\/+$/,"")); return localStorage.getItem("chupik_api"); }
   if (localStorage.getItem("chupik_api")) return localStorage.getItem("chupik_api");
   // сайт на GitHub Pages — потрібна зовнішня адреса; якщо кабінет відкритий з самого backend — той самий origin
   if (!location.hostname.endsWith("github.io")) return "";
-  return null; // невідома
+  return DEFAULT_API || null;
 }
 const API = getApiBase();
 let TOKEN = localStorage.getItem("chupik_token") || "";
