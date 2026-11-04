@@ -30,9 +30,21 @@ class Settings:
     # Публічна URL цього backend (для Stripe success_url)
     BASE_URL = os.environ.get("BASE_URL", "").rstrip("/")
 
+    # Публічна URL сайту (GitHub Pages) — для реферальних посилань веб-акаунтів
+    WEB_SITE_URL = os.environ.get(
+        "WEB_SITE_URL", "https://tomnukoleksandr94-gif.github.io/chupik-vpn").rstrip("/")
+
     # Stripe (оплата картою на сайті). Пусто = вимкнено.
     STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
     STRIPE_WEBHOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "")
+
+    # LiqPay (ПриватБанк) — оплата картою з виплатами на картку UA. Пусто = вимкнено.
+    # Гроші приходять на карту, прив'язану до торгового акаунта LiqPay.
+    LIQPAY_PUBLIC_KEY = os.environ.get("LIQPAY_PUBLIC_KEY", "")
+    LIQPAY_PRIVATE_KEY = os.environ.get("LIQPAY_PRIVATE_KEY", "")
+
+    # Сесії веб-кабінету (сайт) — час життя, днів
+    WEB_SESSION_DAYS = int(os.environ.get("WEB_SESSION_DAYS", "30"))
 
     # SSH для керування VPN-серверами
     WG_SSH_USER = os.environ.get("WG_SSH_USER", "root")

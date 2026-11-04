@@ -70,6 +70,19 @@ CREATE TABLE IF NOT EXISTS admin_log(
   ts INTEGER, actor TEXT, action TEXT, details TEXT
 );
 CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE IF NOT EXISTS web_users(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  tg_id INTEGER UNIQUE NOT NULL,               -- синтеэтичний ID (негативний), спільна логіка з Telegram
+  created_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS web_sessions(
+  token TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  created_at INTEGER,
+  expires_at INTEGER
+);
 CREATE INDEX IF NOT EXISTS idx_devices_tg ON devices(tg_id);
 CREATE INDEX IF NOT EXISTS idx_payments_tg ON payments(tg_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_tg ON subscriptions(tg_id);

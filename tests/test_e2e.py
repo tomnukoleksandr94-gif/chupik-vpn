@@ -22,6 +22,8 @@ os.environ["DB_PATH"] = "/tmp/chupik_test.db"
 os.environ["BASE_URL"] = "http://localhost:9999"
 os.environ["STRIPE_SECRET_KEY"] = "sk_test_123"
 os.environ["STRIPE_WEBHOOK_SECRET"] = "whsec_test"
+os.environ["LIQPAY_PUBLIC_KEY"] = "i_test_pub"
+os.environ["LIQPAY_PRIVATE_KEY"] = "test_priv_key_12345"
 os.environ["WG_FAKE_LOG"] = "/tmp/wg_fake.log"
 os.environ["WG_FAKE_PEERS"] = "/tmp/wg_fake_peers.txt"
 
@@ -206,6 +208,80 @@ async def main():
         check("повернення Stars записано", ok)
         p = db.q1("SELECT status FROM payments WHERE provider_ref='charge_XXX_1'")
         check("платіж позначено refunded", p["status"] == "refunded")
+
+        # --- 10. веб-акаунти сайту (реєстрація / вхід / Bearer) ---
+        reg_bad = c.post("/api/web/auth/register", json={"email": "bad-email", "password": "123456"})
+        check("реєстрація з кривим email відкинута", reg_bad.status_code == 400)
+        reg_dup = c.post("/api/web/auth/register", json={"email": "user@site.ua", "password": "pass123"})
+        reg_dup2 = c.post("/api/web/auth/register", json={"email": "user@site.ua", "password": "pass123"})
+        check("реєстрація веб-акаунта працює", reg_dup.status_code == 200 and reg_dup2.status_code == 400)
+        token = reg_dup.json().get("token", "")
+        web_tg_id = reg_dup.json().get("tg_id", 0)
+        check("веб-акаунт отримав синтетичний ID", web_tg_id < 0)
+
+        login_bad = c.post("/api/web/auth/login", json={"email": "user@site.ua", "password": "wrong!"})
+        check("невірний пароль відкидається", login_bad.status_code == 400)
+        login = c.post("/api/web/auth/login", json={"email": "user@site.ua", "password": "pass123"})
+        check("вхід веб-акаунта працює", login.status_code == 200 and login.json().get("token"))
+
+        me_web = c.get("/api/me", headers={"Authorization": f"Bearer {token}"})
+        check("Bearer-сесія дає доступ до /api/me", me_web.status_code == 200 and me_web.json()["tg_id"] == web_tg_id)
+        me_bad = c.get("/api/me", headers={"Authorization": "Bearer not-a-token"})
+        check("кривий Bearer відкидається", me_bad.status_code == 401)
+
+        # реферальний код у реєстрації
+        reg_ref = c.post("/api/web/auth/register", json={"email": "friend@site.ua", "password": "pass123", "ref": web_tg_id})
+        check("реєстрація за реферальним кодом", reg_ref.status_code == 200)
+        check("рефералка веб-акаунта записана", core.register_referral(web_tg_id, reg_ref.json()["tg_id"]) is False)  # дублікат
+
+        # --- 11. LiqPay: інвойс + webhook ---
+        check("провайдер карток = liqpay (має пріоритет)", payments.card_provider() == "liqpay")
+        url = payments.create_liqpay_checkout(222, "premium")
+        check("інвойс LiqPay створено", url.startswith("https://www.liqpay.ua/api/3/checkout/"))
+        import re as _re
+        m = _re.search(r"checkout/([^/]+)/([^/?#]+)", url)
+        check("інвойс має data+signature", m and len(m.group(1)) > 20 and len(m.group(2)) > 20)
+        order_id = db.q1("SELECT provider_ref FROM payments WHERE provider_ref LIKE 'chupik_222_premium_%' ORDER BY id DESC")
+        check("платіж pending записано", order_id is not None)
+
+        # справжній webhook: правильний підпис → активація
+        import base64 as _b64
+        lp_payload = {"status": "success", "order_id": order_id["provider_ref"], "amount": 4.99, "currency": "EUR"}
+        lp_data = _b64.b64encode(json.dumps(lp_payload).encode()).decode()
+        lp_sig = base64.b64encode(hashlib.sha1(
+            (os.environ["LIQPAY_PRIVATE_KEY"] + lp_data + os.environ["LIQPAY_PRIVATE_KEY"]).encode()).digest()).decode()
+        lp_ok = c.post("/webhook/liqpay", content=f"data={lp_data}&signature={lp_sig}".encode(),
+                      headers={"Content-Type": "application/x-www-form-urlencoded"})
+        check("webhook LiqPay активував підписку", lp_ok.status_code == 200 and lp_ok.json().get("ok") is True)
+        check("тариф premium після LiqPay", core.get_user(222)["plan"] == "premium")
+
+        # повторний той самий webhook — ігнорується (ідемпотентність)
+        lp_dup = c.post("/webhook/liqpay", content=f"data={lp_data}&signature={lp_sig}".encode())
+        check("повторний LiqPay-webhook ігнорується", lp_dup.json().get("duplicate") is True)
+
+        # невірний підпис
+        lp_bad = c.post("/webhook/liqpay", content=f"data={lp_data}&signature=AAAA".encode())
+        check("невірний підпис LiqPay відкинуто", lp_bad.status_code == 400)
+
+        # невдалий платіж позначається failed
+        url2 = payments.create_liqpay_checkout(222, "basic")
+        o2 = db.q1("SELECT provider_ref FROM payments WHERE provider_ref LIKE 'chupik_222_basic_%' ORDER BY id DESC")
+        lp_fail = {"status": "failure", "order_id": o2["provider_ref"]}
+        d2 = _b64.b64encode(json.dumps(lp_fail).encode()).decode()
+        s2 = base64.b64encode(hashlib.sha1((os.environ["LIQPAY_PRIVATE_KEY"] + d2 + os.environ["LIQPAY_PRIVATE_KEY"]).encode()).digest()).decode()
+        c.post("/webhook/liqpay", content=f"data={d2}&signature={s2}".encode())
+        check("невдалий LiqPay-платіж позначено failed",
+              db.q1("SELECT status FROM payments WHERE provider_ref=?", (o2["provider_ref"],))["status"] == "failed")
+
+        # оплата карткою з Bearer-сесії (як робить кабінет сайту)
+        co = c.post("/api/card/checkout", json={"plan": "basic"}, headers={"Authorization": f"Bearer {token}"})
+        check("checkout карткою з сесії сайту", co.status_code == 200 and co.json().get("provider") == "liqpay")
+
+        # вихід з веб-сесії
+        out = c.post("/api/web/auth/logout", headers={"Authorization": f"Bearer {token}"})
+        check("вихід з сесії працює", out.status_code == 200)
+        me_after = c.get("/api/me", headers={"Authorization": f"Bearer {token}"})
+        check("сесію після виходу відкликано", me_after.status_code == 401)
 
     print(f"\n{'='*50}\n✅ пройдено: {len(PASS)}  ❌ провалено: {len(FAIL)}")
     if FAIL:

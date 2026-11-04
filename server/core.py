@@ -147,11 +147,19 @@ def on_invitee_paid(invited_id: int):
 
 
 def _notify(tg_id: int, text: str):
-    if BOT is None:
+    """Надіслати повідомлення користувачу (веб-акаунти з негативним ID просто ігноруються)."""
+    if BOT is None or tg_id <= 0:
         return
+
+    async def _send():
+        try:
+            await BOT.send_message(tg_id, text)
+        except Exception:
+            pass  # чат може бути закритий — не ламаємо основний потік
+
     try:
         loop = asyncio.get_running_loop()
-        loop.create_task(BOT.send_message(tg_id, text))
+        loop.create_task(_send())
     except RuntimeError:
         pass
 

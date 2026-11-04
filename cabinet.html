@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080511">
+<meta name="description" content="ЧУПИК VPN — особистий кабінет: реєстрація, вхід, сервери, пристрої, тарифи та оплата підписки.">
+<link rel="canonical" href="https://tomnukoleksandr94-gif.github.io/chupik-vpn/cabinet.html">
+<title>Кабінет — ЧУПИК VPN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05030d;--bg2:#0b0618;--card:#130b25;--purple:#7900ff;--neon:#a855ff;--light:#c084fc;--white:#fff;--muted:#a9a0bc;--green:#00e59b;--red:#ff5b7f;--line:rgba(192,132,252,.15);--font:'Manrope',sans-serif;--display:'Unbounded',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--white);font-family:var(--font);line-height:1.6;min-height:100vh}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;background:radial-gradient(ellipse at 80% 12%,rgba(121,0,255,.16),transparent 34%),radial-gradient(ellipse at 10% 45%,rgba(92,0,180,.12),transparent 38%),linear-gradient(180deg,#070410,#05030d 55%,#080411)}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}input,select{font:inherit}
+.wrap{width:min(1060px,calc(100% - 36px));margin:0 auto}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,4,16,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.topbar-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:14px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:14px;font-weight:800}
+.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#a855ff,#4e00a8);display:grid;place-items:center}
+.brand-mark svg{width:20px;height:20px}
+.top-links{display:flex;gap:8px;align-items:center}
+.top-links a,.top-links button{font-size:12px;font-weight:700;color:#bdb3ca;border:1px solid var(--line);background:rgba(255,255,255,.02);padding:9px 14px;border-radius:10px;transition:.2s}
+.top-links a:hover,.top-links button:hover{color:#fff;border-color:var(--light)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 20px;border-radius:12px;font-weight:800;font-size:13px;border:1px solid transparent;transition:.25s ease;white-space:nowrap}
+.btn-primary{color:#fff;background:linear-gradient(110deg,#6900e8,#9a38ff);box-shadow:0 9px 32px rgba(121,0,255,.26),inset 0 1px rgba(255,255,255,.25)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-outline{border-color:rgba(192,132,252,.28);background:rgba(255,255,255,.025);color:#e9dcfa}
+.btn-outline:hover{border-color:var(--light);background:rgba(121,0,255,.1)}
+.btn-danger{border-color:rgba(255,91,127,.35);background:rgba(255,91,127,.08);color:#ffb3c4}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
+.center{display:grid;place-items:center;min-height:calc(100vh - 66px);padding:30px 0}
+.card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:22px;padding:34px;width:min(430px,100%)}
+.card h1{font-size:22px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:800;color:#cbb9dd;margin-bottom:7px;letter-spacing:.04em}
+.field input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(192,132,252,.3);background:rgba(121,0,255,.08);color:#fff;font-size:14px}
+.field input:focus{outline:none;border-color:var(--neon)}
+.form-note{font-size:11px;color:#8e849f;margin-top:14px}
+.form-note a{color:var(--light)}
+.err{background:rgba(255,91,127,.12);border:1px solid rgba(255,91,127,.4);color:#ffb3c4;border-radius:10px;padding:10px 13px;font-size:12px;margin-bottom:14px;display:none}
+.okmsg{background:rgba(0,229,155,.1);border:1px solid rgba(0,229,155,.4);color:#7dffca;border-radius:10px;padding:10px 13px;font-size:12px;margin-bottom:14px;display:none}
+/* ---- кабінет ---- */
+.app{padding:26px 0 60px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:18px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:rgba(255,255,255,.02);color:#bdb3ca;padding:10px 16px;border-radius:100px;font-size:12px;font-weight:800;white-space:nowrap;transition:.2s}
+.tab.active{background:linear-gradient(110deg,#6900e8,#9a38ff);color:#fff;border-color:transparent}
+.panel{display:none}.panel.active{display:block}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.stat{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px}
+.stat .k{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.stat .v{font-family:var(--display);font-size:26px;margin-top:8px}
+.stat .v small{font-size:12px;color:var(--muted);font-family:var(--font)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .t{font-size:13px;font-weight:700}.row .d{font-size:11px;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;padding:5px 10px;border-radius:100px;border:1px solid rgba(168,85,255,.35);color:#d9b4ff;background:rgba(121,0,255,.1)}
+.pill.on{border-color:rgba(0,229,155,.4);color:#7dffca;background:rgba(0,229,155,.08)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.dot.off{background:var(--red);box-shadow:0 0 10px var(--red)}
+.sec-title{font-size:17px;margin:26px 0 14px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.plan-card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative}
+.plan-card.cur{border-color:rgba(0,229,155,.45)}
+.plan-card .nm{font-family:var(--display);font-size:15px}
+.plan-card .pr{font-family:var(--display);font-size:26px;margin:12px 0 4px}
+.plan-card .pr small{font-family:var(--font);font-size:11px;color:var(--muted)}
+.plan-card ul{list-style:none;margin:14px 0;display:grid;gap:8px}
+.plan-card li{font-size:11px;color:#d4c9df;display:flex;gap:8px;align-items:center}
+.plan-card li svg{width:13px;height:13px;color:var(--green);flex-shrink:0}
+.plan-card .btn{width:100%;margin-top:4px}
+.tag-cur{position:absolute;top:14px;right:14px;font-size:9px;font-weight:800;letter-spacing:.08em;color:#7dffca;border:1px solid rgba(0,229,155,.4);border-radius:100px;padding:4px 9px}
+.toast{position:fixed;z-index:100;bottom:22px;left:50%;transform:translate(-50%,20px);background:#211333;border:1px solid rgba(168,85,255,.4);border-radius:12px;padding:12px 17px;color:#eee;font-size:12px;opacity:0;pointer-events:none;transition:.3s;max-width:92vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+/* модалка */
+.modal-bg{position:fixed;inset:0;background:rgba(3,1,10,.8);backdrop-filter:blur(6px);z-index:90;display:none;place-items:center;padding:20px}
+.modal-bg.open{display:grid}
+.modal{background:linear-gradient(145deg,#1c1030,#0d0819);border:1px solid var(--line);border-radius:22px;padding:28px;width:min(420px,100%);max-height:90vh;overflow:auto}
+.modal h3{font-size:16px;margin-bottom:14px}
+.qr-box{margin:14px auto;width:fit-content;background:#fff;padding:12px;border-radius:14px}
+.qr-box img{display:block;width:230px;height:230px}
+.conf-pre{background:#0b0713;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:10px;color:#cbb9dd;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow:auto}
+.hint{font-size:11px;color:#8e849f;line-height:1.7;margin-top:12px}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.spinner{width:34px;height:34px;border:3px solid rgba(168,85,255,.2);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:640px){.card{padding:24px}.stat .v{font-size:21px}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap topbar-in">
+  <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2 20 5v6c0 5-3.4 8.8-8 11-4.6-2.2-8-6-8-11V5l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span>ЧУПИК VPN</a>
+  <div class="top-links">
+    <a href="index.html">На сайт</a>
+    <button id="btnLogout" style="display:none">Вийти</button>
+  </div>
+</div></div>
+
+<!-- ===== ЕКРАН ПІДКЛЮЧЕННЯ ДО СЕРВЕРА ===== -->
+<div class="center" id="screenSetup" style="display:none">
+  <div class="card">
+    <h1>Підключення до сервера</h1>
+    <p class="sub">Вкажіть адресу сервера ЧУПИК VPN (наприклад, https://chupik-vpn.duckdns.org). Її можна знайти в боті командою /admin або уточнити у підтримки.</p>
+    <div class="err" id="setupErr"></div>
+    <div class="field"><label>АДРЕСА СЕРВЕРА (API)</label><input id="setupApi" type="url" placeholder="https://ваш-сервер"></div>
+    <button class="btn btn-primary" id="setupSave" style="width:100%">Підключитися</button>
+    <p class="form-note">Адреса зберігається у вашому браузері. Підключення також можна передати через посилання: <b>cabinet.html?api=адреса</b></p>
+  </div>
+</div>
+
+<!-- ===== ЕКРАН ВХОДУ / РЕЄСТРАЦІЇ ===== -->
+<div class="center" id="screenAuth" style="display:none">
+  <div class="card">
+    <h1>Особистий кабінет</h1>
+    <p class="sub">Реєстрація або вхід на сайті ЧУПИК VPN. Той самий акаунт працює і в Telegram-боті.</p>
+    <div class="err" id="authErr"></div>
+    <div id="authLogin">
+      <div class="field"><label>EMAIL</label><input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label>ПАРОЛЬ</label><input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn btn-primary" id="doLogin" style="width:100%">Увійти</button>
+      <p class="form-note">Немає акаунта? <a href="#" id="toRegister">Зареєструватися</a></p>
+    </div>
+    <div id="authRegister" style="display:none">
+      <div class="field"><label>EMAIL</label><input id="regEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label>ПАРОЛЬ (від 6 символів)</label><input id="regPass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="field"><label>ПОВТОРИТИ ПАРОЛЬ</label><input id="regPass2" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <button class="btn btn-primary" id="doRegister" style="width:100%">Створити акаунт</button>
+      <p class="form-note">Вже маєте акаунт? <a href="#" id="toLogin">Увійти</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== КАБІНЕТ ===== -->
+<div class="wrap app" id="screenApp" style="display:none">
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-tab="home">Головна</button>
+    <button class="tab" data-tab="servers">Сервери</button>
+    <button class="tab" data-tab="devices">Пристрої</button>
+    <button class="tab" data-tab="plans">Тарифи</button>
+    <button class="tab" data-tab="profile">Профіль</button>
+  </div>
+
+  <!-- Головна -->
+  <div class="panel active" id="panel-home">
+    <div class="grid g2" id="homeStats"></div>
+    <h3 class="sec-title">Швидкі дії</h3>
+    <div class="grid g2">
+      <div class="stat">
+        <div class="k">Статус підписки</div>
+        <div class="v" id="homePlan">—</div>
+        <div class="d" id="homeExp" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" data-goto="plans">Продовжити / купити</button>
+          <button class="btn btn-outline" data-goto="devices">Мої пристрої</button>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="k">Ваші сервери</div>
+        <div class="v" id="homeServers">—</div>
+        <div style="margin-top:16px"><button class="btn btn-outline" data-goto="servers">Обрати сервер</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Сервери -->
+  <div class="panel" id="panel-servers">
+    <h3 class="sec-title">Доступні сервери</h3>
+    <div class="grid g2" id="serverList"><div class="stat"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- Пристрої -->
+  <div class="panel" id="panel-devices">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <h3 class="sec-title" style="margin:0">Мої пристрої <span id="devCount" style="color:var(--muted);font-size:12px;font-family:var(--font);margin-left:8px"></span></h3>
+      <button class="btn btn-primary" id="btnAddDevice">+ Додати пристрій</button>
+    </div>
+    <div class="grid" id="deviceList" style="margin-top:14px"><div class="stat"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- Тарифи -->
+  <div class="panel" id="panel-plans">
+    <h3 class="sec-title">Тарифи</h3>
+    <div id="cardPayNote" class="stat" style="display:none;margin-bottom:14px"></div>
+    <div class="plans" id="planList"></div>
+    <p class="hint">Оплата картою — на сайті (правила Telegram). Оплата всередині Telegram-бота — Telegram Stars. Після підтвердження платежу підписка активується автоматично, а VPN-конфігурація з'явиться у вкладці «Пристрої».</p>
+  </div>
+
+  <!-- Профіль -->
+  <div class="panel" id="panel-profile">
+    <h3 class="sec-title">Профіль</h3>
+    <div class="stat" id="profileCard"><div class="spinner"></div></div>
+    <h3 class="sec-title">Реферальна програма</h3>
+    <div class="stat" id="refCard"><div class="spinner"></div></div>
+    <h3 class="sec-title">Історія платежів</h3>
+    <div class="stat" id="payCard"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА ПРИСТРОЯ ===== -->
+<div class="modal-bg" id="modalDevice">
+  <div class="modal">
+    <h3>Новий пристрій</h3>
+    <div class="err" id="devErr"></div>
+    <div class="field"><label>НАЗВА ПРИСТРОЮ</label><input id="devName" type="text" placeholder="Наприклад: Мій телефон" maxlength="40"></div>
+    <div class="field"><label>СЕРВЕР</label><select id="devServer"></select></div>
+    <button class="btn btn-primary" id="doAddDevice" style="width:100%">Створити VPN-конфігурацію</button>
+    <p class="hint">Створюється окремий ключ WireGuard для цього пристрою. Ліміт залежить від тарифу: FREE — 1, BASIC — 2, PREMIUM — 4, ULTIMATE — 5 пристроїв.</p>
+  </div>
+</div>
+
+<!-- ===== МОДАЛКА КОНФІГУ ===== -->
+<div class="modal-bg" id="modalConfig">
+  <div class="modal">
+    <h3 id="cfgTitle">Конфігурація VPN</h3>
+    <div class="qr-box"><img id="cfgQr" alt="QR-код конфігурації"></div>
+    <div class="conf-pre" id="cfgText"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="btn btn-primary" id="btnDownloadConf" style="flex:1">Завантажити .conf</button>
+      <button class="btn btn-outline" id="closeCfg" style="flex:1">Закрити</button>
+    </div>
+    <p class="hint"><b>Як підключитися:</b> встановіть застосунок WireGuard (Android/iOS/Windows/Mac), натисніть «+» → «Створити з QR-коду» (або імпортуйте файл .conf) → увімкніть тунель. Сам сайт не створює VPN-з'єднання — його створює застосунок WireGuard.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- база API ---------- */
+function getApiBase(){
+  const p = new URLSearchParams(location.search);
+  if (p.get("api")) { localStorage.setItem("chupik_api", p.get("api").replace(/\/+$/,"")); return localStorage.getItem("chupik_api"); }
+  if (localStorage.getItem("chupik_api")) return localStorage.getItem("chupik_api");
+  // сайт на GitHub Pages — потрібна зовнішня адреса; якщо кабінет відкритий з самого backend — той самий origin
+  if (!location.hostname.endsWith("github.io")) return "";
+  return null; // невідома
+}
+const API = getApiBase();
+let TOKEN = localStorage.getItem("chupik_token") || "";
+let ME = null, SERVERS = [], cfgBlob = {name:"", text:""};
+
+const $ = s => document.querySelector(s);
+function show(id){ ["screenSetup","screenAuth","screenApp"].forEach(x=>$("#"+x).style.display = x===id?"block":"none"); }
+function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),3000); }
+function fmtDate(ts){ if(!ts) return "—"; return new Date(ts*1000).toLocaleDateString("uk-UA"); }
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;"}[c])); }
+
+async function api(path, opts={}){
+  const headers = Object.assign({"Content-Type":"application/json"}, opts.headers||{});
+  if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
+  let r;
+  try { r = await fetch(API + path, {...opts, headers}); }
+  catch(e){ throw new Error("Немає з'єднання з сервером"); }
+  let j;
+  try { j = await r.json(); } catch(e){ throw new Error("Сервер відповів некоректно"); }
+  if (r.status === 401 && TOKEN){ // сесія протермінувалася
+    TOKEN=""; localStorage.removeItem("chupik_token"); show("screenAuth");
+    throw new Error("Сесію завершено — увійдіть знову");
+  }
+  if (!r.ok) throw new Error(j.detail || j.error || "Помилка сервера");
+  return j;
+}
+
+/* ---------- екран налаштування API ---------- */
+async function boot(){
+  if (API === null){ show("screenSetup"); return; }
+  await checkConfig();
+}
+async function checkConfig(){
+  try {
+    const cfg = await api("/api/web/config");
+    if (!TOKEN){ show("screenAuth"); return; }
+    try { await loadAll(); } catch(e){ if (TOKEN) throw e; show("screenAuth"); }
+  } catch(e){
+    if (API === null || API === ""){ show("screenSetup"); }
+    else { toast(e.message); show("screenSetup"); $("#setupApi").value = API; }
+  }
+}
+$("#setupSave").addEventListener("click", async ()=>{
+  const v = $("#setupApi").value.trim().replace(/\/+$/,"");
+  if (!/^https?:\/\/.+/.test(v)){ $("#setupErr").textContent="Адреса має починатися з http:// або https://"; $("#setupErr").style.display="block"; return; }
+  localStorage.setItem("chupik_api", v); location.replace(location.pathname);
+});
+
+/* ---------- вхід / реєстрація ---------- */
+$("#toRegister").addEventListener("click",e=>{e.preventDefault();$("#authLogin").style.display="none";$("#authRegister").style.display="block";});
+$("#toLogin").addEventListener("click",e=>{e.preventDefault();$("#authRegister").style.display="none";$("#authLogin").style.display="block";});
+function authErr(m){ const e=$("#authErr"); e.textContent=m; e.style.display="block"; }
+async function afterAuth(j){ TOKEN=j.token; localStorage.setItem("chupik_token",TOKEN); ME=j.user; await startApp(); }
+$("#doLogin").addEventListener("click", async ()=>{
+  $("#authErr").style.display="none";
+  try{ const j = await api("/api/web/auth/login",{method:"POST",body:JSON.stringify({email:$("#loginEmail").value,password:$("#loginPass").value})}); await afterAuth(j); }
+  catch(e){ authErr(e.message); }
+});
+$("#doRegister").addEventListener("click", async ()=>{
+  $("#authErr").style.display="none";
+  if ($("#regPass").value !== $("#regPass2").value){ authErr("Паролі не співпадають"); return; }
+  const ref = new URLSearchParams(location.search).get("ref");
+  try{ const j = await api("/api/web/auth/register",{method:"POST",body:JSON.stringify({email:$("#regEmail").value,password:$("#regPass").value, ref: ref?Number(ref):null})}); await afterAuth(j); }
+  catch(e){ authErr(e.message); }
+});
+$("#btnLogout").addEventListener("click", async ()=>{
+  try{ await api("/api/web/auth/logout",{method:"POST"}); }catch(e){}
+  TOKEN=""; localStorage.removeItem("chupik_token"); location.reload();
+});
+
+/* ---------- дані ---------- */
+async function loadAll(){
+  const me = await api("/api/me");
+  ME = me;
+  try {
+    const cfg = await api("/api/web/config");
+    ME._cardProvider = cfg.card_provider || null;
+  } catch(e){ ME._cardProvider = null; }
+  try { const sv = await api("/api/servers"); SERVERS = sv.servers||[]; } catch(e){ SERVERS=[]; }
+  startApp();
+}
+function planName(p){ return ({free:"FREE",basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE"})[p]||p; }
+
+function startApp(){
+  show("screenApp");
+  $("#btnLogout").style.display="inline-block";
+  renderHome(); renderServers(); renderDevices(); renderPlans(); renderProfile();
+}
+
+/* ---------- Головна ---------- */
+function renderHome(){
+  const days = ME.plan_expires_at ? Math.max(0, Math.ceil((ME.plan_expires_at - Date.now()/1000)/86400)) : 0;
+  $("#homeStats").innerHTML = `
+    <div class="stat"><div class="k">Поточний тариф</div><div class="v">${planName(ME.plan)}</div>
+      ${ME.bonus_until ? `<div class="d" style="color:#7dffca;font-size:11px">Бонус ${planName(ME.bonus_plan)} до ${fmtDate(ME.bonus_until)}</div>`:""}</div>
+    <div class="stat"><div class="k">Днів до завершення</div><div class="v">${days}<small> днів</small></div></div>
+    <div class="stat"><div class="k">Пристрої</div><div class="v">${(ME.devices||[]).length}<small> / ${ME.device_limit}</small></div></div>
+    <div class="stat"><div class="k">Статус</div><div class="v" style="font-size:15px">${ME.plan!=="free"?'<span class="pill on"><span class="dot"></span>Активна підписка</span>':'<span class="pill"><span class="dot off"></span>Без підписки (FREE)</span>'}</div></div>`;
+  $("#homePlan").innerHTML = planName(ME.plan) + (ME.plan!=="free" ? ` <small>до ${fmtDate(ME.plan_expires_at)}</small>`:"");
+  $("#homeExp").textContent = ME.plan!=="free" ? `Завершується ${fmtDate(ME.plan_expires_at)}` : "Оформіть підписку, щоб отримати повний доступ";
+  $("#homeServers").textContent = `${SERVERS.filter(s=>s.online).length} онлайн / ${SERVERS.length}`;
+}
+
+/* ---------- Сервери ---------- */
+function renderServers(){
+  const box = $("#serverList");
+  if (!SERVERS.length){ box.innerHTML = '<div class="stat"><div class="d">Сервери ще не налаштовані адміністратором.</div></div>'; return; }
+  box.innerHTML = SERVERS.map(s=>`
+    <div class="stat">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div class="t" style="font-weight:800;font-size:14px">${esc(s.flag||"🌐")} ${esc(s.name)}</div>
+        <div class="d">${esc(s.country||"")} · ${esc(s.code||"")}</div></div>
+        ${s.online?'<span class="pill on"><span class="dot"></span>Онлайн</span>':'<span class="pill"><span class="dot off"></span>Недоступний</span>'}
+      </div>
+      <div class="divider"></div>
+      <div class="d">Підключень: <b>${s.peers}</b>${s.load1!=null?` · Навантаження: <b>${(+s.load1).toFixed(2)}</b>`:""}</div>
+      <button class="btn btn-outline" data-goto="devices" style="width:100%;margin-top:12px" onclick="pickServerForDevice(${s.id})">Обрати для нового пристрою</button>
+    </div>`).join("");
+}
+window.pickServerForDevice = function(id){ openAddDevice(id); };
+
+/* ---------- Пристрої ---------- */
+function renderDevices(){
+  const box = $("#deviceList");
+  const devs = ME.devices||[];
+  $("#devCount").textContent = `${devs.length}/${ME.device_limit}`;
+  if (!devs.length){ box.innerHTML = '<div class="stat"><div class="d">Пристроїв немає. Створіть першу VPN-конфігурацію — кнопка «Додати пристрій».</div></div>'; return; }
+  box.innerHTML = devs.map(d=>{
+    const srv = SERVERS.find(s=>s.id===d.server_id);
+    return `<div class="stat">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div><div class="t" style="font-weight:800;font-size:14px">${esc(d.name)}</div>
+        <div class="d">${esc(srv?srv.name:"сервер")} · створено ${fmtDate(d.created_at)}</div></div>
+        <span class="pill on"><span class="dot"></span>активний</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <button class="btn btn-primary" style="flex:1" onclick="openCfg(${d.id})">Конфіг + QR</button>
+        <button class="btn btn-danger" onclick="delDevice(${d.id})">Видалити</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function openAddDevice(preselect){
+  $("#devErr").style.display="none";
+  const sel = $("#devServer");
+  const online = SERVERS.filter(s=>s.online);
+  if (!online.length){ toast("Немає доступних серверів"); return; }
+  sel.innerHTML = online.map(s=>`<option value="${s.id}" ${s.id===preselect?"selected":""}>${esc(s.flag||"")} ${esc(s.name)}</option>`).join("");
+  $("#devName").value = "";
+  $("#modalDevice").classList.add("open");
+}
+$("#btnAddDevice").addEventListener("click",()=>openAddDevice());
+$("#doAddDevice").addEventListener("click", async ()=>{
+  $("#devErr").style.display="none";
+  try{
+    await api("/api/devices",{method:"POST",body:JSON.stringify({name:$("#devName").value||"Мій пристрій", server_id:Number($("#devServer").value)})});
+    $("#modalDevice").classList.remove("open");
+    toast("Пристрій створено");
+    await loadAll();
+  }catch(e){ $("#devErr").textContent=e.message; $("#devErr").style.display="block"; }
+});
+window.delDevice = async function(id){
+  if (!confirm("Видалити пристрій і відкликати VPN-доступ?")) return;
+  try{ await api("/api/devices/"+id,{method:"DELETE"}); toast("Пристрій видалено"); await loadAll(); }
+  catch(e){ toast(e.message); }
+};
+
+/* ---------- Конфіг / QR ---------- */
+window.openCfg = async function(id){
+  try{
+    const j = await api(`/api/devices/${id}/config`);
+    cfgBlob = {name:(ME.devices||[]).find(d=>d.id===id)?.name || "chupik-vpn", text:j.config};
+    $("#cfgTitle").textContent = "Конфігурація: " + cfgBlob.name;
+    $("#cfgQr").src = "data:image/png;base64," + j.qr_png_base64;
+    $("#cfgText").textContent = j.config;
+    $("#modalConfig").classList.add("open");
+  }catch(e){ toast(e.message); }
+};
+$("#closeCfg").addEventListener("click",()=>$("#modalConfig").classList.remove("open"));
+$("#btnDownloadConf").addEventListener("click",()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([cfgBlob.text],{type:"text/plain"}));
+  a.download=(cfgBlob.name||"chupik-vpn").replace(/\s+/g,"_")+".conf";
+  a.click(); URL.revokeObjectURL(a.href);
+});
+
+/* ---------- Тарифи ---------- */
+function renderPlans(){
+  const note = $("#cardPayNote");
+  if (ME._cardProvider === null){ note.style.display="block"; note.innerHTML='<div class="d">Оплата картою ще не підключена адміністратором. Оплатити можна Telegram Stars у <a href="https://t.me/Chupik_vpnBot" style="color:var(--light)">боті</a>.</div>'; }
+  const prices = {basic:1.99, premium:4.99, ultimate:7.99};
+  const feats = {
+    basic:["2 пристрої","Розширений вибір серверів","1 друг у групі"],
+    premium:["4 пристрої","Усі стандартні сервери","До 3 друзів у групі","Пріоритетна підтримка"],
+    ultimate:["5 пристроїв","Усі доступні сервери","До 5 друзів у групі","Повна статистика"]
+  };
+  $("#planList").innerHTML = ["basic","premium","ultimate"].map(p=>`
+    <div class="plan-card ${ME.plan===p?"cur":""}">
+      ${ME.plan===p?'<span class="tag-cur">ВАШ ТАРИФ</span>':""}
+      <div class="nm">${planName(p)}</div>
+      <div class="pr">€${prices[p].toFixed(2)} <small>/ 1 місяць</small></div>
+      <ul>${feats[p].map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${f}</li>`).join("")}</ul>
+      <button class="btn ${ME.plan===p?"btn-outline":"btn-primary"}" onclick="buyPlan('${p}')">${ME.plan===p?"Продовжити":"Купити карткою"}</button>
+    </div>`).join("");
+}
+window.buyPlan = async function(plan){
+  if (!confirm(`Оформити підписку ${planName(plan)} на 1 місяць (карткою)?`)) return;
+  try{
+    const j = await api("/api/card/checkout",{method:"POST",body:JSON.stringify({plan})});
+    if (j.url) location.href = j.url; else toast("Посилання на оплату не отримано");
+  }catch(e){ toast(e.message); }
+};
+
+/* ---------- Профіль ---------- */
+function renderProfile(){
+  $("#profileCard").innerHTML = `
+    <div class="row"><div><div class="t">${esc(ME.web_email || ("Telegram ID: "+ME.tg_id))}</div><div class="d">${ME.tg_id>0?"Обліковий запис Telegram":"Веб-акаунт"}</div></div><span class="pill ${ME.plan!=="free"?"on":""}">${planName(ME.plan)}</span></div>
+    <div class="row"><div class="t">Пристрої</div><div class="d">${(ME.devices||[]).length} / ${ME.device_limit}</div></div>
+    <div class="row"><div class="t">Діє до</div><div class="d">${ME.plan_expires_at?fmtDate(ME.plan_expires_at):"—"}</div></div>`;
+  const inv = ME.referral||{}, tiers = inv.tiers||[];
+  const next = tiers.find(t=>t[0]>(inv.invited||0));
+  const friends = n => n===1 ? "друг" : (n<5 ? "друзі" : "друзів");
+  const hoursTxt = h => h<24 ? (h===3 ? "години" : "годин") : (h===24 ? "1 день" : h===72 ? "3 дні" : "7 днів");
+  $("#refCard").innerHTML = `
+    <div class="row"><div class="t">Запрошено друзів</div><div class="d">${inv.invited||0}</div></div>
+    ${tiers.map(t=>`<div class="row"><div class="t">${t[0]} ${friends(t[0])} = ${t[1]<24?t[1]+" ": ""}${hoursTxt(t[1])} PREMIUM</div><div class="d">${(inv.invited||0)>=t[0]?"✅ отримано":`залишилось ${t[0]-(inv.invited||0)}`}</div></div>`).join("")}
+    <div class="divider"></div>
+    <div class="d" style="word-break:break-all">${esc(inv.link||"")}</div>
+    <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="copyRef()">Скопіювати посилання</button>
+    ${next?`<p class="hint">Наступна нагорода: ${next[0]} ${friends(next[0])} — ${next[1]<24?next[1]+" ":""}${hoursTxt(next[1])} PREMIUM.</p>`:""}`;
+  const pays = ME.payments||[];
+  $("#payCard").innerHTML = pays.length ? pays.map(p=>`
+    <div class="row"><div><div class="t">${planName(p.plan)} · €${(+p.amount).toFixed(2)}</div><div class="d">${p.provider==="stars"?"Telegram Stars":"Картка"} · ${fmtDate(p.created_at)}</div></div>
+    <span class="pill ${p.status==="succeeded"?"on":""}">${esc(p.status)}</span></div>`).join("")
+    : '<div class="d">Платежів ще не було.</div>';
+}
+window.copyRef = async function(){
+  try{ await navigator.clipboard.writeText(ME.referral?.link||""); toast("Посилання скопійовано"); }
+  catch(e){ toast("Скопіюйте посилання вручну"); }
+};
+
+/* ---------- вкладки ---------- */
+document.querySelectorAll("#tabs .tab").forEach(t=>t.addEventListener("click",()=>{
+  document.querySelectorAll("#tabs .tab").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  $("#panel-"+t.dataset.tab).classList.add("active");
+}));
+document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{
+  const tab = document.querySelector(`#tabs .tab[data-tab="${b.dataset.goto}"]`);
+  if (tab) tab.click();
+}));
+
+/* ---------- старт ---------- */
+boot();
+</script>
+</body>
+</html>

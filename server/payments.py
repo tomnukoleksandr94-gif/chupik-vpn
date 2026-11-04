@@ -12,6 +12,8 @@
    - webhook з перевіркою підпису
    - захист від повторної обробки: payments.provider_ref UNIQUE + таблиця оброблених подій
 """
+import hashlib
+import hmac
 import json
 import time
 
@@ -39,12 +41,16 @@ def activate_after_payment(provider: str, provider_ref: str, tg_id: int, plan: s
                            amount: float, currency: str, raw: str = "") -> dict:
     """Єдиний шлях: платіж підтверджено → активувати підписку + нарахувати рефералку."""
     inserted = record_payment(provider, provider_ref, tg_id, plan, amount, currency,
-                             "succeeded", raw)
+                              "succeeded", raw)
     if not inserted:
         row = q1("SELECT status FROM payments WHERE provider_ref=?", (provider_ref,))
         if row and row["status"] == "succeeded":
             return {"ok": True, "duplicate": True}
-        return {"ok": False, "error": "payment record conflict"}
+        if row and row["status"] == "pending":
+            # очікуваний перехід: інвойс було створено раніше (pending) → підтверджено
+            mark_payment(provider_ref, "succeeded")
+        else:
+            return {"ok": False, "error": "payment record conflict"}
     result = core.activate_subscription(tg_id, plan, provider, days=30)
     core.on_invitee_paid(tg_id)  # реферальна нагорода тому, хто запросив
     return {"ok": True, "subscription": result, "duplicate": False}
@@ -93,6 +99,95 @@ async def refund_stars(bot, user_id: int, charge_id: str) -> bool:
     except Exception as e:
         db.log_admin("admin", "stars_refund_failed", f"charge={charge_id} err={e}")
         return False
+
+
+# ---------------- Картка: вибір провайдера ----------------
+
+def card_provider() -> str | None:
+    """LiqPay (виплати на картку ПриватБанку) має перевагу, інакше Stripe."""
+    if settings.LIQPAY_PUBLIC_KEY and settings.LIQPAY_PRIVATE_KEY and settings.BASE_URL:
+        return "liqpay"
+    if settings.STRIPE_SECRET_KEY and settings.STRIPE_WEBHOOK_SECRET and settings.BASE_URL:
+        return "stripe"
+    return None
+
+
+def create_card_checkout_url(tg_id: int, plan: str) -> str:
+    """Створює сторінку оплати активним провайдером (LiqPay або Stripe)."""
+    if card_provider() == "liqpay":
+        return create_liqpay_checkout(tg_id, plan)
+    return create_card_checkout(tg_id, plan)
+
+
+# ---------------- LiqPay (ПриватБанк): оплата карткою на сайті ----------------
+
+def liqpay_configured() -> bool:
+    return bool(settings.LIQPAY_PUBLIC_KEY and settings.LIQPAY_PRIVATE_KEY and settings.BASE_URL)
+
+
+def _liqpay_signature(data_b64: str) -> str:
+    import base64 as _b64
+    import hashlib as _hl
+    priv = settings.LIQPAY_PRIVATE_KEY
+    return _b64.b64encode(_hl.sha1((priv + data_b64 + priv).encode()).digest()).decode()
+
+
+def create_liqpay_checkout(tg_id: int, plan: str) -> str:
+    """Інвойс LiqPay Checkout: гроші припадають на карту торговця LiqPay.
+
+    Посилання формується за офіційною схемою api/3/checkout (data + signature).
+    """
+    import base64 as _b64
+    plan_info = core.PLANS[plan]
+    if plan == "free":
+        raise ValueError("FREE не продається")
+    order_id = f"chupik_{tg_id}_{plan}_{int(time.time() * 1000)}"
+    payload = {
+        "public_key": settings.LIQPAY_PUBLIC_KEY,
+        "version": "3",
+        "action": "pay",
+        "amount": f"{plan_info['price_eur']:.2f}",
+        "currency": "EUR",
+        "description": f"CHUPIK VPN {plan_info['name']} · 1 месяц",
+        "order_id": order_id,
+        "result_url": f"{settings.BASE_URL}/pay/success",
+        "server_url": f"{settings.BASE_URL}/webhook/liqpay",
+        "language": "ru",
+    }
+    data_b64 = _b64.b64encode(json.dumps(payload, ensure_ascii=False).encode()).decode()
+    sig = _liqpay_signature(data_b64)
+    record_payment("card", order_id, tg_id, plan,
+                   plan_info["price_eur"], "EUR", "pending",
+                   json.dumps({"provider": "liqpay", "order_id": order_id}))
+    return f"https://www.liqpay.ua/api/3/checkout/{data_b64}/{sig}"
+
+
+def verify_and_process_liqpay(data_b64: str, signature: str) -> dict:
+    """Перевірка підпису LiqPay → активація підписки. Повторна обробка ігнорується."""
+    import base64 as _b64
+    if not hmac.compare_digest(_liqpay_signature(data_b64 or ""), signature or ""):
+        return {"ok": False, "error": "invalid signature"}
+    try:
+        data = json.loads(_b64.b64decode(data_b64).decode())
+    except Exception:
+        return {"ok": False, "error": "bad data"}
+    status = (data.get("status") or "").lower()
+    order_id = data.get("order_id") or ""
+    if not order_id:
+        return {"ok": False, "error": "no order_id"}
+    db.log_admin("liqpay_webhook", f"status={status}", f"order={order_id}")
+
+    if status in ("success", "sandbox"):
+        row = q1("SELECT tg_id, plan FROM payments WHERE provider_ref=?", (order_id,))
+        if not row:
+            return {"ok": False, "error": "unknown order"}
+        return activate_after_payment(
+            "card", order_id, row["tg_id"], row["plan"],
+            float(data.get("amount", 0)), data.get("currency", "EUR"),
+            raw=json.dumps({"provider": "liqpay", "status": status}))
+    if status in ("failure", "error"):
+        mark_payment(order_id, "failed")
+    return {"ok": True, "status": status}
 
 
 # ---------------- Stripe (картка, зовнішній сайт) ----------------

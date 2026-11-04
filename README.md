@@ -1,50 +1,57 @@
-# ЧУПИК VPN — сайт + Telegram Mini App + бот + backend (WireGuard + платежі)
+# ЧУПИК VPN — сайт + кабінет + Telegram Mini App + бот + backend (WireGuard + платежі)
 
-Репозиторій проєкту **CHUPIK VPN** (етапи 1–4 за ТЗ: сайт, Mini App, бот, реальний VPN-бэкенд з двома платіжними системами).
+Репозиторій проєкту **CHUPIK VPN**: сайт із реєстрацією/входом та особистим кабінетом,
+Telegram Mini App, бот, реальний VPN-бэкенд з WireGuard і двома платіжними системами
+(Telegram Stars + картка: LiqPay або Stripe).
 
-> 🚀 **Запуск наживо (безкоштовно): див. [DEPLOY.md](DEPLOY.md)** — Oracle Cloud Always Free + WireGuard + Stripe.
+> 🚀 **Запуск наживо (безкоштовно): див. [DEPLOY.md](DEPLOY.md)** — Oracle Cloud Always Free + WireGuard + LiqPay/Stripe.
 
 ## Що всередині
 
 | Шлях | Що це |
 |---|---|
-| `index.html` | Основний сайт (GitHub Pages) |
+| `index.html` | Основний сайт (GitHub Pages): тарифи, FAQ, посилання на кабінет |
+| `cabinet.html` | **Веб-кабінет сайту**: реєстрація/вхід (email+пароль), сервери, пристрої, QR-коди, оплата карткою, реферали |
 | `miniapp/index.html` | Telegram Mini App: карта світу, сервери, пристрої, QR-коди, тарифи, профіль, реферали |
 | `bot/bot.py` | Статичний бот (застарілий, залишено для історії) — робочий бот тепер у `server/` |
-| `server/` | **Backend**: FastAPI + aiogram + WireGuard-менеджер + платежі (Stars і Stripe) |
-| `server/api.py` | FastAPI-застосунок: REST API для Mini App, Stripe webhook, статика адмінки |
-| `server/bot_app.py` | Telegram-бот (aiogram 3): реєстрація, оплати Stars, реферали, 8 мов |
+| `server/` | **Backend**: FastAPI + aiogram + WireGuard-менеджер + платежі (Stars, LiqPay, Stripe) |
+| `server/api.py` | FastAPI: REST API для Mini App і сайту (Bearer-сесії), webhook-и, статика адмінки |
+| `server/webauth.py` | Веб-акаунти сайту: реєстрація/вхід, PBKDF2-паролі, сесії |
+| `server/bot_app.py` | Telegram-бот (aiogram 3): реєстрація, оплати Stars, реферали, 8 мов, кеш фото |
 | `server/wg.py` | Менеджер WireGuard: генерація ключів, peer'и через SSH або локально, статистика |
-| `server/payments.py` | Платежі: Telegram Stars (XTR) + Stripe Checkout + webhook з ідемпотентністю |
+| `server/payments.py` | Платежі: Telegram Stars (XTR) + LiqPay + Stripe Checkout + webhook-и з ідемпотентністю |
 | `server/core.py` | Бізнес-логіка: підписки, ліміти пристроїв, реферали, expiry-воркер |
-| `server/db.py` | SQLite (async) з міграціями — users, devices, servers, payments, referral_events |
+| `server/db.py` | SQLite з міграціями — users, devices, servers, payments, referral_events, web_users, web_sessions |
 | `server/admin/index.html` | Адмін-панель (потребує ADMIN_TOKEN) |
 | `server/deploy_wg.sh` | Скрипт налаштування WireGuard на VPS |
 | `.env.example` | Шаблон змінних середовища (скопіюй у `.env`) |
 | `server/render.yaml` | Деплой backend на Render |
-| `tests/test_e2e.py` | 37 e2e-тестів (backend + API + платежі) |
+| `tests/test_e2e.py` | e2e-тести (backend + API + платежі + веб-акаунти) |
 
 ## Посилання
 
 - Сайт: https://tomnukoleksandr94-gif.github.io/chupik-vpn/
+- Кабінет (реєстрація/вхід): https://tomnukoleksandr94-gif.github.io/chupik-vpn/cabinet.html
 - Mini App: https://tomnukoleksandr94-gif.github.io/chupik-vpn/miniapp/
 - Бот: https://t.me/Chupik_vpnBot
 
 ## Архітектура
 
 ```
-GitHub Pages (статика)          Backend (Render/VPS)                VPS з WireGuard
-├─ сайт (index.html)   ──/pay──▶ FastAPI :8766                     wg0 (UDP 51820)
-├─ miniapp/  ◀──REST API─────  ├─ /api/*  (Mini App, X-Init-Data)   ▲
-└─ адмінка (server/admin)────▶  ├─ бот (aiogram polling)            SSH (peer add/remove)
-                               ├─ Stripe webhook (підпис перевіряється)
-                               └─ expiry-воркер (кожні 60 с: downgrade + revoke)
+GitHub Pages (статика)          Backend (VPS/Render)                 VPS з WireGuard
+├─ сайт (index.html)   ──API──▶  FastAPI :8766                       wg0 (UDP 51820)
+├─ cabinet.html ◀─Bearer сесії──  ├─ /api/*  (Mini App + сайт)         ▲
+├─ miniapp/  ◀──X-Init-Data────   ├─ бот (aiogram polling)            SSH (peer add/remove)
+└─ адмінка (server/admin)───────▶ ├─ LiqPay/Stripe webhook             │
+                                   └─ expiry-воркер (кожні 60 с)        │
 ```
 
 - **Один процес** FastAPI одночасно обслуговує бот (polling), API та воркер.
-- **Один канал активації**: і Stars, і Stripe викликають `activate_subscription()` — оплата проходить лише після підтвердження (successful_payment / webhook), захист від повторної обробки через `provider_ref UNIQUE`.
-- **Картка — тільки на сайті** (`/pay?plan=...` → Stripe Checkout), у Telegram — лише Stars, за правилами Telegram.
-- Ключі клієнтів WireGuard шифруються (Fernet) у БД; `SECRET_KEY` у змінних оточення.
+- **Два способи входу в API**: підпис Telegram initData (Mini App) і Bearer-токен веб-сесії (сайт). Веб-акаунт отримує синтетичний негативний ID і користується тією ж логікою підписок/пристроїв.
+- **Один канал активації**: Stars, LiqPay і Stripe викликають `activate_subscription()` — оплата проходить лише після підтвердження (successful_payment / webhook), захист від повторної обробки через `provider_ref UNIQUE`.
+- **Картка — тільки на сайті** (LiqPay Checkout або Stripe Checkout), у Telegram — лише Stars, за правилами Telegram.
+- **LiqPay** — виплати на картку ПриватБанку (карта прив'язується в кабінеті liqpay.ua). **Stripe** — альтернатива з виплатами на IBAN.
+- Ключі клієнтів WireGuard шифруються (Fernet) у БД; `SECRET_KEY` у змінних оточення. Паролі сайту — PBKDF2 (200k ітерацій).
 
 ## Запуск backend
 
@@ -55,15 +62,17 @@ pip install -r requirements.txt
 python api.py         # uvicorn на :8766 + бот + expiry-воркер
 ```
 
-### Змінні середовища (див. `server/.env.example`)
+### Змінні середовища (див. `.env.example`)
 
 | Змінна | Для чого |
 |---|---|
 | `BOT_TOKEN` | токен бота (ніколи не комітити) |
 | `SECRET_KEY` | шифрування ключів WireGuard + валідація initData |
 | `ADMIN_TOKEN` | пароль адмін-панелі `/admin` |
-| `BASE_URL` | публічний URL backend (для Stripe webhook/redirect) |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | карткові платежі (поки не задані — Stripe вимкнено) |
+| `BASE_URL` | публічний URL backend (для webhook-ів оплати; для карток — обов'язково HTTPS) |
+| `WEB_SITE_URL` | адреса сайту (реферальні посилання веб-акаунтів) |
+| `LIQPAY_PUBLIC_KEY`, `LIQPAY_PRIVATE_KEY` | карткові платежі з виплатами на картку ПриватБанку |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | карткові платежі (альтернатива LiqPay) |
 | `WG_DRIVER` | `local` (wg на цій же машині) або `ssh` (VPS) |
 | `WG_SSH_HOST`, `WG_SSH_USER`, `WG_SSH_KEY` | підключення до VPS з WireGuard |
 | `DB_PATH` | файл SQLite |
@@ -79,7 +88,7 @@ python api.py         # uvicorn на :8766 + бот + expiry-воркер
 ### Тести
 
 ```bash
-cd tests && python test_e2e.py   # 37 тестів: API, підписки, платежі, ідемпотентність
+cd tests && python test_e2e.py   # e2e: API, підписки, платежі (Stars/Stripe/LiqPay), веб-акаунти, ідемпотентність
 ```
 
 ## Безпека токена — ВАЖЛИВО
@@ -88,8 +97,11 @@ cd tests && python test_e2e.py   # 37 тестів: API, підписки, пл�
 1. @BotFather → `/mybots` → Chupik_vpnBot → **API Token → Revoke current token**.
 2. Оновіть `BOT_TOKEN` у змінних середовища хостингу.
 
+Те саме стосується номеру картки: ніколи не зберігайте номер карти в коді чи чаті —
+виплати на неї налаштовуються в кабінеті платіжного провайдера (LiqPay).
+
 ## Що далі
 
-- Публічний деплой backend (Render / VPS) — потребує рішення власника
-- Реєстрація Stripe (або MoR: Paddle/LemonSqueezy) — потребує рішення власника
-- Оновити ціни на сайті з "—" на реальні після запуску платежів
+- Запуск backend на постійному VPS (безкоштовний варіант — Oracle Always Free, див. DEPLOY.md)
+- Реєстрація LiqPay (виплати на карту) або Stripe — потребує рішення власника
+- Додавання реальних WireGuard-серверів через адмінку

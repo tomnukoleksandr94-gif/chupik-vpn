@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import bot_app, core, db, payments, wg
+from . import bot_app, core, db, payments, wg, webauth
 from .config import settings
 
 app = FastAPI(title="CHUPIK VPN API", docs_url=None, redoc_url=None)
@@ -31,7 +31,7 @@ ADMIN_DIR = Path(__file__).parent / "admin"
 
 
 # ================================================================
-# Автентифікація Mini App (перевірка підпису Telegram)
+# Автентифікація: Mini App (підпис Telegram) АБО сайт (Bearer-токен)
 # ================================================================
 def validate_init_data(init_data: str) -> dict | None:
     if not init_data or not settings.BOT_TOKEN:
@@ -53,6 +53,22 @@ def validate_init_data(init_data: str) -> dict | None:
 
 
 async def tg_user(request: Request) -> dict:
+    """Два способи входу:
+    1. Mini App — підпис Telegram initData (заголовок X-Init-Data);
+    2. Сайт — сесія веб-кабінету (Authorization: Bearer <token>).
+    Обидва дають доступ до одних і тих самих API-ендпоінтів.
+    """
+    # --- спершу веб-сесія (сайт) ---
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        session = webauth.resolve_session(auth[7:].strip())
+        if not session:
+            raise HTTPException(401, "invalid or expired session")
+        row = core.get_user(session["tg_id"])
+        if row and row["is_banned"]:
+            raise HTTPException(403, "banned")
+        return {"id": session["tg_id"], "web_email": session["email"]}
+    # --- потім підпис Telegram (Mini App) ---
     init = request.headers.get("X-Init-Data", "") or request.query_params.get("init_data", "")
     user = validate_init_data(init)
     if not user or not user.get("id"):
@@ -61,6 +77,56 @@ async def tg_user(request: Request) -> dict:
     if row and row["is_banned"]:
         raise HTTPException(403, "banned")
     return user
+
+
+# ================================================================
+# Веб-акаунти сайту: реєстрація / вхід / вихід
+# ================================================================
+class RegisterIn(BaseModel):
+    email: str
+    password: str
+    ref: int | None = None
+
+
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+
+@app.post("/api/web/auth/register")
+async def web_register(body: RegisterIn):
+    try:
+        result = webauth.register(body.email, body.password, body.ref)
+    except webauth.AuthError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, **result, "user": _user_payload(result["tg_id"])}
+
+
+@app.post("/api/web/auth/login")
+async def web_login(body: LoginIn):
+    try:
+        result = webauth.login(body.email, body.password)
+    except webauth.AuthError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, **result, "user": _user_payload(result["tg_id"])}
+
+
+@app.post("/api/web/auth/logout")
+async def web_logout(request: Request):
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        webauth.logout(auth[7:].strip())
+    return {"ok": True}
+
+
+@app.get("/api/web/config")
+async def web_config():
+    """Сайт питає: чи доступні реєстрація та оплата картою."""
+    return {
+        "ok": True,
+        "web_auth": True,
+        "card_provider": payments.card_provider(),
+    }
 
 
 # ================================================================
@@ -83,7 +149,9 @@ def _user_payload(tg_id: int) -> dict:
         "device_limit": core.device_limit(plan),
         "devices": devices,
         "referral": {
-            "link": f"https://t.me/{bot_app.BOT_USERNAME}?start=ref_{tg_id}",
+            # для Telegram-користувачів — посилання на бота, для веб-акаунтів — на сайт
+            "link": (f"https://t.me/{bot_app.BOT_USERNAME}?start=ref_{tg_id}" if tg_id > 0
+                     else f"{settings.WEB_SITE_URL}/cabinet.html?ref={tg_id}"),
             "invited": core.invited_count(tg_id),
             "tiers": core.REF_TIERS,
         },
@@ -190,24 +258,24 @@ class CardIn(BaseModel):
 
 @app.post("/api/card/checkout")
 async def api_card_checkout(body: CardIn, user=Depends(tg_user)):
-    if not payments.stripe_configured():
+    if not payments.card_provider():
         raise HTTPException(503, "card payments not configured")
     if body.plan not in core.PLANS or body.plan == "free":
         raise HTTPException(400, "unknown plan")
     tg_id = body.tg_id or user["id"]
     try:
-        url = payments.create_card_checkout(tg_id, body.plan)
+        url = payments.create_card_checkout_url(tg_id, body.plan)
     except Exception as e:
         raise HTTPException(502, str(e))
-    return {"ok": True, "url": url}
+    return {"ok": True, "url": url, "provider": payments.card_provider()}
 
 
 # ================================================================
-# Сайт: оплата карткою (Stripe) — зовнішня сторінка
+# Сайт: оплата карткою (LiqPay / Stripe) — зовнішня сторінка
 # ================================================================
 @app.get("/pay", response_class=HTMLResponse)
 async def pay_page(plan: str = "premium"):
-    if not payments.stripe_configured():
+    if not payments.card_provider():
         return HTMLResponse(_pay_disabled_page(), status_code=503)
     if plan not in core.PLANS or plan == "free":
         plan = "premium"
@@ -221,14 +289,14 @@ class PayForm(BaseModel):
 
 @app.post("/pay/checkout")
 async def pay_checkout(body: PayForm):
-    if not payments.stripe_configured():
+    if not payments.card_provider():
         raise HTTPException(503, "card payments not configured")
     if body.plan not in core.PLANS or body.plan == "free":
         raise HTTPException(400, "unknown plan")
     if not core.get_user(body.tg_id):
-        raise HTTPException(404, "Telegram ID не найден — сначала откройте бота и нажмите /start")
+        raise HTTPException(404, "ID не найден — сначала зарегистрируйтесь на сайте или в боте (/start)")
     try:
-        url = payments.create_card_checkout(body.tg_id, body.plan)
+        url = payments.create_card_checkout_url(body.tg_id, body.plan)
     except Exception as e:
         raise HTTPException(502, str(e))
     return {"ok": True, "url": url}
@@ -249,8 +317,19 @@ async def pay_cancel():
 
 
 # ================================================================
-# Stripe webhook
+# Webhook-и платіжних провайдерів
 # ================================================================
+@app.post("/webhook/liqpay")
+async def liqpay_webhook(request: Request):
+    """LiqPay надсилає form-urlencoded: data=<base64> & signature=<sig>."""
+    body = (await request.body()).decode("utf-8", "replace")
+    form = dict(urllib.parse.parse_qsl(body, keep_blank_values=True))
+    result = payments.verify_and_process_liqpay(form.get("data", ""), form.get("signature", ""))
+    if not result.get("ok"):
+        return JSONResponse(result, status_code=400)
+    return result
+
+
 @app.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     payload = await request.body()

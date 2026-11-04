@@ -77,6 +77,31 @@ def plans_kb(lang: str):
 
 
 # ---------------- /start ----------------
+async def _send_welcome_photo(msg: Message, text: str, reply_markup):
+    """Фото /start із кешем file_id: Telegram не завантажує його з GitHub щоразу.
+
+    Перше відправлення за URL повільне (Telegram тягне файл із GitHub Pages) —
+    тому зберігаємо file_id у БД і далі відправляємо миттєво.
+    """
+    if not settings.BRAND_PHOTO_URL:
+        await msg.answer(text, reply_markup=reply_markup)
+        return
+    file_id = db.get_setting("brand_photo_file_id")
+    m = None
+    if file_id:
+        try:
+            m = await msg.answer_photo(file_id, caption=text, reply_markup=reply_markup)
+        except Exception:
+            m = None
+    if m is None:  # перший запуск або файл протермінався
+        try:
+            m = await msg.answer_photo(settings.BRAND_PHOTO_URL, caption=text, reply_markup=reply_markup)
+            if m and m.photo:
+                db.set_setting("brand_photo_file_id", m.photo[-1].file_id)
+        except Exception:
+            await msg.answer(text, reply_markup=reply_markup)
+
+
 @dp.message(CommandStart())
 async def cmd_start(msg: Message, command=None):
     payload = command.args if command else ""
@@ -91,19 +116,13 @@ async def cmd_start(msg: Message, command=None):
     lang = L(user)
     if referrer and core.register_referral(referrer, msg.from_user.id):
         await msg.answer(T[lang]["new_ref"])
+    # welcome + trial-підказка в ОДНОМУ повідомленні (менше повідомлень = швидше)
     text = T[lang]["welcome"].format(name=msg.from_user.first_name)
-    if settings.BRAND_PHOTO_URL:
-        try:
-            await msg.answer_photo(settings.BRAND_PHOTO_URL, caption=text, reply_markup=webapp_kb(lang))
-        except Exception:
-            await msg.answer(text, reply_markup=webapp_kb(lang))
-    else:
-        await msg.answer(text, reply_markup=webapp_kb(lang))
-    await msg.answer("Меню ниже 👇", reply_markup=main_kb(lang))
-    # trial-підказка для нових без платного тарифу
     if user["plan"] in (None, "free") and not q1(
             "SELECT 1 FROM referral_events WHERE invited_id=? AND kind='trial'", (msg.from_user.id,)):
-        await msg.answer(T[lang]["trial_hint"])
+        text += "\n\n" + T[lang]["trial_hint"]
+    await _send_welcome_photo(msg, text, webapp_kb(lang))
+    await msg.answer("Меню ниже 👇", reply_markup=main_kb(lang))
 
 
 # ---------------- покупки (Stars) ----------------
@@ -395,6 +414,20 @@ for lang_code in T:
                 await msg.answer(T[L(user)]["support"])
         dp.message.register(_h, F.text == m[i])
     dp.message.register(miniapp_btn_handler, F.text == m[6])
+
+
+# ---------------- захист від збоїв ----------------
+@dp.errors()
+async def on_error(event, exception):
+    """Помилка в обробнику не «зависає» запит — логується і бот живе далі."""
+    import traceback
+    print(f"[bot] помилка обробника: {exception}\n{traceback.format_exc()[-400:]}")
+    try:
+        if event and getattr(event, "message", None):
+            await event.message.answer("⚠️ Виникла помилка. Спробуйте ще раз.")
+    except Exception:
+        pass
+    return True
 
 
 # ---------------- setup ----------------
