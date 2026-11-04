@@ -11,7 +11,7 @@ Telegram Mini App, бот, реальний VPN-бэкенд з WireGuard і д�
 | Шлях | Що це |
 |---|---|
 | `index.html` | Основний сайт (GitHub Pages): тарифи, FAQ, посилання на кабінет |
-| `cabinet.html` | **Веб-кабінет сайту**: реєстрація/вхід (email+пароль), сервери, пристрої, QR-коди, оплата карткою, реферали |
+| `cabinet.html` | **Веб-кабінет сайту (premium dashboard)**: сайдбар-навігація, приладдя, пристрої (з типами Windows/Android/iOS/macOS/Linux), сервери, тарифи, групи, реферали, тікети підтримки, профіль (8 мов, сповіщення, зміна/скидання пароля, прив'язка Telegram, історія входів, видалення акаунта) |
 | `miniapp/index.html` | Telegram Mini App: карта світу, сервери, пристрої, QR-коди, тарифи, профіль, реферали |
 | `bot/bot.py` | Статичний бот (застарілий, залишено для історії) — робочий бот тепер у `server/` |
 | `server/` | **Backend**: FastAPI + aiogram + WireGuard-менеджер + платежі (Stars, LiqPay, Stripe) |
@@ -20,8 +20,9 @@ Telegram Mini App, бот, реальний VPN-бэкенд з WireGuard і д�
 | `server/bot_app.py` | Telegram-бот (aiogram 3): реєстрація, оплати Stars, реферали, 8 мов, кеш фото |
 | `server/wg.py` | Менеджер WireGuard: генерація ключів, peer'и через SSH або локально, статистика |
 | `server/payments.py` | Платежі: Telegram Stars (XTR) + LiqPay + Stripe Checkout + webhook-и з ідемпотентністю |
-| `server/core.py` | Бізнес-логіка: підписки, ліміти пристроїв, реферали, expiry-воркер |
-| `server/db.py` | SQLite з міграціями — users, devices, servers, payments, referral_events, web_users, web_sessions |
+| `server/core.py` | Бізнес-логіка: підписки, ліміти пристроїв, реферали, expiry-воркер, мови/сповіщення |
+| `server/groups.py` | **Групи**: слоти за тарифом (BASIC=1, PREMIUM=3, ULTIMATE=5), одноразові запрошення, автовідкликання VPN при закінченні підписки власника |
+| `server/db.py` | SQLite з міграціями — users, devices, servers, payments, referral_events, web_users, web_sessions, groups, group_invites, group_members, tickets, ticket_messages, web_logins, web_reset_tokens |
 | `server/admin/index.html` | Адмін-панель (потребує ADMIN_TOKEN) |
 | `server/deploy_wg.sh` | Скрипт налаштування WireGuard на VPS |
 | `.env.example` | Шаблон змінних середовища (скопіюй у `.env`) |

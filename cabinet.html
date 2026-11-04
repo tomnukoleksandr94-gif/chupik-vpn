@@ -4,70 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#080511">
-<meta name="description" content="ЧУПИК VPN — особистий кабінет: реєстрація, вхід, сервери, пристрої, тарифи та оплата підписки.">
+<meta name="description" content="ЧУПИК VPN — особистий кабінет: приладдя, пристрої, сервери, тарифи, групи, підтримка та налаштування профілю.">
 <link rel="canonical" href="https://tomnukoleksandr94-gif.github.io/chupik-vpn/cabinet.html">
 <title>Кабінет — ЧУПИК VPN</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#05030d;--bg2:#0b0618;--card:#130b25;--purple:#7900ff;--neon:#a855ff;--light:#c084fc;--white:#fff;--muted:#a9a0bc;--green:#00e59b;--red:#ff5b7f;--line:rgba(192,132,252,.15);--font:'Manrope',sans-serif;--display:'Unbounded',sans-serif}
+:root{--bg:#05030d;--bg2:#0b0618;--card:#130b25;--purple:#7900ff;--neon:#a855ff;--light:#c084fc;--white:#fff;--muted:#a9a0bc;--green:#00e59b;--red:#ff5b7f;--line:rgba(192,132,252,.15);--font:'Manrope',sans-serif;--display:'Unbounded',sans-serif;--side-w:236px}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--white);font-family:var(--font);line-height:1.6;min-height:100vh}
 body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-2;background:radial-gradient(ellipse at 80% 12%,rgba(121,0,255,.16),transparent 34%),radial-gradient(ellipse at 10% 45%,rgba(92,0,180,.12),transparent 38%),linear-gradient(180deg,#070410,#05030d 55%,#080411)}
-a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}input,select{font:inherit}
-.wrap{width:min(1060px,calc(100% - 36px));margin:0 auto}
-.topbar{position:sticky;top:0;z-index:50;background:rgba(7,4,16,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-.topbar-in{display:flex;align-items:center;justify-content:space-between;height:66px;gap:14px}
-.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:14px;font-weight:800}
-.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#a855ff,#4e00a8);display:grid;place-items:center}
-.brand-mark svg{width:20px;height:20px}
-.top-links{display:flex;gap:8px;align-items:center}
-.top-links a,.top-links button{font-size:12px;font-weight:700;color:#bdb3ca;border:1px solid var(--line);background:rgba(255,255,255,.02);padding:9px 14px;border-radius:10px;transition:.2s}
-.top-links a:hover,.top-links button:hover{color:#fff;border-color:var(--light)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 20px;border-radius:12px;font-weight:800;font-size:13px;border:1px solid transparent;transition:.25s ease;white-space:nowrap}
+a{color:inherit;text-decoration:none}button{font:inherit;cursor:pointer}input,select,textarea{font:inherit}
+.wrap{width:min(1160px,calc(100% - 36px));margin:0 auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 19px;border-radius:12px;font-weight:800;font-size:13px;border:1px solid transparent;transition:.25s ease;white-space:nowrap}
 .btn-primary{color:#fff;background:linear-gradient(110deg,#6900e8,#9a38ff);box-shadow:0 9px 32px rgba(121,0,255,.26),inset 0 1px rgba(255,255,255,.25)}
-.btn-primary:hover{transform:translateY(-2px)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(121,0,255,.4)}
 .btn-outline{border-color:rgba(192,132,252,.28);background:rgba(255,255,255,.025);color:#e9dcfa}
-.btn-outline:hover{border-color:var(--light);background:rgba(121,0,255,.1)}
+.btn-outline:hover{border-color:var(--light);background:rgba(121,0,255,.1);transform:translateY(-2px)}
 .btn-danger{border-color:rgba(255,91,127,.35);background:rgba(255,91,127,.08);color:#ffb3c4}
+.btn-danger:hover{background:rgba(255,91,127,.16)}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
-.center{display:grid;place-items:center;min-height:calc(100vh - 66px);padding:30px 0}
-.card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:22px;padding:34px;width:min(430px,100%)}
+.center{display:grid;place-items:center;min-height:100vh;padding:30px 16px}
+.card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:22px;padding:34px;width:min(440px,100%)}
 .card h1{font-size:22px;margin-bottom:6px}
 .sub{color:var(--muted);font-size:13px;margin-bottom:22px}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:11px;font-weight:800;color:#cbb9dd;margin-bottom:7px;letter-spacing:.04em}
-.field input{width:100%;padding:14px;border-radius:12px;border:1px solid rgba(192,132,252,.3);background:rgba(121,0,255,.08);color:#fff;font-size:14px}
-.field input:focus{outline:none;border-color:var(--neon)}
+.field input,.field select,.field textarea{width:100%;padding:13px;border-radius:12px;border:1px solid rgba(192,132,252,.3);background:rgba(121,0,255,.08);color:#fff;font-size:14px}
+.field textarea{min-height:110px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--neon)}
 .form-note{font-size:11px;color:#8e849f;margin-top:14px}
 .form-note a{color:var(--light)}
 .err{background:rgba(255,91,127,.12);border:1px solid rgba(255,91,127,.4);color:#ffb3c4;border-radius:10px;padding:10px 13px;font-size:12px;margin-bottom:14px;display:none}
 .okmsg{background:rgba(0,229,155,.1);border:1px solid rgba(0,229,155,.4);color:#7dffca;border-radius:10px;padding:10px 13px;font-size:12px;margin-bottom:14px;display:none}
-/* ---- кабінет ---- */
-.app{padding:26px 0 60px}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:18px;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{border:1px solid var(--line);background:rgba(255,255,255,.02);color:#bdb3ca;padding:10px 16px;border-radius:100px;font-size:12px;font-weight:800;white-space:nowrap;transition:.2s}
-.tab.active{background:linear-gradient(110deg,#6900e8,#9a38ff);color:#fff;border-color:transparent}
-.panel{display:none}.panel.active{display:block}
+/* ---- каркас dashboard ---- */
+.mobilebar{display:none;position:sticky;top:0;z-index:60;background:rgba(7,4,16,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.mobilebar-in{display:flex;align-items:center;justify-content:space-between;height:62px;gap:12px}
+.burger{background:none;border:1px solid var(--line);color:#fff;border-radius:10px;padding:9px 12px;font-size:16px}
+.layout{display:grid;grid-template-columns:var(--side-w) 1fr;min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;border-right:1px solid var(--line);background:rgba(9,5,20,.6);backdrop-filter:blur(14px);display:flex;flex-direction:column;padding:22px 14px;z-index:55}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-size:14px;font-weight:800;padding:4px 10px 20px}
+.brand-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#a855ff,#4e00a8);display:grid;place-items:center;flex-shrink:0}
+.brand-mark svg{width:20px;height:20px}
+.nav{display:flex;flex-direction:column;gap:4px;flex:1}
+.nav button{display:flex;align-items:center;gap:12px;background:none;border:1px solid transparent;color:#bdb3ca;padding:11px 13px;border-radius:12px;font-size:13px;font-weight:700;text-align:left;transition:.2s;cursor:pointer}
+.nav button:hover{color:#fff;background:rgba(121,0,255,.09)}
+.nav button.active{color:#fff;background:linear-gradient(110deg,rgba(105,0,232,.35),rgba(154,56,255,.28));border-color:rgba(168,85,255,.35);box-shadow:0 4px 18px rgba(121,0,255,.18)}
+.nav button .ico{width:20px;text-align:center;flex-shrink:0}
+.side-foot{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:6px}
+.side-foot a,.side-foot button{display:flex;align-items:center;gap:12px;background:none;border:0;color:#8e849f;padding:9px 13px;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;text-align:left}
+.side-foot a:hover,.side-foot button:hover{color:#fff;background:rgba(121,0,255,.08)}
+.content{padding:30px clamp(18px,3vw,42px) 70px;min-width:0}
+.panel{display:none;animation:fadeUp .45s cubic-bezier(.22,.8,.3,1)}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.page-head{margin-bottom:24px}
+.page-head h1{font-size:clamp(22px,3vw,30px)}
+.page-head p{color:var(--muted);font-size:13px;margin-top:6px;max-width:620px}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-.stat{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.stat{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px;transition:.25s}
+.stat:hover{border-color:rgba(168,85,255,.35);transform:translateY(-3px)}
 .stat .k{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .stat .v{font-family:var(--display);font-size:26px;margin-top:8px}
 .stat .v small{font-size:12px;color:var(--muted);font-family:var(--font)}
-.row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:0}
-.row .t{font-size:13px;font-weight:700}.row .d{font-size:11px;color:var(--muted)}
+.rowline{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line)}
+.rowline:last-child{border-bottom:0}
+.rowline .t{font-size:13px;font-weight:700}.rowline .d{font-size:11px;color:var(--muted)}
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;padding:5px 10px;border-radius:100px;border:1px solid rgba(168,85,255,.35);color:#d9b4ff;background:rgba(121,0,255,.1)}
 .pill.on{border-color:rgba(0,229,155,.4);color:#7dffca;background:rgba(0,229,155,.08)}
+.pill.off{border-color:rgba(255,91,127,.4);color:#ffb3c4;background:rgba(255,91,127,.08)}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
 .dot.off{background:var(--red);box-shadow:0 0 10px var(--red)}
-.sec-title{font-size:17px;margin:26px 0 14px}
-.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-.plan-card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative}
+.sec-title{font-size:16px;margin:26px 0 14px}
+.box{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px}
+.plan-card{background:linear-gradient(145deg,#1a0f2b,#0c0716);border:1px solid var(--line);border-radius:18px;padding:22px;position:relative;transition:.25s}
+.plan-card:hover{transform:translateY(-4px);border-color:rgba(168,85,255,.4)}
 .plan-card.cur{border-color:rgba(0,229,155,.45)}
 .plan-card .nm{font-family:var(--display);font-size:15px}
 .plan-card .pr{font-family:var(--display);font-size:26px;margin:12px 0 4px}
@@ -77,12 +94,11 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
 .plan-card li svg{width:13px;height:13px;color:var(--green);flex-shrink:0}
 .plan-card .btn{width:100%;margin-top:4px}
 .tag-cur{position:absolute;top:14px;right:14px;font-size:9px;font-weight:800;letter-spacing:.08em;color:#7dffca;border:1px solid rgba(0,229,155,.4);border-radius:100px;padding:4px 9px}
-.toast{position:fixed;z-index:100;bottom:22px;left:50%;transform:translate(-50%,20px);background:#211333;border:1px solid rgba(168,85,255,.4);border-radius:12px;padding:12px 17px;color:#eee;font-size:12px;opacity:0;pointer-events:none;transition:.3s;max-width:92vw}
+.toast{position:fixed;z-index:120;bottom:22px;left:50%;transform:translate(-50%,20px);background:#211333;border:1px solid rgba(168,85,255,.4);border-radius:12px;padding:12px 17px;color:#eee;font-size:12px;opacity:0;pointer-events:none;transition:.3s;max-width:92vw}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-/* модалка */
 .modal-bg{position:fixed;inset:0;background:rgba(3,1,10,.8);backdrop-filter:blur(6px);z-index:90;display:none;place-items:center;padding:20px}
 .modal-bg.open{display:grid}
-.modal{background:linear-gradient(145deg,#1c1030,#0d0819);border:1px solid var(--line);border-radius:22px;padding:28px;width:min(420px,100%);max-height:90vh;overflow:auto}
+.modal{background:linear-gradient(145deg,#1c1030,#0d0819);border:1px solid var(--line);border-radius:22px;padding:28px;width:min(430px,100%);max-height:90vh;overflow:auto;animation:pop .3s ease}
 .modal h3{font-size:16px;margin-bottom:14px}
 .qr-box{margin:14px auto;width:fit-content;background:#fff;padding:12px;border-radius:14px}
 .qr-box img{display:block;width:230px;height:230px}
@@ -91,213 +107,347 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
 .divider{height:1px;background:var(--line);margin:16px 0}
 .spinner{width:34px;height:34px;border:3px solid rgba(168,85,255,.2);border-top-color:var(--neon);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
 @keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:640px){.card{padding:24px}.stat .v{font-size:21px}}
+.devtype{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.devtype button{border:1px solid var(--line);background:rgba(255,255,255,.02);color:#bdb3ca;border-radius:12px;padding:11px 6px;font-size:11px;font-weight:700;transition:.2s}
+.devtype button.sel{border-color:var(--neon);background:rgba(121,0,255,.16);color:#fff}
+.langs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.langs button{border:1px solid var(--line);background:rgba(255,255,255,.02);color:#bdb3ca;border-radius:12px;padding:11px;font-size:12px;font-weight:700;transition:.2s}
+.langs button.sel{border-color:var(--neon);background:rgba(121,0,255,.16);color:#fff}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer}
+.switch input{opacity:0;width:0;height:0}
+.switch i{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:100px;transition:.25s}
+.switch i:before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s}
+.switch input:checked + i{background:linear-gradient(110deg,#6900e8,#9a38ff)}
+.switch input:checked + i:before{transform:translateX(18px)}
+.tmsg{border-radius:12px;padding:10px 13px;font-size:12px;margin-bottom:8px;max-width:85%}
+.tmsg.user{background:rgba(121,0,255,.14);border:1px solid rgba(168,85,255,.3);margin-left:auto}
+.tmsg.admin{background:rgba(0,229,155,.08);border:1px solid rgba(0,229,155,.3)}
+.tmsg b{font-size:10px;display:block;opacity:.7;margin-bottom:2px}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-105%);transition:transform .3s cubic-bezier(.22,.8,.3,1);width:min(280px,86vw);background:rgba(9,5,20,.97)}
+  .sidebar.open{transform:none;box-shadow:20px 0 60px rgba(0,0,0,.5)}
+  .mobilebar{display:block}
+  .content{padding:22px 16px 90px}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
 </style>
 </head>
 <body>
 
-<div class="topbar"><div class="wrap topbar-in">
+<!-- ===== МОБІЛЬНИЙ ТОПБАР ===== -->
+<div class="mobilebar"><div class="wrap mobilebar-in">
+  <button class="burger" id="burger">☰</button>
   <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2 20 5v6c0 5-3.4 8.8-8 11-4.6-2.2-8-6-8-11V5l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span>ЧУПИК VPN</a>
-  <div class="top-links">
-    <a href="index.html">На сайт</a>
-    <button id="btnLogout" style="display:none">Вийти</button>
-  </div>
+  <select id="langTop" style="background:rgba(121,0,255,.08);border:1px solid var(--line);color:#fff;border-radius:10px;padding:8px;font-size:11px"></select>
 </div></div>
 
-<!-- ===== ЕКРАН ПІДКЛЮЧЕННЯ ДО СЕРВЕРА ===== -->
+<div class="layout">
+<!-- ===== САЙДБАР ===== -->
+<aside class="sidebar" id="sidebar">
+  <a class="brand" href="index.html"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M12 2 20 5v6c0 5-3.4 8.8-8 11-4.6-2.2-8-6-8-11V5l8-3Z"/><path d="m8.5 12 2.2 2.2 4.8-5"/></svg></span>ЧУПИК VPN</a>
+  <nav class="nav" id="nav">
+    <button class="active" data-tab="dash"><span class="ico">📊</span><span data-i18n="nav_dash">Головна</span></button>
+    <button data-tab="devices"><span class="ico">📱</span><span data-i18n="nav_devices">Пристрої</span></button>
+    <button data-tab="servers"><span class="ico">🌍</span><span data-i18n="nav_servers">Сервери</span></button>
+    <button data-tab="sub"><span class="ico">💎</span><span data-i18n="nav_sub">Тарифи</span></button>
+    <button data-tab="group"><span class="ico">👥</span><span data-i18n="nav_group">Група</span></button>
+    <button data-tab="ref"><span class="ico">🎁</span><span data-i18n="nav_ref">Реферали</span></button>
+    <button data-tab="support"><span class="ico">💬</span><span data-i18n="nav_support">Підтримка</span></button>
+    <button data-tab="profile"><span class="ico">⚙️</span><span data-i18n="nav_profile">Профіль</span></button>
+  </nav>
+  <div class="side-foot">
+    <a href="index.html"><span class="ico">🏠</span><span data-i18n="to_site">На сайт</span></a>
+    <button id="btnLogout" style="display:none"><span class="ico">🚪</span><span data-i18n="logout">Вийти</span></button>
+  </div>
+</aside>
+
+<!-- ===== КОНТЕНТ ===== -->
+<main class="content">
+
+<!-- ЕКРАН API -->
 <div class="center" id="screenSetup" style="display:none">
   <div class="card">
-    <h1>Підключення до сервера</h1>
-    <p class="sub">Вкажіть адресу сервера ЧУПИК VPN (наприклад, https://chupik-vpn.duckdns.org). Її можна знайти в боті командою /admin або уточнити у підтримки.</p>
+    <h1 data-i18n="setup_title">Підключення до сервера</h1>
+    <p class="sub" data-i18n="setup_sub">Вкажіть адресу сервера ЧУПИК VPN. Її можна знайти в боті командою /admin або уточнити у підтримки.</p>
     <div class="err" id="setupErr"></div>
-    <div class="field"><label>АДРЕСА СЕРВЕРА (API)</label><input id="setupApi" type="url" placeholder="https://ваш-сервер"></div>
-    <button class="btn btn-primary" id="setupSave" style="width:100%">Підключитися</button>
-    <p class="form-note">Адреса зберігається у вашому браузері. Підключення також можна передати через посилання: <b>cabinet.html?api=адреса</b></p>
+    <div class="field"><label data-i18n="setup_addr">АДРЕСА СЕРВЕРА (API)</label><input id="setupApi" type="url" placeholder="https://ваш-сервер"></div>
+    <button class="btn btn-primary" id="setupSave" style="width:100%" data-i18n="setup_btn">Підключитися</button>
+    <p class="form-note" data-i18n="setup_note">Адреса зберігається у вашому браузері. Також можна передати її через посилання: cabinet.html?api=адреса</p>
   </div>
 </div>
 
-<!-- ===== ЕКРАН ВХОДУ / РЕЄСТРАЦІЇ ===== -->
+<!-- ЕКРАН ВХОДУ -->
 <div class="center" id="screenAuth" style="display:none">
   <div class="card">
-    <h1>Особистий кабінет</h1>
-    <p class="sub">Реєстрація або вхід на сайті ЧУПИК VPN. Той самий акаунт працює і в Telegram-боті.</p>
+    <h1 data-i18n="auth_title">Особистий кабінет</h1>
+    <p class="sub" data-i18n="auth_sub">Реєстрація або вхід на сайті ЧУПИК VPN. Той самий акаунт працює і в Telegram-боті.</p>
     <div class="err" id="authErr"></div>
+    <div class="okmsg" id="authOk"></div>
     <div id="authLogin">
-      <div class="field"><label>EMAIL</label><input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
-      <div class="field"><label>ПАРОЛЬ</label><input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
-      <button class="btn btn-primary" id="doLogin" style="width:100%">Увійти</button>
-      <p class="form-note">Немає акаунта? <a href="#" id="toRegister">Зареєструватися</a></p>
+      <div class="field"><label data-i18n="email">EMAIL</label><input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label data-i18n="password">ПАРОЛЬ</label><input id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn btn-primary" id="doLogin" style="width:100%" data-i18n="login_btn">Увійти</button>
+      <p class="form-note"><span data-i18n="no_account">Немає акаунта?</span> <a href="#" id="toRegister" data-i18n="to_register">Зареєструватися</a></p>
+      <p class="form-note"><a href="#" id="toForgot" data-i18n="forgot">Забули пароль?</a></p>
     </div>
     <div id="authRegister" style="display:none">
-      <div class="field"><label>EMAIL</label><input id="regEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
-      <div class="field"><label>ПАРОЛЬ (від 6 символів)</label><input id="regPass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
-      <div class="field"><label>ПОВТОРИТИ ПАРОЛЬ</label><input id="regPass2" type="password" placeholder="••••••••" autocomplete="new-password"></div>
-      <button class="btn btn-primary" id="doRegister" style="width:100%">Створити акаунт</button>
-      <p class="form-note">Вже маєте акаунт? <a href="#" id="toLogin">Увійти</a></p>
+      <div class="field"><label data-i18n="email">EMAIL</label><input id="regEmail" type="email" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="field"><label data-i18n="password2">ПАРОЛЬ (ВІД 6 СИМВОЛІВ)</label><input id="regPass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <div class="field"><label data-i18n="password3">ПОВТОРИТИ ПАРОЛЬ</label><input id="regPass2" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <button class="btn btn-primary" id="doRegister" style="width:100%" data-i18n="register_btn">Створити акаунт</button>
+      <p class="form-note"><span data-i18n="have_account">Вже маєте акаунт?</span> <a href="#" id="toLogin" data-i18n="to_login">Увійти</a></p>
+    </div>
+    <div id="authForgot" style="display:none">
+      <div class="field"><label data-i18n="email">EMAIL</label><input id="fgEmail" type="email" placeholder="you@example.com"></div>
+      <button class="btn btn-primary" id="doForgot" style="width:100%" data-i18n="forgot_btn">Відновити пароль</button>
+      <p class="form-note" data-i18n="forgot_note">Якщо акаунт прив'язаний до Telegram — посилання для скидання прийде в чат з ботом. Інакше зверніться до підтримки.</p>
+      <p class="form-note"><a href="#" id="backLogin" data-i18n="to_login">Увійти</a></p>
+    </div>
+    <div id="authReset" style="display:none">
+      <div class="field"><label data-i18n="new_password">НОВИЙ ПАРОЛЬ</label><input id="rsPass" type="password" placeholder="••••••••" autocomplete="new-password"></div>
+      <button class="btn btn-primary" id="doReset" style="width:100%" data-i18n="reset_btn">Зберегти новий пароль</button>
+      <p class="form-note"><a href="#" id="backLogin2" data-i18n="to_login">Увійти</a></p>
     </div>
   </div>
 </div>
 
-<!-- ===== КАБІНЕТ ===== -->
-<div class="wrap app" id="screenApp" style="display:none">
-  <div class="tabs" id="tabs">
-    <button class="tab active" data-tab="home">Головна</button>
-    <button class="tab" data-tab="servers">Сервери</button>
-    <button class="tab" data-tab="devices">Пристрої</button>
-    <button class="tab" data-tab="plans">Тарифи</button>
-    <button class="tab" data-tab="profile">Профіль</button>
-  </div>
+<!-- ===== DASHBOARD ===== -->
+<div id="screenApp" style="display:none">
 
-  <!-- Головна -->
-  <div class="panel active" id="panel-home">
-    <div class="grid g2" id="homeStats"></div>
-    <h3 class="sec-title">Швидкі дії</h3>
+  <div class="panel active" id="panel-dash">
+    <div class="page-head"><h1 data-i18n="dash_hello">Вітаємо в кабінеті</h1><p data-i18n="dash_sub">Керуйте підпискою, пристроями та групою — усе в одному місці.</p></div>
+    <div class="grid g4" id="dashStats"></div>
+    <h3 class="sec-title" data-i18n="conn_title">Стан сервісу</h3>
+    <div class="grid g2" id="dashStatus"></div>
+    <h3 class="sec-title" data-i18n="dash_actions">Швидкі дії</h3>
     <div class="grid g2">
-      <div class="stat">
-        <div class="k">Статус підписки</div>
-        <div class="v" id="homePlan">—</div>
-        <div class="d" id="homeExp" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
-        <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-          <button class="btn btn-primary" data-goto="plans">Продовжити / купити</button>
-          <button class="btn btn-outline" data-goto="devices">Мої пристрої</button>
-        </div>
-      </div>
-      <div class="stat">
-        <div class="k">Ваші сервери</div>
-        <div class="v" id="homeServers">—</div>
-        <div style="margin-top:16px"><button class="btn btn-outline" data-goto="servers">Обрати сервер</button></div>
-      </div>
+      <div class="box"><div class="rowline"><div><div class="t" data-i18n="dash_buy">Продовжити або купити підписку</div><div class="d" data-i18n="dash_buy_d">Карта або Telegram Stars</div></div><button class="btn btn-primary" data-goto="sub" data-i18n="go">Перейти</button></div></div>
+      <div class="box"><div class="rowline"><div><div class="t" data-i18n="dash_dev">Додати пристрій</div><div class="d" data-i18n="dash_dev_d">Конфіг WireGuard + QR-код</div></div><button class="btn btn-primary" data-goto="devices" data-i18n="go">Перейти</button></div></div>
     </div>
   </div>
 
-  <!-- Сервери -->
+  <!-- ПРИСТРОЇ -->
+  <div class="panel" id="panel-devices">
+    <div class="page-head"><h1 data-i18n="dev_title">Пристрої</h1><p data-i18n="dev_sub">Конфігурації WireGuard для ваших гаджетів. Оберіть тип — кабінет підкаже як підключитися.</p></div>
+    <div class="box" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div><span class="pill" id="devCount">0/1</span></div>
+      <button class="btn btn-primary" id="btnAddDevice" data-i18n="dev_add">+ Додати пристрій</button>
+    </div>
+    <div class="grid g2" id="deviceList"><div class="stat"><div class="spinner"></div></div></div>
+  </div>
+
+  <!-- СЕРВЕРИ -->
   <div class="panel" id="panel-servers">
-    <h3 class="sec-title">Доступні сервери</h3>
+    <div class="page-head"><h1 data-i18n="srv_title">Сервери</h1><p data-i18n="srv_sub">Реальний стан серверів: онлайн, кількість підключень та навантаження. Новий пристрій автоматично підключається до найвільнішого.</p></div>
     <div class="grid g2" id="serverList"><div class="stat"><div class="spinner"></div></div></div>
   </div>
 
-  <!-- Пристрої -->
-  <div class="panel" id="panel-devices">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-      <h3 class="sec-title" style="margin:0">Мої пристрої <span id="devCount" style="color:var(--muted);font-size:12px;font-family:var(--font);margin-left:8px"></span></h3>
-      <button class="btn btn-primary" id="btnAddDevice">+ Додати пристрій</button>
-    </div>
-    <div class="grid" id="deviceList" style="margin-top:14px"><div class="stat"><div class="spinner"></div></div></div>
-  </div>
-
-  <!-- Тарифи -->
-  <div class="panel" id="panel-plans">
-    <h3 class="sec-title">Тарифи</h3>
-    <div id="cardPayNote" class="stat" style="display:none;margin-bottom:14px"></div>
+  <!-- ТАРИФИ -->
+  <div class="panel" id="panel-sub">
+    <div class="page-head"><h1 data-i18n="sub_title">Тарифи</h1><p data-i18n="sub_sub">Оплата картою або Telegram Stars. Підписка діє 30 днів.</p></div>
+    <div class="err" id="cardPayNote" style="display:none"></div>
     <div class="plans" id="planList"></div>
-    <p class="hint">Оплата картою — на сайті (правила Telegram). Оплата всередині Telegram-бота — Telegram Stars. Після підтвердження платежу підписка активується автоматично, а VPN-конфігурація з'явиться у вкладці «Пристрої».</p>
+    <div class="box" style="margin-top:18px"><h3 style="font-size:13px;margin-bottom:8px" data-i18n="pay_hist">Історія платежів</h3><div id="payCard"></div></div>
   </div>
 
-  <!-- Профіль -->
+  <!-- ГРУПА -->
+  <div class="panel" id="panel-group">
+    <div class="page-head"><h1 data-i18n="grp_title">Група</h1><p data-i18n="grp_sub">Запрошуйте друзів у свою групу: кожен отримує власний VPN-доступ. Кількість слотів залежить від вашого тарифу.</p></div>
+    <div id="groupBox"></div>
+  </div>
+
+  <!-- РЕФЕРАЛИ -->
+  <div class="panel" id="panel-ref">
+    <div class="page-head"><h1 data-i18n="ref_title">Реферали</h1><p data-i18n="ref_sub">Запрошуйте друзів — отримуйте безкоштовний PREMIUM. Нагорода нараховується після їхньої першої оплати.</p></div>
+    <div class="box" id="refCard"></div>
+  </div>
+
+  <!-- ПІДТРИМКА -->
+  <div class="panel" id="panel-support">
+    <div class="page-head"><h1 data-i18n="sup_title">Підтримка</h1><p data-i18n="sup_sub">Створіть тікет — адміністратор відповість, а відповідь прийде також у Telegram (якщо акаунт прив'язаний).</p></div>
+    <div class="box" style="margin-bottom:18px">
+      <div class="field"><label data-i18n="sup_subject">ТЕМА</label><input id="tkSubject" placeholder="..."></div>
+      <div class="field"><label data-i18n="sup_message">ПОВІДОМЛЕННЯ</label><textarea id="tkMessage" placeholder="Опишіть проблему..."></textarea></div>
+      <button class="btn btn-primary" id="btnTicket" data-i18n="sup_send">Надіслати тікет</button>
+    </div>
+    <h3 class="sec-title" data-i18n="sup_mine">Мої тікети</h3>
+    <div id="ticketsList"></div>
+  </div>
+
+  <!-- ПРОФІЛЬ -->
   <div class="panel" id="panel-profile">
-    <h3 class="sec-title">Профіль</h3>
-    <div class="stat" id="profileCard"><div class="spinner"></div></div>
-    <h3 class="sec-title">Реферальна програма</h3>
-    <div class="stat" id="refCard"><div class="spinner"></div></div>
-    <h3 class="sec-title">Історія платежів</h3>
-    <div class="stat" id="payCard"><div class="spinner"></div></div>
+    <div class="page-head"><h1 data-i18n="prof_title">Профіль</h1><p data-i18n="prof_sub">Мова інтерфейсу, сповіщення, безпека та прив'язка Telegram.</p></div>
+    <div class="grid g2">
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_acct">Акаунт</h3>
+        <div id="profAcct"></div>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_lang">Мова інтерфейсу</h3>
+        <div class="langs" id="langGrid"></div>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_notify">Сповіщення</h3>
+        <div class="rowline"><div><div class="t" data-i18n="prof_remind">Нагадування про підписку</div><div class="d" data-i18n="prof_remind_d">За 3 дні до завершення</div></div><label class="switch"><input type="checkbox" id="npExpire"><i></i></label></div>
+        <div class="rowline"><div><div class="t" data-i18n="prof_promos">Акції та знижки</div><div class="d" data-i18n="prof_promos_d">Рідкі новини сервісу</div></div><label class="switch"><input type="checkbox" id="npPromos"><i></i></label></div>
+        <div class="rowline"><div><div class="t" data-i18n="prof_tickets_d2">Відповіді підтримки</div><div class="d" data-i18n="prof_tickets_d">Сповіщення про відповіді на тікети</div></div><label class="switch"><input type="checkbox" id="npTickets"><i></i></label></div>
+        <button class="btn btn-outline" style="margin-top:14px" id="btnSaveNotify" data-i18n="save">Зберегти</button>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_pass">Зміна пароля</h3>
+        <div class="field"><label data-i18n="prof_oldpass">ПОТОЧНИЙ ПАРОЛЬ</label><input id="oldPass" type="password" autocomplete="current-password"></div>
+        <div class="field"><label data-i18n="new_password">НОВИЙ ПАРОЛЬ</label><input id="newPass" type="password" autocomplete="new-password"></div>
+        <button class="btn btn-outline" id="btnChangePass" data-i18n="prof_changepass">Змінити пароль</button>
+        <p class="hint" data-i18n="prof_pass_note">Після зміни пароля всі активні сесії завершаться — увійдіть знову.</p>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_tg">Прив'язка Telegram</h3>
+        <div id="tgBox"></div>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_history">Історія входів</h3>
+        <div id="loginHist"></div>
+      </div>
+      <div class="box" style="border-color:rgba(255,91,127,.25)">
+        <h3 style="font-size:13px;margin-bottom:14px" data-i18n="prof_del">Видалення акаунта</h3>
+        <p class="hint" data-i18n="prof_del_warn">Видалить веб-акаунт, сесії та закриє тікети. Підписка й оплата не повертаються.</p>
+        <button class="btn btn-danger" id="btnDeleteAcct" style="margin-top:12px" data-i18n="prof_del">Видалити акаунт</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<!-- ===== МОДАЛКА ПРИСТРОЯ ===== -->
+</div><!-- /screenApp -->
+</main>
+</div><!-- /layout -->
+
+<!-- МОДАЛКА: ПРИСТРІЙ -->
 <div class="modal-bg" id="modalDevice">
   <div class="modal">
-    <h3>Новий пристрій</h3>
+    <h3 data-i18n="dev_add">Додати пристрій</h3>
     <div class="err" id="devErr"></div>
-    <div class="field"><label>НАЗВА ПРИСТРОЮ</label><input id="devName" type="text" placeholder="Наприклад: Мій телефон" maxlength="40"></div>
-    <div class="field"><label>СЕРВЕР</label><select id="devServer"></select></div>
-    <button class="btn btn-primary" id="doAddDevice" style="width:100%">Створити VPN-конфігурацію</button>
-    <p class="hint">Створюється окремий ключ WireGuard для цього пристрою. Ліміт залежить від тарифу: FREE — 1, BASIC — 2, PREMIUM — 4, ULTIMATE — 5 пристроїв.</p>
+    <div class="field"><label data-i18n="dev_type">ТИП ПРИСТРОЮ</label>
+      <div class="devtype" id="devTypes"></div>
+    </div>
+    <div class="field"><label data-i18n="dev_name">НАЗВА</label><input id="devName" placeholder="Мій пристрій"></div>
+    <div class="field"><label data-i18n="dev_server">СЕРВЕР</label><select id="devServer"></select></div>
+    <button class="btn btn-primary" id="doAddDevice" style="width:100%" data-i18n="dev_add">Додати</button>
+    <button class="btn btn-outline" id="closeDevice" style="width:100%;margin-top:8px" data-i18n="cancel">Скасувати</button>
   </div>
 </div>
 
-<!-- ===== МОДАЛКА КОНФІГУ ===== -->
+<!-- МОДАЛКА: КОНФІГ -->
 <div class="modal-bg" id="modalConfig">
   <div class="modal">
-    <h3 id="cfgTitle">Конфігурація VPN</h3>
-    <div class="qr-box"><img id="cfgQr" alt="QR-код конфігурації"></div>
-    <div class="conf-pre" id="cfgText"></div>
+    <h3 id="cfgTitle"></h3>
+    <div class="qr-box"><img id="cfgQr" alt="QR"></div>
+    <pre class="conf-pre" id="cfgText"></pre>
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-      <button class="btn btn-primary" id="btnDownloadConf" style="flex:1">Завантажити .conf</button>
-      <button class="btn btn-outline" id="closeCfg" style="flex:1">Закрити</button>
+      <button class="btn btn-primary" id="btnDownloadConf" style="flex:1" data-i18n="download">Завантажити .conf</button>
+      <button class="btn btn-outline" id="closeCfg" data-i18n="close">Закрити</button>
     </div>
-    <p class="hint"><b>Як підключитися:</b> встановіть застосунок WireGuard (Android/iOS/Windows/Mac), натисніть «+» → «Створити з QR-коду» (або імпортуйте файл .conf) → увімкніть тунель. Сам сайт не створює VPN-з'єднання — його створює застосунок WireGuard.</p>
+    <p class="hint" id="cfgHint"></p>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-"use strict";
-/* ---------- база API ---------- */
-// Адреса backend за замовчуванням (щоб кабінет працював одразу, без ручного налаштування).
-// Якщо сервер недоступний — з'явиться екран підключення з можливістю вказати іншу адресу.
+/* ================================================================
+   ЧУПИК VPN — кабінет (SPA). Дизайн і бренд збережено 1:1.
+   ================================================================ */
 const DEFAULT_API = "https://d25b0907ad27c6.lhr.life";
-function getApiBase(){
-  const p = new URLSearchParams(location.search);
-  if (p.get("api")) { localStorage.setItem("chupik_api", p.get("api").replace(/\/+$/,"")); return localStorage.getItem("chupik_api"); }
-  if (localStorage.getItem("chupik_api")) return localStorage.getItem("chupik_api");
-  // сайт на GitHub Pages — потрібна зовнішня адреса; якщо кабінет відкритий з самого backend — той самий origin
-  if (!location.hostname.endsWith("github.io")) return "";
-  return DEFAULT_API || null;
-}
-const API = getApiBase();
-let TOKEN = localStorage.getItem("chupik_token") || "";
-let ME = null, SERVERS = [], cfgBlob = {name:"", text:""};
-
 const $ = s => document.querySelector(s);
-function show(id){ ["screenSetup","screenAuth","screenApp"].forEach(x=>$("#"+x).style.display = x===id?"block":"none"); }
-function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove("show"),3000); }
-function fmtDate(ts){ if(!ts) return "—"; return new Date(ts*1000).toLocaleDateString("uk-UA"); }
-function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;"}[c])); }
+const $$ = s => [...document.querySelectorAll(s)];
+const AMP = String.fromCharCode(38);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": AMP+"amp;", "<": AMP+"lt;", ">": AMP+"gt;", '"': AMP+"quot;", "'": AMP+"#39;" }[c]));
+let API = null, TOKEN = localStorage.getItem("chupik_token") || "", ME = null, SERVERS = [], GROUP = null, TICKETS = [], LANG = localStorage.getItem("chupik_lang") || "uk";
+let cfgBlob = null, devTypeSel = "other";
 
+/* ---------------- i18n: 8 мов ---------------- */
+const LANGS = [["uk","Українська"],["ru","Русский"],["fr","Français"],["en","English"],["es","Español"],["de","Deutsch"],["it","Italiano"],["zh","中文"]];
+const T = {
+uk:{nav_dash:"Головна",nav_devices:"Пристрої",nav_servers:"Сервери",nav_sub:"Тарифи",nav_group:"Група",nav_ref:"Реферали",nav_support:"Підтримка",nav_profile:"Профіль",to_site:"На сайт",logout:"Вийти",setup_title:"Підключення до сервера",setup_sub:"Вкажіть адресу сервера ЧУПИК VPN. Її можна знайти в боті командою /admin або уточнити у підтримки.",setup_addr:"АДРЕСА СЕРВЕРА (API)",setup_btn:"Підключитися",setup_note:"Адреса зберігається у вашому браузері. Також можна передати її через посилання: cabinet.html?api=адреса",auth_title:"Особистий кабінет",auth_sub:"Реєстрація або вхід на сайті ЧУПИК VPN. Той самий акаунт працює і в Telegram-боті.",email:"EMAIL",password:"ПАРОЛЬ",password2:"ПАРОЛЬ (ВІД 6 СИМВОЛІВ)",password3:"ПОВТОРИТИ ПАРОЛЬ",login_btn:"Увійти",no_account:"Немає акаунта?",to_register:"Зареєструватися",register_btn:"Створити акаунт",have_account:"Вже маєте акаунт?",to_login:"Увійти",forgot:"Забули пароль?",forgot_btn:"Відновити пароль",forgot_note:"Якщо акаунт прив'язаний до Telegram — посилання для скидання прийде в чат з ботом. Інакше зверніться до підтримки.",new_password:"НОВИЙ ПАРОЛЬ",reset_btn:"Зберегти новий пароль",dash_hello:"Вітаємо в кабінеті",dash_sub:"Керуйте підпискою, пристроями та групою — усе в одному місці.",conn_title:"Стан сервісу",dash_actions:"Швидкі дії",dash_buy:"Продовжити або купити підписку",dash_buy_d:"Карта або Telegram Stars",go:"Перейти",dash_dev:"Додати пристрій",dash_dev_d:"Конфіг WireGuard + QR-код",dev_title:"Пристрої",dev_sub:"Конфігурації WireGuard для ваших гаджетів. Оберіть тип — кабінет підкаже, як підключитися.",dev_add:"Додати пристрій",dev_type:"ТИП ПРИСТРОЮ",dev_name:"НАЗВА",dev_server:"СЕРВЕР",cancel:"Скасувати",download:"Завантажити .conf",close:"Закрити",srv_title:"Сервери",srv_sub:"Реальний стан серверів: онлайн, підключення та навантаження. Новий пристрій автоматично підключається до найвільнішого.",srv_online:"Онлайн",srv_offline:"Недоступний",srv_peers:"Підключень",srv_load:"Навантаження",srv_pick:"Обрати для нового пристрою",srv_empty:"Сервери ще не налаштовані адміністратором.",sub_title:"Тарифи",sub_sub:"Оплата картою або Telegram Stars. Підписка діє 30 днів.",pay_hist:"Історія платежів",grp_title:"Група",grp_sub:"Запрошуйте друзів у свою групу: кожен отримує власний VPN-доступ. Кількість слотів залежить від вашого тарифу.",ref_title:"Реферали",ref_sub:"Запрошуйте друзів — отримуйте безкоштовний PREMIUM. Нагорода нараховується після першої оплати запрошеного.",sup_title:"Підтримка",sup_sub:"Створіть тікет — адміністратор відповість, а відповідь прийде також у Telegram (якщо акаунт прив'язаний).",sup_subject:"ТЕМА",sup_message:"ПОВІДОМЛЕННЯ",sup_send:"Надіслати тікет",sup_mine:"Мої тікети",prof_title:"Профіль",prof_sub:"Мова інтерфейсу, сповіщення, безпека та прив'язка Telegram.",prof_acct:"Акаунт",prof_lang:"Мова інтерфейсу",prof_notify:"Сповіщення",prof_remind:"Нагадування про підписку",prof_remind_d:"За 3 дні до завершення",prof_promos:"Акції та знижки",prof_promos_d:"Рідкі новини сервісу",prof_tickets_d2:"Відповіді підтримки",prof_tickets_d:"Сповіщення про відповіді на тікети",save:"Зберегти",prof_pass:"Зміна пароля",prof_oldpass:"ПОТОЧНИЙ ПАРОЛЬ",prof_changepass:"Змінити пароль",prof_pass_note:"Після зміни пароля всі активні сесії завершаться — увійдіть знову.",prof_tg:"Прив'язка Telegram",prof_history:"Історія входів",prof_del:"Видалення акаунта",prof_del_warn:"Видалить веб-акаунт, сесії та закриє тікети. Підписка й оплата не повертаються.",dash_plan:"Тариф",dash_days:"Днів до завершення",dash_dev_u:"Пристрої",dash_status:"Статус",dash_active:"Активна підписка",dash_inactive:"Без підписки (FREE)",dash_expiry:"діє до",none:"—",conn_srv:"Сервери сервісу",conn_cfg:"Ваші VPN-конфіги",conn_note:"Стан показує лише реальні дані сервісу: сайт не може визначити, чи запущено тунель на вашому пристрої. Підключення вказує стан серверів та наявність активних конфігів.",dev_limit:"Пристрої",dev_cfg:"Конфіг + QR",dev_del:"Видалити",dev_empty:"Пристроїв немає. Створіть першу VPN-конфігурацію — кнопка «Додати пристрій».",dev_created:"Пристрій створено",dev_del_confirm:"Видалити пристрій і відкликати VPN-доступ?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Інше",type_hint_windows:"Windows: встановіть офіційний клієнт WireGuard → Import tunnel from file.",type_hint_android:"Android: застосунок WireGuard з Google Play → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard для Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / завантажений .conf у /etc/wireguard/.",type_hint_other:"Завантажте .conf або відскануйте QR-код у клієнті WireGuard.",sub_buy:"Купити карткою",sub_continue:"Продовжити",sub_cur:"ВАШ ТАРИФ",per_month:"/ 1 місяць",pays_none:"Платежів ще не було.",card_off:"Оплата картою ще не підключена адміністратором. Оплатити можна Telegram Stars у боті.",grp_create:"Створити групу",grp_name:"НАЗВА ГРУПИ",grp_slots:"Слотів за тарифом",grp_invite:"Створити запрошення",grp_inv_code:"Код запрошення",grp_join_t:"Маєте код запрошення?",grp_code:"КОД",grp_join:"Приєднатися",grp_members:"Учасники",grp_remove:"Видалити",grp_leave:"Покинути групу",grp_owner_note:"Кожен учасник отримує окремий акаунт і один VPN-пристрій. Коли ваша підписка завершується — група деактивується автоматично.",grp_member_note:"Ви учасник групи: доступний 1 пристрій VPN. Доступ активний, поки підписка власника групи дійсна.",grp_need_plan:"Група доступна з активною підпискою BASIC, PREMIUM або ULTIMATE.",grp_your:"Ваша група",grp_inv_links:"Поділитися: надішліть код другому або посилання на бота.",grp_created:"Групу створено",ref_invited:"Запрошено друзів",ref_link:"Ваше посилання",ref_next:"Наступна нагорода",ref_copy:"Скопіювати посилання",copied:"Скопійовано",sup_none:"Тікетів ще немає.",sup_open:"відкритий",sup_answered:"є відповідь",sup_closed:"закритий",tg_not:"Не прив'язано. Прив'язка дає змогу отримувати сповіщення та відновлювати пароль через Telegram.",tg_btn:"Отримати код прив'язки",tg_hint:"Надішліть боту команду:",tg_linked:"Прив'язано до Telegram",hist_none:"Історії входів немає.",hist_now:"зараз",msg_no_conn:"Немає з'єднання з сервером",msg_bad_resp:"Сервер відповів некорректно",msg_session_end:"Сесію завершено — увійдіть знову",msg_error:"Помилка сервера",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}},
+ru:{nav_dash:"Главная",nav_devices:"Устройства",nav_servers:"Серверы",nav_sub:"Тарифы",nav_group:"Группа",nav_ref:"Рефералы",nav_support:"Поддержка",nav_profile:"Профиль",to_site:"На сайт",logout:"Выйти",setup_title:"Подключение к серверу",setup_sub:"Укажите адрес сервера ЧУПИК VPN. Его можно найти в боте командой /admin или уточнить в поддержке.",setup_addr:"АДРЕС СЕРВЕРА (API)",setup_btn:"Подключиться",setup_note:"Адрес сохраняется в вашем браузере. Также его можно передать через ссылку: cabinet.html?api=адрес",auth_title:"Личный кабинет",auth_sub:"Регистрация или вход на сайте ЧУПИК VPN. Тот же аккаунт работает и в Telegram-боте.",email:"EMAIL",password:"ПАРОЛЬ",password2:"ПАРОЛЬ (ОТ 6 СИМВОЛОВ)",password3:"ПОВТОРИТЬ ПАРОЛЬ",login_btn:"Войти",no_account:"Нет аккаунта?",to_register:"Зарегистрироваться",register_btn:"Создать аккаунт",have_account:"Уже есть аккаунт?",to_login:"Войти",forgot:"Забыли пароль?",forgot_btn:"Восстановить пароль",forgot_note:"Если аккаунт привязан к Telegram — ссылка для сброса придёт в чат с ботом. Иначе обратитесь в поддержку.",new_password:"НОВЫЙ ПАРОЛЬ",reset_btn:"Сохранить новый пароль",dash_hello:"Добро пожаловать",dash_sub:"Управляйте подпиской, устройствами и группой — всё в одном месте.",conn_title:"Состояние сервиса",dash_actions:"Быстрые действия",dash_buy:"Продлить или купить подписку",dash_buy_d:"Карта или Telegram Stars",go:"Перейти",dash_dev:"Добавить устройство",dash_dev_d:"Конфиг WireGuard + QR-код",dev_title:"Устройства",dev_sub:"Конфигурации WireGuard для ваших гаджетов. Выберите тип — кабинет подскажет, как подключиться.",dev_add:"Добавить устройство",dev_type:"ТИП УСТРОЙСТВА",dev_name:"НАЗВАНИЕ",dev_server:"СЕРВЕР",cancel:"Отмена",download:"Скачать .conf",close:"Закрыть",srv_title:"Серверы",srv_sub:"Реальное состояние серверов: онлайн, подключения и нагрузка. Новое устройство автоматически подключается к самому свободному.",srv_online:"Онлайн",srv_offline:"Недоступен",srv_peers:"Подключений",srv_load:"Нагрузка",srv_pick:"Выбрать для нового устройства",srv_empty:"Серверы ещё не настроены администратором.",sub_title:"Тарифы",sub_sub:"Оплата картой или Telegram Stars. Подписка действует 30 дней.",pay_hist:"История платежей",grp_title:"Группа",grp_sub:"Приглашайте друзей в свою группу: каждый получает свой VPN-доступ. Количество слотов зависит от вашего тарифа.",ref_title:"Рефералы",ref_sub:"Приглашайте друзей — получайте бесплатный PREMIUM. Награда начисляется после первой оплаты приглашённого.",sup_title:"Поддержка",sup_sub:"Создайте тикет — администратор ответит, а ответ придёт также в Telegram (если аккаунт привязан).",sup_subject:"ТЕМА",sup_message:"СООБЩЕНИЕ",sup_send:"Отправить тикет",sup_mine:"Мои тикеты",prof_title:"Профиль",prof_sub:"Язык интерфейса, уведомления, безопасность и привязка Telegram.",prof_acct:"Аккаунт",prof_lang:"Язык интерфейса",prof_notify:"Уведомления",prof_remind:"Напоминания о подписке",prof_remind_d:"За 3 дня до окончания",prof_promos:"Акции и скидки",prof_promos_d:"Редкие новости сервиса",prof_tickets_d2:"Ответы поддержки",prof_tickets_d:"Уведомления об ответах на тикеты",save:"Сохранить",prof_pass:"Смена пароля",prof_oldpass:"ТЕКУЩИЙ ПАРОЛЬ",prof_changepass:"Сменить пароль",prof_pass_note:"После смены пароля все активные сессии завершатся — войдите заново.",prof_tg:"Привязка Telegram",prof_history:"История входов",prof_del:"Удаление аккаунта",prof_del_warn:"Удалит веб-аккаунт, сессии и закроет тикеты. Подписка и оплата не возвращаются.",dash_plan:"Тариф",dash_days:"Дней до окончания",dash_dev_u:"Устройства",dash_status:"Статус",dash_active:"Активная подписка",dash_inactive:"Без подписки (FREE)",dash_expiry:"действует до",none:"—",conn_srv:"Серверы сервиса",conn_cfg:"Ваши VPN-конфиги",conn_note:"Состояние показывает только реальные данные: сайт не может определить, запущен ли туннель на вашем устройстве.",dev_limit:"Устройства",dev_cfg:"Конфиг + QR",dev_del:"Удалить",dev_empty:"Устройств нет. Создайте первую VPN-конфигурацию — кнопка «Добавить устройство».",dev_created:"Устройство создано",dev_del_confirm:"Удалить устройство и отозвать VPN-доступ?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Другое",type_hint_windows:"Windows: установите официальный клиент WireGuard → Import tunnel from file.",type_hint_android:"Android: приложение WireGuard из Google Play → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard для Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / скачанный .conf в /etc/wireguard/.",type_hint_other:"Скачайте .conf или отсканируйте QR-код в клиенте WireGuard.",sub_buy:"Купить картой",sub_continue:"Продлить",sub_cur:"ВАШ ТАРИФ",per_month:"/ 1 месяц",pays_none:"Платежей ещё не было.",card_off:"Оплата картой ещё не подключена администратором. Оплатить можно Telegram Stars в боте.",grp_create:"Создать группу",grp_name:"НАЗВАНИЕ ГРУППЫ",grp_slots:"Слотов по тарифу",grp_invite:"Создать приглашение",grp_inv_code:"Код приглашения",grp_join_t:"Есть код приглашения?",grp_code:"КОД",grp_join:"Присоединиться",grp_members:"Участники",grp_remove:"Удалить",grp_leave:"Покинуть группу",grp_owner_note:"Каждый участник получает отдельный аккаунт и одно VPN-устройство. Когда ваша подписка заканчивается — группа деактивируется автоматически.",grp_member_note:"Вы участник группы: доступно 1 устройство VPN. Доступ активен, пока подписка владельца группы действительна.",grp_need_plan:"Группа доступна с активной подпиской BASIC, PREMIUM или ULTIMATE.",grp_your:"Ваша группа",grp_inv_links:"Поделиться: отправьте код другу или ссылку на бота.",grp_created:"Группа создана",ref_invited:"Приглашено друзей",ref_link:"Ваша ссылка",ref_next:"Следующая награда",ref_copy:"Скопировать ссылку",copied:"Скопировано",sup_none:"Тикетов ещё нет.",sup_open:"открыт",sup_answered:"есть ответ",sup_closed:"закрыт",tg_not:"Не привязано. Привязка позволяет получать уведомления и восстанавливать пароль через Telegram.",tg_btn:"Получить код привязки",tg_hint:"Отправьте боту команду:",tg_linked:"Привязано к Telegram",hist_none:"Истории входов нет.",hist_now:"сейчас",msg_no_conn:"Нет соединения с сервером",msg_bad_resp:"Сервер ответил некорректно",msg_session_end:"Сессия завершена — войдите заново",msg_error:"Ошибка сервера",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}},
+en:{nav_dash:"Dashboard",nav_devices:"Devices",nav_servers:"Servers",nav_sub:"Plans",nav_group:"Group",nav_ref:"Referrals",nav_support:"Support",nav_profile:"Profile",to_site:"Website",logout:"Log out",setup_title:"Connect to server",setup_sub:"Enter your CHUPIK VPN server address. You can find it with /admin in the bot or from support.",setup_addr:"SERVER ADDRESS (API)",setup_btn:"Connect",setup_note:"The address is stored in your browser. You can also pass it via link: cabinet.html?api=address",auth_title:"Personal cabinet",auth_sub:"Sign up or sign in on the CHUPIK VPN website. The same account works in the Telegram bot.",email:"EMAIL",password:"PASSWORD",password2:"PASSWORD (MIN 6 CHARACTERS)",password3:"CONFIRM PASSWORD",login_btn:"Sign in",no_account:"No account?",to_register:"Sign up",register_btn:"Create account",have_account:"Already have an account?",to_login:"Sign in",forgot:"Forgot password?",forgot_btn:"Recover password",forgot_note:"If your account is linked to Telegram, the reset link arrives in the bot chat. Otherwise, contact support.",new_password:"NEW PASSWORD",reset_btn:"Save new password",dash_hello:"Welcome to your cabinet",dash_sub:"Manage your subscription, devices and group — all in one place.",conn_title:"Service status",dash_actions:"Quick actions",dash_buy:"Extend or buy subscription",dash_buy_d:"Card or Telegram Stars",go:"Open",dash_dev:"Add a device",dash_dev_d:"WireGuard config + QR code",dev_title:"Devices",dev_sub:"WireGuard configs for your gadgets. Pick a type — the cabinet shows how to connect.",dev_add:"Add device",dev_type:"DEVICE TYPE",dev_name:"NAME",dev_server:"SERVER",cancel:"Cancel",download:"Download .conf",close:"Close",srv_title:"Servers",srv_sub:"Real server status: online, connections and load. New devices automatically use the least loaded server.",srv_online:"Online",srv_offline:"Offline",srv_peers:"Connections",srv_load:"Load",srv_pick:"Use for new device",srv_empty:"Servers are not configured by the administrator yet.",sub_title:"Plans",sub_sub:"Pay by card or Telegram Stars. Subscription lasts 30 days.",pay_hist:"Payment history",grp_title:"Group",grp_sub:"Invite friends to your group: each gets their own VPN access. Slots depend on your plan.",ref_title:"Referrals",ref_sub:"Invite friends — get free PREMIUM. The reward is credited after their first payment.",sup_title:"Support",sup_sub:"Create a ticket — the administrator will reply, and the answer also arrives in Telegram (if linked).",sup_subject:"SUBJECT",sup_message:"MESSAGE",sup_send:"Send ticket",sup_mine:"My tickets",prof_title:"Profile",prof_sub:"Interface language, notifications, security and Telegram linking.",prof_acct:"Account",prof_lang:"Interface language",prof_notify:"Notifications",prof_remind:"Subscription reminders",prof_remind_d:"3 days before expiry",prof_promos:"Deals and discounts",prof_promos_d:"Occasional service news",prof_tickets_d2:"Support replies",prof_tickets_d:"Notifications about ticket replies",save:"Save",prof_pass:"Change password",prof_oldpass:"CURRENT PASSWORD",prof_changepass:"Change password",prof_pass_note:"After a password change all sessions are ended — sign in again.",prof_tg:"Telegram linking",prof_history:"Login history",prof_del:"Delete account",prof_del_warn:"Deletes your web account, sessions and closes tickets. Subscription and payments are not refunded.",dash_plan:"Plan",dash_days:"Days left",dash_dev_u:"Devices",dash_status:"Status",dash_active:"Active subscription",dash_inactive:"No subscription (FREE)",dash_expiry:"valid until",none:"—",conn_srv:"Service servers",conn_cfg:"Your VPN configs",conn_note:"Status shows only real service data: a website cannot detect whether the tunnel runs on your device.",dev_limit:"Devices",dev_cfg:"Config + QR",dev_del:"Delete",dev_empty:"No devices yet. Create your first VPN config — the 'Add device' button.",dev_created:"Device created",dev_del_confirm:"Delete device and revoke VPN access?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Other",type_hint_windows:"Windows: install the official WireGuard client → Import tunnel from file.",type_hint_android:"Android: WireGuard app from Google Play → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard for Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / downloaded .conf in /etc/wireguard/.",type_hint_other:"Download the .conf or scan the QR code in a WireGuard client.",sub_buy:"Buy with card",sub_continue:"Extend",sub_cur:"YOUR PLAN",per_month:"/ 1 month",pays_none:"No payments yet.",card_off:"Card payments are not enabled by the administrator yet. Pay with Telegram Stars in the bot.",grp_create:"Create group",grp_name:"GROUP NAME",grp_slots:"Slots by plan",grp_invite:"Create invite",grp_inv_code:"Invite code",grp_join_t:"Have an invite code?",grp_code:"CODE",grp_join:"Join",grp_members:"Members",grp_remove:"Remove",grp_leave:"Leave group",grp_owner_note:"Each member gets a separate account and one VPN device. When your subscription ends, the group is deactivated automatically.",grp_member_note:"You are a group member: 1 VPN device available. Access lasts while the owner's subscription is active.",grp_need_plan:"Groups require an active BASIC, PREMIUM or ULTIMATE subscription.",grp_your:"Your group",grp_inv_links:"Share: send the code or the bot link to a friend.",grp_created:"Group created",ref_invited:"Friends invited",ref_link:"Your link",ref_next:"Next reward",ref_copy:"Copy link",copied:"Copied",sup_none:"No tickets yet.",sup_open:"open",sup_answered:"answered",sup_closed:"closed",tg_not:"Not linked. Linking enables notifications and password recovery via Telegram.",tg_btn:"Get linking code",tg_hint:"Send the bot this command:",tg_linked:"Linked to Telegram",hist_none:"No login history.",hist_now:"now",msg_no_conn:"No connection to server",msg_bad_resp:"Server responded incorrectly",msg_session_end:"Session ended — sign in again",msg_error:"Server error",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}}
+};
+T.fr={nav_dash:"Accueil",nav_devices:"Appareils",nav_servers:"Serveurs",nav_sub:"Tarifs",nav_group:"Groupe",nav_ref:"Parrainage",nav_support:"Support",nav_profile:"Profil",to_site:"Site web",logout:"Déconnexion",setup_title:"Connexion au serveur",setup_sub:"Indiquez l'adresse du serveur CHUPIK VPN. Elle se trouve avec /admin dans le bot ou auprès du support.",setup_addr:"ADRESSE DU SERVEUR (API)",setup_btn:"Se connecter",setup_note:"L'adresse est enregistrée dans votre navigateur. Vous pouvez aussi la passer par lien : cabinet.html?api=adresse",auth_title:"Espace personnel",auth_sub:"Inscription ou connexion sur le site CHUPIK VPN. Le même compte fonctionne dans le bot Telegram.",email:"E-MAIL",password:"MOT DE PASSE",password2:"MOT DE PASSE (MIN 6 CARACTÈRES)",password3:"CONFIRMER LE MOT DE PASSE",login_btn:"Se connecter",no_account:"Pas de compte ?",to_register:"S'inscrire",register_btn:"Créer un compte",have_account:"Vous avez déjà un compte ?",to_login:"Se connecter",forgot:"Mot de passe oublié ?",forgot_btn:"Récupérer le mot de passe",forgot_note:"Si votre compte est lié à Telegram, le lien de réinitialisation arrive dans le chat du bot. Sinon, contactez le support.",new_password:"NOUVEAU MOT DE PASSE",reset_btn:"Enregistrer le mot de passe",dash_hello:"Bienvenue dans votre espace",dash_sub:"Gérez abonnement, appareils et groupe — tout au même endroit.",conn_title:"État du service",dash_actions:"Actions rapides",dash_buy:"Prolonger ou acheter",dash_buy_d:"Carte ou Telegram Stars",go:"Ouvrir",dash_dev:"Ajouter un appareil",dash_dev_d:"Config WireGuard + QR",dev_title:"Appareils",dev_sub:"Configurations WireGuard pour vos appareils. Choisissez le type — l'espace vous explique comment vous connecter.",dev_add:"Ajouter un appareil",dev_type:"TYPE D'APPAREIL",dev_name:"NOM",dev_server:"SERVEUR",cancel:"Annuler",download:"Télécharger .conf",close:"Fermer",srv_title:"Serveurs",srv_sub:"État réel des serveurs : en ligne, connexions et charge. Un nouvel appareil utilise automatiquement le serveur le moins chargé.",srv_online:"En ligne",srv_offline:"Hors ligne",srv_peers:"Connexions",srv_load:"Charge",srv_pick:"Choisir pour un nouvel appareil",srv_empty:"Les serveurs ne sont pas encore configurés par l'administrateur.",sub_title:"Tarifs",sub_sub:"Paiement par carte ou Telegram Stars. Abonnement de 30 jours.",pay_hist:"Historique des paiements",grp_title:"Groupe",grp_sub:"Invitez vos amis dans votre groupe : chacun reçoit son accès VPN. Le nombre de places dépend de votre tarif.",ref_title:"Parrainage",ref_sub:"Invitez des amis — recevez PREMIUM gratuit. La récompense est créditée après leur premier paiement.",sup_title:"Support",sup_sub:"Créez un ticket — l'administrateur répondra, et la réponse arrive aussi sur Telegram (si lié).",sup_subject:"SUJET",sup_message:"MESSAGE",sup_send:"Envoyer le ticket",sup_mine:"Mes tickets",prof_title:"Profil",prof_sub:"Langue, notifications, sécurité et liaison Telegram.",prof_acct:"Compte",prof_lang:"Langue de l'interface",prof_notify:"Notifications",prof_remind:"Rappels d'abonnement",prof_remind_d:"3 jours avant l'expiration",prof_promos:"Promotions",prof_promos_d:"Nouvelles occasionnelles",prof_tickets_d2:"Réponses du support",prof_tickets_d:"Notifications des réponses aux tickets",save:"Enregistrer",prof_pass:"Changer le mot de passe",prof_oldpass:"MOT DE PASSE ACTUEL",prof_changepass:"Changer le mot de passe",prof_pass_note:"Après le changement, toutes les sessions sont terminées — reconnectez-vous.",prof_tg:"Liaison Telegram",prof_history:"Historique des connexions",prof_del:"Supprimer le compte",prof_del_warn:"Supprime le compte web, les sessions et ferme les tickets. Abonnement et paiements non remboursés.",dash_plan:"Tarif",dash_days:"Jours restants",dash_dev_u:"Appareils",dash_status:"Statut",dash_active:"Abonnement actif",dash_inactive:"Sans abonnement (FREE)",dash_expiry:"valable jusqu'au",none:"—",conn_srv:"Serveurs du service",conn_cfg:"Vos configs VPN",conn_note:"L'état affiche uniquement des données réelles : un site ne peut pas détecter si le tunnel tourne sur votre appareil.",dev_limit:"Appareils",dev_cfg:"Config + QR",dev_del:"Supprimer",dev_empty:"Aucun appareil. Créez votre première config VPN — bouton « Ajouter un appareil ».",dev_created:"Appareil créé",dev_del_confirm:"Supprimer l'appareil et révoquer l'accès VPN ?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Autre",type_hint_windows:"Windows : installez le client officiel WireGuard → Import tunnel from file.",type_hint_android:"Android : application WireGuard (Google Play) → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad : App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS : WireGuard pour Mac → Import tunnel from file.",type_hint_linux:"Linux : wg-quick up / fichier .conf dans /etc/wireguard/.",type_hint_other:"Téléchargez le .conf ou scannez le QR dans un client WireGuard.",sub_buy:"Payer par carte",sub_continue:"Prolonger",sub_cur:"VOTRE TARIF",per_month:"/ 1 mois",pays_none:"Aucun paiement pour l'instant.",card_off:"Le paiement par carte n'est pas encore activé. Payez avec Telegram Stars dans le bot.",grp_create:"Créer un groupe",grp_name:"NOM DU GROUPE",grp_slots:"Places selon le tarif",grp_invite:"Créer une invitation",grp_inv_code:"Code d'invitation",grp_join_t:"Vous avez un code d'invitation ?",grp_code:"CODE",grp_join:"Rejoindre",grp_members:"Membres",grp_remove:"Retirer",grp_leave:"Quitter le groupe",grp_owner_note:"Chaque membre reçoit un compte séparé et un appareil VPN. À la fin de votre abonnement, le groupe est désactivé automatiquement.",grp_member_note:"Vous êtes membre : 1 appareil VPN disponible, tant que l'abonnement du propriétaire est actif.",grp_need_plan:"Le groupe nécessite un abonnement BASIC, PREMIUM ou ULTIMATE actif.",grp_your:"Votre groupe",grp_inv_links:"Partagez : envoyez le code ou le lien du bot à un ami.",grp_created:"Groupe créé",ref_invited:"Amis invités",ref_link:"Votre lien",ref_next:"Prochaine récompense",ref_copy:"Copier le lien",copied:"Copié",sup_none:"Aucun ticket pour l'instant.",sup_open:"ouvert",sup_answered:"répondu",sup_closed:"fermé",tg_not:"Non lié. La liaison permet les notifications et la récupération du mot de passe via Telegram.",tg_btn:"Obtenir un code",tg_hint:"Envoyez cette commande au bot :",tg_linked:"Lié à Telegram",hist_none:"Pas d'historique de connexions.",hist_now:"maintenant",msg_no_conn:"Pas de connexion au serveur",msg_bad_resp:"Réponse du serveur incorrecte",msg_session_end:"Session terminée — reconnectez-vous",msg_error:"Erreur du serveur",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}};
+T.es={nav_dash:"Inicio",nav_devices:"Dispositivos",nav_servers:"Servidores",nav_sub:"Planes",nav_group:"Grupo",nav_ref:"Referidos",nav_support:"Soporte",nav_profile:"Perfil",to_site:"Sitio web",logout:"Salir",setup_title:"Conexión al servidor",setup_sub:"Introduce la dirección del servidor CHUPIK VPN. La encuentras con /admin en el bot o con soporte.",setup_addr:"DIRECCIÓN DEL SERVIDOR (API)",setup_btn:"Conectar",setup_note:"La dirección se guarda en tu navegador. También puedes pasarla por enlace: cabinet.html?api=dirección",auth_title:"Área personal",auth_sub:"Registro o inicio de sesión en la web de CHUPIK VPN. La misma cuenta funciona en el bot de Telegram.",email:"CORREO",password:"CONTRASEÑA",password2:"CONTRASEÑA (MÍN 6 CARACTERES)",password3:"CONFIRMAR CONTRASEÑA",login_btn:"Entrar",no_account:"¿Sin cuenta?",to_register:"Registrarse",register_btn:"Crear cuenta",have_account:"¿Ya tienes cuenta?",to_login:"Entrar",forgot:"¿Olvidaste la contraseña?",forgot_btn:"Recuperar contraseña",forgot_note:"Si tu cuenta está vinculada a Telegram, el enlace llega al chat del bot. Si no, contacta con soporte.",new_password:"NUEVA CONTRASEÑA",reset_btn:"Guardar contraseña",dash_hello:"Bienvenido a tu área",dash_sub:"Gestiona suscripción, dispositivos y grupo — todo en un lugar.",conn_title:"Estado del servicio",dash_actions:"Acciones rápidas",dash_buy:"Renovar o comprar",dash_buy_d:"Tarjeta o Telegram Stars",go:"Abrir",dash_dev:"Añadir dispositivo",dash_dev_d:"Config WireGuard + QR",dev_title:"Dispositivos",dev_sub:"Configuraciones WireGuard para tus dispositivos. Elige el tipo — el área te indica cómo conectarte.",dev_add:"Añadir dispositivo",dev_type:"TIPO DE DISPOSITIVO",dev_name:"NOMBRE",dev_server:"SERVIDOR",cancel:"Cancelar",download:"Descargar .conf",close:"Cerrar",srv_title:"Servidores",srv_sub:"Estado real: en línea, conexiones y carga. Un dispositivo nuevo usa automáticamente el servidor menos cargado.",srv_online:"En línea",srv_offline:"No disponible",srv_peers:"Conexiones",srv_load:"Carga",srv_pick:"Elegir para dispositivo nuevo",srv_empty:"El administrador aún no ha configurado servidores.",sub_title:"Planes",sub_sub:"Pago con tarjeta o Telegram Stars. Suscripción de 30 días.",pay_hist:"Historial de pagos",grp_title:"Grupo",grp_sub:"Invita amigos a tu grupo: cada uno recibe su acceso VPN. Los cupos dependen de tu plan.",ref_title:"Referidos",ref_sub:"Invita amigos — consigue PREMIUM gratis. La recompensa se acredita tras su primer pago.",sup_title:"Soporte",sup_sub:"Crea un ticket — el administrador responderá y la respuesta también llega por Telegram (si está vinculado).",sup_subject:"TEMA",sup_message:"MENSAJE",sup_send:"Enviar ticket",sup_mine:"Mis tickets",prof_title:"Perfil",prof_sub:"Idioma, notificaciones, seguridad y vinculación con Telegram.",prof_acct:"Cuenta",prof_lang:"Idioma de la interfaz",prof_notify:"Notificaciones",prof_remind:"Recordatorios de suscripción",prof_remind_d:"3 días antes de caducar",prof_promos:"Ofertas y descuentos",prof_promos_d:"Noticias ocasionales",prof_tickets_d2:"Respuestas de soporte",prof_tickets_d:"Avisos de respuestas a tickets",save:"Guardar",prof_pass:"Cambiar contraseña",prof_oldpass:"CONTRASEÑA ACTUAL",prof_changepass:"Cambiar contraseña",prof_pass_note:"Tras el cambio se cierran todas las sesiones — inicia sesión de nuevo.",prof_tg:"Vinculación con Telegram",prof_history:"Historial de accesos",prof_del:"Eliminar cuenta",prof_del_warn:"Elimina la cuenta web, las sesiones y cierra los tickets. Suscripción y pagos no reembolsables.",dash_plan:"Plan",dash_days:"Días restantes",dash_dev_u:"Dispositivos",dash_status:"Estado",dash_active:"Suscripción activa",dash_inactive:"Sin suscripción (FREE)",dash_expiry:"válido hasta",none:"—",conn_srv:"Servidores del servicio",conn_cfg:"Tus configs VPN",conn_note:"El estado muestra solo datos reales: una web no puede detectar si el túnel funciona en tu dispositivo.",dev_limit:"Dispositivos",dev_cfg:"Config + QR",dev_del:"Eliminar",dev_empty:"Sin dispositivos. Crea tu primera config VPN — botón «Añadir dispositivo».",dev_created:"Dispositivo creado",dev_del_confirm:"¿Eliminar dispositivo y revocar el acceso VPN?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Otro",type_hint_windows:"Windows: instala el cliente oficial WireGuard → Import tunnel from file.",type_hint_android:"Android: app WireGuard de Google Play → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard para Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / .conf descargado en /etc/wireguard/.",type_hint_other:"Descarga el .conf o escanea el QR en un cliente WireGuard.",sub_buy:"Pagar con tarjeta",sub_continue:"Renovar",sub_cur:"TU PLAN",per_month:"/ 1 mes",pays_none:"Todavía no hay pagos.",card_off:"El pago con tarjeta aún no está activado. Paga con Telegram Stars en el bot.",grp_create:"Crear grupo",grp_name:"NOMBRE DEL GRUPO",grp_slots:"Cupos según plan",grp_invite:"Crear invitación",grp_inv_code:"Código de invitación",grp_join_t:"¿Tienes código de invitación?",grp_code:"CÓDIGO",grp_join:"Unirse",grp_members:"Miembros",grp_remove:"Quitar",grp_leave:"Salir del grupo",grp_owner_note:"Cada miembro recibe cuenta propia y un dispositivo VPN. Al terminar tu suscripción, el grupo se desactiva automáticamente.",grp_member_note:"Eres miembro: 1 dispositivo VPN disponible mientras la suscripción del propietario esté activa.",grp_need_plan:"El grupo requiere suscripción BASIC, PREMIUM o ULTIMATE activa.",grp_your:"Tu grupo",grp_inv_links:"Comparte: envía el código o el enlace del bot a un amigo.",grp_created:"Grupo creado",ref_invited:"Amigos invitados",ref_link:"Tu enlace",ref_next:"Próxima recompensa",ref_copy:"Copiar enlace",copied:"Copiado",sup_none:"Todavía no hay tickets.",sup_open:"abierto",sup_answered:"respondido",sup_closed:"cerrado",tg_not:"No vinculado. La vinculación permite notificaciones y recuperar la contraseña por Telegram.",tg_btn:"Obtener código",tg_hint:"Envía este comando al bot:",tg_linked:"Vinculado a Telegram",hist_none:"Sin historial de accesos.",hist_now:"ahora",msg_no_conn:"Sin conexión con el servidor",msg_bad_resp:"El servidor respondió incorrectamente",msg_session_end:"Sesión terminada — entra de nuevo",msg_error:"Error del servidor",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}};
+T.de={nav_dash:"Übersicht",nav_devices:"Geräte",nav_servers:"Server",nav_sub:"Tarife",nav_group:"Gruppe",nav_ref:"Empfehlungen",nav_support:"Support",nav_profile:"Profil",to_site:"Website",logout:"Abmelden",setup_title:"Serververbindung",setup_sub:"Gib die Adresse deines CHUPIK-VPN-Servers ein. Findest du mit /admin im Bot oder beim Support.",setup_addr:"SERVERADRESSE (API)",setup_btn:"Verbinden",setup_note:"Die Adresse wird im Browser gespeichert. Auch per Link möglich: cabinet.html?api=adresse",auth_title:"Persönlicher Bereich",auth_sub:"Registrierung oder Anmeldung auf der CHUPIK-VPN-Website. Derselbe Account funktioniert im Telegram-Bot.",email:"E-MAIL",password:"PASSWORT",password2:"PASSWORT (MIN. 6 ZEICHEN)",password3:"PASSWORT WIEDERHOLEN",login_btn:"Anmelden",no_account:"Kein Account?",to_register:"Registrieren",register_btn:"Account erstellen",have_account:"Schon ein Account?",to_login:"Anmelden",forgot:"Passwort vergessen?",forgot_btn:"Passwort wiederherstellen",forgot_note:"Wenn dein Account mit Telegram verknüpft ist, kommt der Reset-Link in den Bot-Chat. Sonst kontaktiere den Support.",new_password:"NEUES PASSWORT",reset_btn:"Neues Passwort speichern",dash_hello:"Willkommen",dash_sub:"Verwalte Abo, Geräte und Gruppe — alles an einem Ort.",conn_title:"Dienststatus",dash_actions:"Schnellaktionen",dash_buy:"Abo verlängern oder kaufen",dash_buy_d:"Karte oder Telegram Stars",go:"Öffnen",dash_dev:"Gerät hinzufügen",dash_dev_d:"WireGuard-Konfig + QR",dev_title:"Geräte",dev_sub:"WireGuard-Konfigurationen für deine Geräte. Wähle den Typ — der Bereich zeigt, wie du dich verbindest.",dev_add:"Gerät hinzufügen",dev_type:"GERÄTETYP",dev_name:"NAME",dev_server:"SERVER",cancel:"Abbrechen",download:".conf herunterladen",close:"Schließen",srv_title:"Server",srv_sub:"Echter Status: online, Verbindungen und Last. Neue Geräte nutzen automatisch den am wenigsten ausgelasteten Server.",srv_online:"Online",srv_offline:"Nicht verfügbar",srv_peers:"Verbindungen",srv_load:"Last",srv_pick:"Für neues Gerät wählen",srv_empty:"Server sind noch nicht vom Administrator eingerichtet.",sub_title:"Tarife",sub_sub:"Zahlung per Karte oder Telegram Stars. Abo läuft 30 Tage.",pay_hist:"Zahlungshistorie",grp_title:"Gruppe",grp_sub:"Lade Freunde in deine Gruppe ein: jeder erhält eigenen VPN-Zugang. Slots hängen von deinem Tarif ab.",ref_title:"Empfehlungen",ref_sub:"Lade Freunde ein — erhalte kostenloses PREMIUM. Die Belohnung kommt nach deren erster Zahlung.",sup_title:"Support",sup_sub:"Erstelle ein Ticket — der Administrator antwortet, und die Antwort kommt auch per Telegram (falls verknüpft).",sup_subject:"THEMA",sup_message:"NACHRICHT",sup_send:"Ticket senden",sup_mine:"Meine Tickets",prof_title:"Profil",prof_sub:"Sprache, Benachrichtigungen, Sicherheit und Telegram-Verknüpfung.",prof_acct:"Konto",prof_lang:"Sprache",prof_notify:"Benachrichtigungen",prof_remind:"Abo-Erinnerungen",prof_remind_d:"3 Tage vor Ablauf",prof_promos:"Angebote und Rabatte",prof_promos_d:"Gelegentliche Neuigkeiten",prof_tickets_d2:"Support-Antworten",prof_tickets_d:"Benachrichtigungen zu Ticket-Antworten",save:"Speichern",prof_pass:"Passwort ändern",prof_oldpass:"AKTUELLES PASSWORT",prof_changepass:"Passwort ändern",prof_pass_note:"Nach der Änderung werden alle Sitzungen beendet — melde dich neu an.",prof_tg:"Telegram-Verknüpfung",prof_history:"Anmeldeverlauf",prof_del:"Konto löschen",prof_del_warn:"Löscht Web-Konto, Sitzungen und schließt Tickets. Abo und Zahlungen werden nicht erstattet.",dash_plan:"Tarif",dash_days:"Tage übrig",dash_dev_u:"Geräte",dash_status:"Status",dash_active:"Aktives Abo",dash_inactive:"Kein Abo (FREE)",dash_expiry:"gültig bis",none:"—",conn_srv:"Dienstserver",conn_cfg:"Deine VPN-Konfigs",conn_note:"Der Status zeigt nur echte Daten: eine Website kann nicht erkennen, ob der Tunnel auf deinem Gerät läuft.",dev_limit:"Geräte",dev_cfg:"Konfig + QR",dev_del:"Löschen",dev_empty:"Keine Geräte. Erstelle deine erste VPN-Konfiguration — Button „Gerät hinzufügen“.",dev_created:"Gerät erstellt",dev_del_confirm:"Gerät löschen und VPN-Zugriff widerrufen?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Sonstiges",type_hint_windows:"Windows: offizieller WireGuard-Client → Import tunnel from file.",type_hint_android:"Android: WireGuard-App (Google Play) → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard für Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / heruntergeladene .conf in /etc/wireguard/.",type_hint_other:"Lade die .conf herunter oder scanne den QR-Code in einem WireGuard-Client.",sub_buy:"Mit Karte kaufen",sub_continue:"Verlängern",sub_cur:"DEIN TARIF",per_month:"/ 1 Monat",pays_none:"Noch keine Zahlungen.",card_off:"Kartenzahlung ist noch nicht aktiviert. Zahle mit Telegram Stars im Bot.",grp_create:"Gruppe erstellen",grp_name:"GRUPPENNAME",grp_slots:"Slots nach Tarif",grp_invite:"Einladung erstellen",grp_inv_code:"Einladungscode",grp_join_t:"Hast du einen Einladungscode?",grp_code:"CODE",grp_join:"Beitreten",grp_members:"Mitglieder",grp_remove:"Entfernen",grp_leave:"Gruppe verlassen",grp_owner_note:"Jedes Mitglied erhält eigenes Konto und ein VPN-Gerät. Endet dein Abo, wird die Gruppe automatisch deaktiviert.",grp_member_note:"Du bist Mitglied: 1 VPN-Gerät verfügbar, solange das Abo des Eigentümers aktiv ist.",grp_need_plan:"Die Gruppe erfordert ein aktives BASIC-, PREMIUM- oder ULTIMATE-Abo.",grp_your:"Deine Gruppe",grp_inv_links:"Teilen: schicke einem Freund den Code oder den Bot-Link.",grp_created:"Gruppe erstellt",ref_invited:"Eingeladene Freunde",ref_link:"Dein Link",ref_next:"Nächste Belohnung",ref_copy:"Link kopieren",copied:"Kopiert",sup_none:"Noch keine Tickets.",sup_open:"offen",sup_answered:"beantwortet",sup_closed:"geschlossen",tg_not:"Nicht verknüpft. Die Verknüpfung ermöglicht Benachrichtigungen und Passwort-Wiederherstellung über Telegram.",tg_btn:"Code abrufen",tg_hint:"Sende dem Bot diesen Befehl:",tg_linked:"Mit Telegram verknüpft",hist_none:"Kein Anmeldeverlauf.",hist_now:"jetzt",msg_no_conn:"Keine Verbindung zum Server",msg_bad_resp:"Server antwortet fehlerhaft",msg_session_end:"Sitzung beendet — melde dich neu an",msg_error:"Serverfehler",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}};
+T.it={nav_dash:"Panoramica",nav_devices:"Dispositivi",nav_servers:"Server",nav_sub:"Tariffi",nav_group:"Gruppo",nav_ref:"Referenti",nav_support:"Supporto",nav_profile:"Profilo",to_site:"Sito web",logout:"Esci",setup_title:"Connessione al server",setup_sub:"Inserisci l'indirizzo del server CHUPIK VPN. Lo trovi con /admin nel bot o dal supporto.",setup_addr:"INDIRIZZO SERVER (API)",setup_btn:"Connetti",setup_note:"L'indirizzo è salvato nel browser. Puoi anche passarlo via link: cabinet.html?api=indirizzo",auth_title:"Area personale",auth_sub:"Registrazione o accesso sul sito CHUPIK VPN. Lo stesso account funziona nel bot Telegram.",email:"EMAIL",password:"PASSWORD",password2:"PASSWORD (MIN 6 CARATTERI)",password3:"CONFERMA PASSWORD",login_btn:"Accedi",no_account:"Nessun account?",to_register:"Registrati",register_btn:"Crea account",have_account:"Hai già un account?",to_login:"Accedi",forgot:"Password dimenticata?",forgot_btn:"Recupera password",forgot_note:"Se l'account è collegato a Telegram, il link arriva nella chat del bot. Altrimenti contatta il supporto.",new_password:"NUOVA PASSWORD",reset_btn:"Salva nuova password",dash_hello:"Benvenuto",dash_sub:"Gestisci abbonamento, dispositivi e gruppo — tutto in un posto.",conn_title:"Stato del servizio",dash_actions:"Azioni rapide",dash_buy:"Rinnova o acquista",dash_buy_d:"Carta o Telegram Stars",go:"Apri",dash_dev:"Aggiungi dispositivo",dash_dev_d:"Config WireGuard + QR",dev_title:"Dispositivi",dev_sub:"Configurazioni WireGuard per i tuoi dispositivi. Scegli il tipo — l'area ti spiega come connetterti.",dev_add:"Aggiungi dispositivo",dev_type:"TIPO DI DISPOSITIVO",dev_name:"NOME",dev_server:"SERVER",cancel:"Annulla",download:"Scarica .conf",close:"Chiudi",srv_title:"Server",srv_sub:"Stato reale: online, connessioni e carico. Un nuovo dispositivo usa automaticamente il server meno carico.",srv_online:"Online",srv_offline:"Non disponibile",srv_peers:"Connessioni",srv_load:"Carico",srv_pick:"Scegli per nuovo dispositivo",srv_empty:"Il server non è ancora configurato dall'amministratore.",sub_title:"Tariffi",sub_sub:"Pagamento con carta o Telegram Stars. Abbonamento di 30 giorni.",pay_hist:"Storico pagamenti",grp_title:"Gruppo",grp_sub:"Invita amici nel tuo gruppo: ognuno riceve il proprio accesso VPN. I posti dipendono dal tuo tariffario.",ref_title:"Referenti",ref_sub:"Invita amici — ottieni PREMIUM gratuito. Il premio arriva dopo il loro primo pagamento.",sup_title:"Supporto",sup_sub:"Crea un ticket — l'amministratore risponderà e la risposta arriva anche su Telegram (se collegato).",sup_subject:"ARGOMENTO",sup_message:"MESSAGGIO",sup_send:"Invia ticket",sup_mine:"I miei ticket",prof_title:"Profilo",prof_sub:"Lingua, notifiche, sicurezza e collegamento Telegram.",prof_acct:"Account",prof_lang:"Lingua interfaccia",prof_notify:"Notifiche",prof_remind:"Promemoria abbonamento",prof_remind_d:"3 giorni prima della scadenza",prof_promos:"Offerte e sconti",prof_promos_d:"Novità occasionali",prof_tickets_d2:"Risposte del supporto",prof_tickets_d:"Notifiche sulle risposte ai ticket",save:"Salva",prof_pass:"Cambia password",prof_oldpass:"PASSWORD ATTUALE",prof_changepass:"Cambia password",prof_pass_note:"Dopo la modifica tutte le sessioni terminano — accedi di nuovo.",prof_tg:"Collegamento Telegram",prof_history:"Storico accessi",prof_del:"Elimina account",prof_del_warn:"Elimina l'account web, le sessioni e chiude i ticket. Abbonamento e pagamenti non rimborsati.",dash_plan:"Tariffa",dash_days:"Giorni rimasti",dash_dev_u:"Dispositivi",dash_status:"Stato",dash_active:"Abbonamento attivo",dash_inactive:"Senza abbonamento (FREE)",dash_expiry:"valido fino al",none:"—",conn_srv:"Server del servizio",conn_cfg:"Le tue config VPN",conn_note:"Lo stato mostra solo dati reali: un sito non può rilevare se il tunnel è attivo sul tuo dispositivo.",dev_limit:"Dispositivi",dev_cfg:"Config + QR",dev_del:"Elimina",dev_empty:"Nessun dispositivo. Crea la prima configurazione VPN — pulsante «Aggiungi dispositivo».",dev_created:"Dispositivo creato",dev_del_confirm:"Eliminare il dispositivo e revocare l'accesso VPN?",type_windows:"Windows",type_android:"Android",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"Altro",type_hint_windows:"Windows: client WireGuard ufficiale → Import tunnel from file.",type_hint_android:"Android: app WireGuard da Google Play → ➕ → Scan from QR code.",type_hint_ios:"iPhone/iPad: App Store → WireGuard → Create from QR code.",type_hint_macos:"macOS: WireGuard per Mac → Import tunnel from file.",type_hint_linux:"Linux: wg-quick up / .conf scaricata in /etc/wireguard/.",type_hint_other:"Scarica la .conf o scansiona il QR in un client WireGuard.",sub_buy:"Paga con carta",sub_continue:"Rinnova",sub_cur:"IL TUO TARIFFO",per_month:"/ 1 mese",pays_none:"Nessun pagamento ancora.",card_off:"Il pagamento con carta non è ancora attivo. Paga con Telegram Stars nel bot.",grp_create:"Crea gruppo",grp_name:"NOME DEL GRUPPO",grp_slots:"Posti secondo tariffa",grp_invite:"Crea invito",grp_inv_code:"Codice invito",grp_join_t:"Hai un codice invito?",grp_code:"CODICE",grp_join:"Unisciti",grp_members:"Membri",grp_remove:"Rimuovi",grp_leave:"Lascia il gruppo",grp_owner_note:"Ogni membro riceve un account separato e un dispositivo VPN. Alla scadenza del tuo abbonamento il gruppo si disattiva automaticamente.",grp_member_note:"Sei membro: 1 dispositivo VPN disponibile finché l'abbonamento del proprietario è attivo.",grp_need_plan:"Il gruppo richiede un abbonamento BASIC, PREMIUM o ULTIMATE attivo.",grp_your:"Il tuo gruppo",grp_inv_links:"Condividi: invia il codice o il link del bot a un amico.",grp_created:"Gruppo creato",ref_invited:"Amici invitati",ref_link:"Il tuo link",ref_next:"Prossimo premio",ref_copy:"Copia link",copied:"Copiato",sup_none:"Nessun ticket ancora.",sup_open:"aperto",sup_answered:"risposto",sup_closed:"chiuso",tg_not:"Non collegato. Il collegamento permette notifiche e recupero password via Telegram.",tg_btn:"Ottieni codice",tg_hint:"Invia questo comando al bot:",tg_linked:"Collegato a Telegram",hist_none:"Nessuno storico accessi.",hist_now:"adesso",msg_no_conn:"Nessuna connessione al server",msg_bad_resp:"Il server ha risposto in modo errato",msg_session_end:"Sessione terminata — accedi di nuovo",msg_error:"Errore del server",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}};
+T.zh={nav_dash:"主页",nav_devices:"设备",nav_servers:"服务器",nav_sub:"套餐",nav_group:"群组",nav_ref:"推荐",nav_support:"客服",nav_profile:"个人资料",to_site:"官网",logout:"退出",setup_title:"连接服务器",setup_sub:"输入 CHUPIK VPN 服务器地址。可在机器人中用 /admin 查询或联系客服。",setup_addr:"服务器地址 (API)",setup_btn:"连接",setup_note:"地址保存在浏览器中,也可通过链接传递:cabinet.html?api=地址",auth_title:"个人中心",auth_sub:"在 CHUPIK VPN 网站注册或登录。同一账号也可在 Telegram 机器人中使用。",email:"邮箱",password:"密码",password2:"密码(至少6位)",password3:"确认密码",login_btn:"登录",no_account:"还没有账号?",to_register:"注册",register_btn:"创建账号",have_account:"已有账号?",to_login:"登录",forgot:"忘记密码?",forgot_btn:"找回密码",forgot_note:"若账号已绑定 Telegram,重置链接会发送到机器人聊天。否则请联系客服。",new_password:"新密码",reset_btn:"保存新密码",dash_hello:"欢迎回来",dash_sub:"在一个地方管理订阅、设备和群组。",conn_title:"服务状态",dash_actions:"快速操作",dash_buy:"续费或购买",dash_buy_d:"银行卡或 Telegram Stars",go:"打开",dash_dev:"添加设备",dash_dev_d:"WireGuard 配置 + 二维码",dev_title:"设备",dev_sub:"为您的设备生成 WireGuard 配置。选择类型,中心会提示如何连接。",dev_add:"添加设备",dev_type:"设备类型",dev_name:"名称",dev_server:"服务器",cancel:"取消",download:"下载 .conf",close:"关闭",srv_title:"服务器",srv_sub:"真实状态:在线、连接数与负载。新设备自动使用负载最低的服务器。",srv_online:"在线",srv_offline:"不可用",srv_peers:"连接数",srv_load:"负载",srv_pick:"用于新设备",srv_empty:"管理员尚未配置服务器。",sub_title:"套餐",sub_sub:"银行卡或 Telegram Stars 支付。订阅有效期 30 天。",pay_hist:"支付记录",grp_title:"群组",grp_sub:"邀请朋友加入您的群组:每人获得自己的 VPN 访问。名额取决于您的套餐。",ref_title:"推荐",ref_sub:"邀请朋友,获得免费 PREMIUM。好友首次付款后发放奖励。",sup_title:"客服",sup_sub:"创建工单,管理员会回复;若已绑定 Telegram,回复也会发送到 Telegram。",sup_subject:"主题",sup_message:"内容",sup_send:"发送工单",sup_mine:"我的工单",prof_title:"个人资料",prof_sub:"界面语言、通知、安全与 Telegram 绑定。",prof_acct:"账号",prof_lang:"界面语言",prof_notify:"通知",prof_remind:"订阅提醒",prof_remind_d:"到期前 3 天",prof_promos:"优惠活动",prof_promos_d:"偶尔的服务资讯",prof_tickets_d2:"客服回复",prof_tickets_d:"工单回复通知",save:"保存",prof_pass:"修改密码",prof_oldpass:"当前密码",prof_changepass:"修改密码",prof_pass_note:"修改密码后所有会话将结束,请重新登录。",prof_tg:"Telegram 绑定",prof_history:"登录记录",prof_del:"删除账号",prof_del_warn:"将删除网页账号、会话并关闭工单。订阅和付款不予退还。",dash_plan:"套餐",dash_days:"剩余天数",dash_dev_u:"设备",dash_status:"状态",dash_active:"订阅有效",dash_inactive:"无订阅 (FREE)",dash_expiry:"有效期至",none:"—",conn_srv:"服务服务器",conn_cfg:"您的 VPN 配置",conn_note:"状态仅显示真实数据:网站无法检测隧道是否在您的设备上运行。",dev_limit:"设备",dev_cfg:"配置 + 二维码",dev_del:"删除",dev_empty:"暂无设备。点击“添加设备”创建第一个 VPN 配置。",dev_created:"设备已创建",dev_del_confirm:"删除设备并撤销 VPN 访问?",type_windows:"Windows",type_android:"安卓",type_ios:"iPhone / iPad",type_macos:"macOS",type_linux:"Linux",type_other:"其他",type_hint_windows:"Windows:安装官方 WireGuard 客户端 → Import tunnel from file。",type_hint_android:"安卓:Google Play 安装 WireGuard → ➕ → 扫描二维码。",type_hint_ios:"iPhone/iPad:App Store → WireGuard → 扫二维码创建。",type_hint_macos:"macOS:WireGuard for Mac → Import tunnel from file。",type_hint_linux:"Linux:wg-quick up / 将 .conf 放入 /etc/wireguard/。",type_hint_other:"下载 .conf 或在 WireGuard 客户端中扫描二维码。",sub_buy:"银行卡购买",sub_continue:"续费",sub_cur:"当前套餐",per_month:"/ 1 个月",pays_none:"暂无支付记录。",card_off:"银行卡支付尚未开通。可在机器人中使用 Telegram Stars 支付。",grp_create:"创建群组",grp_name:"群组名称",grp_slots:"套餐名额",grp_invite:"创建邀请",grp_inv_code:"邀请码",grp_join_t:"有邀请码?",grp_code:"邀请码",grp_join:"加入",grp_members:"成员",grp_remove:"移除",grp_leave:"退出群组",grp_owner_note:"每位成员获得独立账号和一台 VPN 设备。订阅到期后群组会自动停用。",grp_member_note:"您是群组成员:可使用 1 台 VPN 设备,群主订阅有效期间可用。",grp_need_plan:"群组需要有效的 BASIC、PREMIUM 或 ULTIMATE 订阅。",grp_your:"您的群组",grp_inv_links:"分享:将邀请码或机器人链接发送给朋友。",grp_created:"群组已创建",ref_invited:"已邀请好友",ref_link:"您的链接",ref_next:"下一个奖励",ref_copy:"复制链接",copied:"已复制",sup_none:"暂无工单。",sup_open:"待处理",sup_answered:"已回复",sup_closed:"已关闭",tg_not:"未绑定。绑定后可通过 Telegram 接收通知并找回密码。",tg_btn:"获取绑定码",tg_hint:"向机器人发送命令:",tg_linked:"已绑定 Telegram",hist_none:"暂无登录记录。",hist_now:"刚刚",msg_no_conn:"无法连接服务器",msg_bad_resp:"服务器响应异常",msg_session_end:"会话已结束,请重新登录",msg_error:"服务器错误",plans_hist:{basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE",free:"FREE"}};
+const t = k => (T[LANG] && T[LANG][k]) || T.uk[k] || k;
+
+/* ---------------- мова ---------------- */
+function applyLang(){
+  document.documentElement.lang = LANG;
+  $$("[data-i18n]").forEach(el => { const k = el.dataset.i18n; if (T[LANG][k]) el.textContent = T[LANG][k]; });
+  const sel = $("#langTop");
+  sel.innerHTML = LANGS.map(([c,n]) => `<option value="${c}" ${c===LANG?"selected":""}>${n}</option>`).join("");
+  if (ME) renderAll();
+}
+$("#langTop").addEventListener("change", e => { LANG = e.target.value; localStorage.setItem("chupik_lang", LANG); applyLang(); });
+
+/* ---------------- api ---------------- */
+function toast(m){ const x=$("#toast"); x.textContent=m; x.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>x.classList.remove("show"),3000); }
+function fmtDate(ts){ if(!ts) return t("none"); return new Date(ts*1000).toLocaleDateString(LANG+"-UA"); }
+function fmtDT(ts){ if(!ts) return t("hist_now"); return new Date(ts*1000).toLocaleString(); }
 async function api(path, opts={}){
   const headers = Object.assign({"Content-Type":"application/json"}, opts.headers||{});
   if (TOKEN) headers["Authorization"] = "Bearer " + TOKEN;
   let r;
   try { r = await fetch(API + path, {...opts, headers}); }
-  catch(e){ throw new Error("Немає з'єднання з сервером"); }
+  catch(e){ throw new Error(t("msg_no_conn")); }
   let j;
-  try { j = await r.json(); } catch(e){ throw new Error("Сервер відповів некоректно"); }
-  if (r.status === 401 && TOKEN){ // сесія протермінувалася
+  try { j = await r.json(); } catch(e){ throw new Error(t("msg_bad_resp")); }
+  if (r.status === 401 && TOKEN){
     TOKEN=""; localStorage.removeItem("chupik_token"); show("screenAuth");
-    throw new Error("Сесію завершено — увійдіть знову");
+    throw new Error(t("msg_session_end"));
   }
-  if (!r.ok) throw new Error(j.detail || j.error || "Помилка сервера");
+  if (!r.ok) throw new Error(j.detail || j.error || t("msg_error"));
   return j;
 }
+function show(id){ ["screenSetup","screenAuth","screenApp"].forEach(s=>{ $("#"+s).style.display = s===id ? (id==="screenApp"?"block":"grid") : "none"; }); if(id==="screenApp") document.body.style.overflow="auto"; }
 
-/* ---------- екран налаштування API ---------- */
+/* ---------------- визначення API ---------------- */
+(function resolveApi(){
+  const p = new URLSearchParams(location.search);
+  if (p.get("api")) { localStorage.setItem("chupik_api", p.get("api").replace(/\/+$/,"")); API = localStorage.getItem("chupik_api"); return; }
+  if (localStorage.getItem("chupik_api")) { API = localStorage.getItem("chupik_api"); return; }
+  API = DEFAULT_API || null;
+})();
+
+/* ---------------- boot / вхід ---------------- */
 async function boot(){
+  applyLang();
+  const hash = location.hash || "";
+  const mReset = hash.match(/reset=([\w-]+)/);
+  if (mReset){ RESET_TOKEN = mReset[1]; show("screenAuth"); $("#authLogin").style.display="none"; $("#authReset").style.display="block"; return; }
   if (API === null){ show("screenSetup"); return; }
-  await checkConfig();
-}
-async function checkConfig(){
   try {
-    const cfg = await api("/api/web/config");
+    await api("/api/web/config");
     if (!TOKEN){ show("screenAuth"); return; }
-    try { await loadAll(); } catch(e){ if (TOKEN) throw e; show("screenAuth"); }
+    await loadAll();
   } catch(e){
-    if (API === null || API === ""){ show("screenSetup"); }
-    else { toast(e.message); show("screenSetup"); $("#setupApi").value = API; }
+    show("screenSetup"); $("#setupApi").value = API || "";
   }
 }
-$("#setupSave").addEventListener("click", async ()=>{
+let RESET_TOKEN = null;
+$("#setupSave").addEventListener("click", ()=>{
   const v = $("#setupApi").value.trim().replace(/\/+$/,"");
-  if (!/^https?:\/\/.+/.test(v)){ $("#setupErr").textContent="Адреса має починатися з http:// або https://"; $("#setupErr").style.display="block"; return; }
+  if (!/^https?:\/\/.+/.test(v)){ const e=$("#setupErr"); e.textContent="http:// або https://"; e.style.display="block"; return; }
   localStorage.setItem("chupik_api", v); location.replace(location.pathname);
 });
-
-/* ---------- вхід / реєстрація ---------- */
 $("#toRegister").addEventListener("click",e=>{e.preventDefault();$("#authLogin").style.display="none";$("#authRegister").style.display="block";});
 $("#toLogin").addEventListener("click",e=>{e.preventDefault();$("#authRegister").style.display="none";$("#authLogin").style.display="block";});
+$("#toForgot").addEventListener("click",e=>{e.preventDefault();$("#authLogin").style.display="none";$("#authForgot").style.display="block";});
+$("#backLogin").addEventListener("click",e=>{e.preventDefault();$("#authForgot").style.display="none";$("#authLogin").style.display="block";});
+$("#backLogin2").addEventListener("click",e=>{e.preventDefault();$("#authReset").style.display="none";$("#authLogin").style.display="block";});
 function authErr(m){ const e=$("#authErr"); e.textContent=m; e.style.display="block"; }
-async function afterAuth(j){ TOKEN=j.token; localStorage.setItem("chupik_token",TOKEN); ME=j.user; await startApp(); }
+function authOk(m){ const e=$("#authOk"); e.textContent=m; e.style.display="block"; setTimeout(()=>e.style.display="none",4000); }
+async function afterAuth(j){ TOKEN=j.token; localStorage.setItem("chupik_token",TOKEN); await loadAll(); }
 $("#doLogin").addEventListener("click", async ()=>{
   $("#authErr").style.display="none";
   try{ const j = await api("/api/web/auth/login",{method:"POST",body:JSON.stringify({email:$("#loginEmail").value,password:$("#loginPass").value})}); await afterAuth(j); }
@@ -305,121 +455,157 @@ $("#doLogin").addEventListener("click", async ()=>{
 });
 $("#doRegister").addEventListener("click", async ()=>{
   $("#authErr").style.display="none";
-  if ($("#regPass").value !== $("#regPass2").value){ authErr("Паролі не співпадають"); return; }
+  if ($("#regPass").value !== $("#regPass2").value){ authErr(t("password3")); return; }
   const ref = new URLSearchParams(location.search).get("ref");
   try{ const j = await api("/api/web/auth/register",{method:"POST",body:JSON.stringify({email:$("#regEmail").value,password:$("#regPass").value, ref: ref?Number(ref):null})}); await afterAuth(j); }
   catch(e){ authErr(e.message); }
+});
+$("#doForgot").addEventListener("click", async ()=>{
+  $("#authErr").style.display="none";
+  try{
+    const j = await api("/api/web/auth/forgot",{method:"POST",body:JSON.stringify({email:$("#fgEmail").value})});
+    authOk(j.delivered==="telegram" ? t("forgot_note") : t("forgot_note"));
+  }catch(e){ authErr(e.message); }
+});
+$("#doReset").addEventListener("click", async ()=>{
+  $("#authErr").style.display="none";
+  try{
+    await api("/api/web/auth/reset",{method:"POST",body:JSON.stringify({token:RESET_TOKEN,new_password:$("#rsPass").value})});
+    RESET_TOKEN = null; history.replaceState(null,"",location.pathname);
+    $("#authReset").style.display="none"; $("#authLogin").style.display="block"; authOk("OK");
+  }catch(e){ authErr(e.message); }
 });
 $("#btnLogout").addEventListener("click", async ()=>{
   try{ await api("/api/web/auth/logout",{method:"POST"}); }catch(e){}
   TOKEN=""; localStorage.removeItem("chupik_token"); location.reload();
 });
 
-/* ---------- дані ---------- */
+/* ---------------- дані ---------------- */
 async function loadAll(){
   const me = await api("/api/me");
   ME = me;
-  try {
-    const cfg = await api("/api/web/config");
-    ME._cardProvider = cfg.card_provider || null;
-  } catch(e){ ME._cardProvider = null; }
+  try { const cfg = await api("/api/web/config"); ME._cardProvider = cfg.card_provider || null; } catch(e){ ME._cardProvider = null; }
   try { const sv = await api("/api/servers"); SERVERS = sv.servers||[]; } catch(e){ SERVERS=[]; }
+  try { const g = await api("/api/group"); GROUP = g; } catch(e){ GROUP = null; }
+  try { const tk = await api("/api/tickets"); TICKETS = tk.tickets||[]; } catch(e){ TICKETS=[]; }
+  const grpCode = new URLSearchParams(location.search).get("grp");
+  if (grpCode && (!GROUP || !GROUP.exists)){
+    try { await api("/api/group/join",{method:"POST",body:JSON.stringify({code:grpCode})}); toast(t("grp_created"));
+      const g = await api("/api/group"); GROUP = g; } catch(e){ toast(e.message); }
+    history.replaceState(null,"",location.pathname);
+  }
   startApp();
 }
-function planName(p){ return ({free:"FREE",basic:"BASIC",premium:"PREMIUM",ultimate:"ULTIMATE"})[p]||p; }
-
+function planName(p){ return t("plans_hist")[p] || p; }
 function startApp(){
   show("screenApp");
-  $("#btnLogout").style.display="inline-block";
-  renderHome(); renderServers(); renderDevices(); renderPlans(); renderProfile();
+  $("#btnLogout").style.display="flex";
+  renderAll();
+  loadProfileExtras();
 }
+function renderAll(){ renderDash(); renderDevices(); renderServers(); renderSub(); renderGroup(); renderRef(); renderTickets(); renderProfile(); }
 
-/* ---------- Головна ---------- */
-function renderHome(){
+/* ---------------- Головна ---------------- */
+function renderDash(){
   const days = ME.plan_expires_at ? Math.max(0, Math.ceil((ME.plan_expires_at - Date.now()/1000)/86400)) : 0;
-  $("#homeStats").innerHTML = `
-    <div class="stat"><div class="k">Поточний тариф</div><div class="v">${planName(ME.plan)}</div>
-      ${ME.bonus_until ? `<div class="d" style="color:#7dffca;font-size:11px">Бонус ${planName(ME.bonus_plan)} до ${fmtDate(ME.bonus_until)}</div>`:""}</div>
-    <div class="stat"><div class="k">Днів до завершення</div><div class="v">${days}<small> днів</small></div></div>
-    <div class="stat"><div class="k">Пристрої</div><div class="v">${(ME.devices||[]).length}<small> / ${ME.device_limit}</small></div></div>
-    <div class="stat"><div class="k">Статус</div><div class="v" style="font-size:15px">${ME.plan!=="free"?'<span class="pill on"><span class="dot"></span>Активна підписка</span>':'<span class="pill"><span class="dot off"></span>Без підписки (FREE)</span>'}</div></div>`;
-  $("#homePlan").innerHTML = planName(ME.plan) + (ME.plan!=="free" ? ` <small>до ${fmtDate(ME.plan_expires_at)}</small>`:"");
-  $("#homeExp").textContent = ME.plan!=="free" ? `Завершується ${fmtDate(ME.plan_expires_at)}` : "Оформіть підписку, щоб отримати повний доступ";
-  $("#homeServers").textContent = `${SERVERS.filter(s=>s.online).length} онлайн / ${SERVERS.length}`;
+  const online = SERVERS.filter(s=>s.online).length;
+  $("#dashStats").innerHTML = `
+    <div class="stat"><div class="k">${t("dash_plan")}</div><div class="v">${planName(ME.plan)}</div>
+      ${ME.bonus_until ? `<div class="d" style="color:#7dffca;font-size:11px">Bonus ${planName(ME.bonus_plan)} → ${fmtDate(ME.bonus_until)}</div>`:""}</div>
+    <div class="stat"><div class="k">${t("dash_days")}</div><div class="v">${days}<small> ${t("dash_days").toLowerCase()}</small></div></div>
+    <div class="stat"><div class="k">${t("dash_dev_u")}</div><div class="v">${(ME.devices||[]).length}<small> / ${ME.device_limit}</small></div></div>
+    <div class="stat"><div class="k">${t("dash_status")}</div><div class="v" style="font-size:14px">${ME.plan!=="free"?`<span class="pill on"><span class="dot"></span>${t("dash_active")}</span>`:`<span class="pill off"><span class="dot off"></span>${t("dash_inactive")}</span>`}</div></div>`;
+  const cfgCount = (ME.devices||[]).length;
+  $("#dashStatus").innerHTML = `
+    <div class="stat"><div class="k">${t("conn_srv")}</div>
+      <div class="v" style="font-size:15px;margin-top:10px">${online} ${t("srv_online")} / ${SERVERS.length}</div>
+      <div class="d" style="margin-top:8px">${t("conn_note")}</div></div>
+    <div class="stat"><div class="k">${t("conn_cfg")}</div>
+      <div class="v" style="font-size:15px;margin-top:10px">${cfgCount > 0 ? `<span class="pill on"><span class="dot"></span>${cfgCount}</span>` : `<span class="pill off"><span class="dot off"></span>0</span>`}</div>
+      <div class="d" style="margin-top:8px">${ME.plan_expires_at ? planName(ME.plan)+" "+t("dash_expiry")+" "+fmtDate(ME.plan_expires_at) : t("dash_inactive")}</div></div>`;
 }
 
-/* ---------- Сервери ---------- */
+/* ---------------- Сервери ---------------- */
 function renderServers(){
   const box = $("#serverList");
-  if (!SERVERS.length){ box.innerHTML = '<div class="stat"><div class="d">Сервери ще не налаштовані адміністратором.</div></div>'; return; }
+  if (!SERVERS.length){ box.innerHTML = `<div class="stat"><div class="d">${t("srv_empty")}</div></div>`; return; }
   box.innerHTML = SERVERS.map(s=>`
     <div class="stat">
-      <div style="display:flex;justify-content:space-between;align-items:center">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div><div class="t" style="font-weight:800;font-size:14px">${esc(s.flag||"🌐")} ${esc(s.name)}</div>
         <div class="d">${esc(s.country||"")} · ${esc(s.code||"")}</div></div>
-        ${s.online?'<span class="pill on"><span class="dot"></span>Онлайн</span>':'<span class="pill"><span class="dot off"></span>Недоступний</span>'}
+        ${s.online?`<span class="pill on"><span class="dot"></span>${t("srv_online")}</span>`:`<span class="pill off"><span class="dot off"></span>${t("srv_offline")}</span>`}
       </div>
       <div class="divider"></div>
-      <div class="d">Підключень: <b>${s.peers}</b>${s.load1!=null?` · Навантаження: <b>${(+s.load1).toFixed(2)}</b>`:""}</div>
-      <button class="btn btn-outline" data-goto="devices" style="width:100%;margin-top:12px" onclick="pickServerForDevice(${s.id})">Обрати для нового пристрою</button>
+      <div class="d">${t("srv_peers")}: <b>${s.peers}</b>${s.load1!=null?` · ${t("srv_load")}: <b>${(+s.load1).toFixed(2)}</b>`:""}</div>
+      <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="pickServerForDevice(${s.id})">${t("srv_pick")}</button>
     </div>`).join("");
 }
-window.pickServerForDevice = function(id){ openAddDevice(id); };
+window.pickServerForDevice = id => openAddDevice(id);
 
-/* ---------- Пристрої ---------- */
+/* ---------------- Пристрої ---------------- */
+const DEVTYPES = [["windows","🖥"],["android","🤖"],["ios","🍎"],["macos","💻"],["linux","🐧"],["other","⚙️"]];
+function devIcon(dt){ const f = DEVTYPES.find(x=>x[0]===dt); return f?f[1]:"⚙️"; }
 function renderDevices(){
   const box = $("#deviceList");
   const devs = ME.devices||[];
   $("#devCount").textContent = `${devs.length}/${ME.device_limit}`;
-  if (!devs.length){ box.innerHTML = '<div class="stat"><div class="d">Пристроїв немає. Створіть першу VPN-конфігурацію — кнопка «Додати пристрій».</div></div>'; return; }
+  if (!devs.length){ box.innerHTML = `<div class="stat"><div class="d">${t("dev_empty")}</div></div>`; return; }
   box.innerHTML = devs.map(d=>{
     const srv = SERVERS.find(s=>s.id===d.server_id);
     return `<div class="stat">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
-        <div><div class="t" style="font-weight:800;font-size:14px">${esc(d.name)}</div>
-        <div class="d">${esc(srv?srv.name:"сервер")} · створено ${fmtDate(d.created_at)}</div></div>
-        <span class="pill on"><span class="dot"></span>активний</span>
+        <div><div class="t" style="font-weight:800;font-size:14px">${devIcon(d.type)} ${esc(d.name)}</div>
+        <div class="d">${esc(t("type_"+(d.type||"other")))} · ${esc(srv?srv.name:"")} · ${fmtDate(d.created_at)}</div></div>
+        <span class="pill on"><span class="dot"></span>active</span>
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn btn-primary" style="flex:1" onclick="openCfg(${d.id})">Конфіг + QR</button>
-        <button class="btn btn-danger" onclick="delDevice(${d.id})">Видалити</button>
+        <button class="btn btn-primary" style="flex:1" onclick="openCfg(${d.id})">${t("dev_cfg")}</button>
+        <button class="btn btn-danger" onclick="delDevice(${d.id})">${t("dev_del")}</button>
       </div>
     </div>`;
   }).join("");
 }
 function openAddDevice(preselect){
   $("#devErr").style.display="none";
-  const sel = $("#devServer");
-  const online = SERVERS.filter(s=>s.online);
-  if (!online.length){ toast("Немає доступних серверів"); return; }
-  sel.innerHTML = online.map(s=>`<option value="${s.id}" ${s.id===preselect?"selected":""}>${esc(s.flag||"")} ${esc(s.name)}</option>`).join("");
+  let online = SERVERS.filter(s=>s.online);
+  if (!online.length){ toast(t("srv_empty")); return; }
+  // авто-вибір найвільнішого сервера
+  online.sort((a,b)=>(a.peers||0)-(b.peers||0));
+  const best = online[0].id;
+  $("#devServer").innerHTML = online.map(s=>`<option value="${s.id}" ${s.id===(preselect||best)?"selected":""}>${esc(s.flag||"")} ${esc(s.name)} · ${t("srv_peers").toLowerCase()}: ${s.peers}</option>`).join("");
+  $("#devTypes").innerHTML = DEVTYPES.map(([c,ic])=>`<button type="button" class="${c===devTypeSel?"sel":""}" data-dt="${c}">${ic}<br>${esc(t("type_"+c))}</button>`).join("");
+  $$("#devTypes button").forEach(b=>b.addEventListener("click",()=>{ devTypeSel=b.dataset.dt; $$("#devTypes button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); }));
   $("#devName").value = "";
   $("#modalDevice").classList.add("open");
 }
-$("#btnAddDevice").addEventListener("click",()=>openAddDevice());
+$("#btnAddDevice").addEventListener("click",()=>{ devTypeSel="other"; openAddDevice(); });
+$("#closeDevice").addEventListener("click",()=>$("#modalDevice").classList.remove("open"));
 $("#doAddDevice").addEventListener("click", async ()=>{
   $("#devErr").style.display="none";
   try{
-    await api("/api/devices",{method:"POST",body:JSON.stringify({name:$("#devName").value||"Мій пристрій", server_id:Number($("#devServer").value)})});
+    await api("/api/devices",{method:"POST",body:JSON.stringify({name:$("#devName").value||"My device", server_id:Number($("#devServer").value), type:devTypeSel})});
     $("#modalDevice").classList.remove("open");
-    toast("Пристрій створено");
+    toast(t("dev_created"));
     await loadAll();
   }catch(e){ $("#devErr").textContent=e.message; $("#devErr").style.display="block"; }
 });
 window.delDevice = async function(id){
-  if (!confirm("Видалити пристрій і відкликати VPN-доступ?")) return;
-  try{ await api("/api/devices/"+id,{method:"DELETE"}); toast("Пристрій видалено"); await loadAll(); }
+  if (!confirm(t("dev_del_confirm"))) return;
+  try{ await api("/api/devices/"+id,{method:"DELETE"}); toast("OK"); await loadAll(); }
   catch(e){ toast(e.message); }
 };
 
-/* ---------- Конфіг / QR ---------- */
+/* ---------------- Конфіг / QR ---------------- */
 window.openCfg = async function(id){
   try{
     const j = await api(`/api/devices/${id}/config`);
-    cfgBlob = {name:(ME.devices||[]).find(d=>d.id===id)?.name || "chupik-vpn", text:j.config};
-    $("#cfgTitle").textContent = "Конфігурація: " + cfgBlob.name;
+    const dev = (ME.devices||[]).find(d=>d.id===id);
+    cfgBlob = {name:dev?dev.name:"chupik-vpn", text:j.config};
+    $("#cfgTitle").textContent = devIcon(dev?dev.type:"other") + " " + cfgBlob.name;
     $("#cfgQr").src = "data:image/png;base64," + j.qr_png_base64;
     $("#cfgText").textContent = j.config;
+    $("#cfgHint").textContent = t("type_hint_"+(dev?dev.type||"other":"other"));
     $("#modalConfig").classList.add("open");
   }catch(e){ toast(e.message); }
 };
@@ -431,74 +617,263 @@ $("#btnDownloadConf").addEventListener("click",()=>{
   a.click(); URL.revokeObjectURL(a.href);
 });
 
-/* ---------- Тарифи ---------- */
-function renderPlans(){
+/* ---------------- Тарифи ---------------- */
+const PLAN_FEATS = {
+  basic:["2","1","s","s","s"],
+  premium:["4","3","s","s"],
+  ultimate:["5","5","s","s"]
+};
+function renderSub(){
   const note = $("#cardPayNote");
-  if (ME._cardProvider === null){ note.style.display="block"; note.innerHTML='<div class="d">Оплата картою ще не підключена адміністратором. Оплатити можна Telegram Stars у <a href="https://t.me/Chupik_vpnBot" style="color:var(--light)">боті</a>.</div>'; }
+  if (ME._cardProvider === null){ note.style.display="block"; note.innerHTML=`<div class="d">${t("card_off")}</div>`; }
+  else note.style.display="none";
   const prices = {basic:1.99, premium:4.99, ultimate:7.99};
   const feats = {
-    basic:["2 пристрої","Розширений вибір серверів","1 друг у групі"],
-    premium:["4 пристрої","Усі стандартні сервери","До 3 друзів у групі","Пріоритетна підтримка"],
-    ultimate:["5 пристроїв","Усі доступні сервери","До 5 друзів у групі","Повна статистика"]
+    basic:[ "2 "+t("dev_limit").toLowerCase(), "1 "+t("grp_members").toLowerCase(), t("srv_title")+" ✓"],
+    premium:[ "4 "+t("dev_limit").toLowerCase(), "3 "+t("grp_members").toLowerCase(), t("srv_title")+" ✓", "★"],
+    ultimate:["5 "+t("dev_limit").toLowerCase(), "5 "+t("grp_members").toLowerCase(), t("srv_title")+" ✓", "★★"]
   };
   $("#planList").innerHTML = ["basic","premium","ultimate"].map(p=>`
     <div class="plan-card ${ME.plan===p?"cur":""}">
-      ${ME.plan===p?'<span class="tag-cur">ВАШ ТАРИФ</span>':""}
+      ${ME.plan===p?`<span class="tag-cur">${t("sub_cur")}</span>`:""}
       <div class="nm">${planName(p)}</div>
-      <div class="pr">€${prices[p].toFixed(2)} <small>/ 1 місяць</small></div>
-      <ul>${feats[p].map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${f}</li>`).join("")}</ul>
-      <button class="btn ${ME.plan===p?"btn-outline":"btn-primary"}" onclick="buyPlan('${p}')">${ME.plan===p?"Продовжити":"Купити карткою"}</button>
+      <div class="pr">€${prices[p].toFixed(2)} <small>${t("per_month")}</small></div>
+      <ul>${feats[p].map(f=>`<li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m5 12 4 4L19 6"/></svg>${esc(f)}</li>`).join("")}</ul>
+      <button class="btn ${ME.plan===p?"btn-outline":"btn-primary"}" onclick="buyPlan('${p}')">${ME.plan===p?t("sub_continue"):t("sub_buy")}</button>
     </div>`).join("");
+  const pays = ME.payments||[];
+  $("#payCard").innerHTML = pays.length ? pays.map(p=>`
+    <div class="rowline"><div><div class="t">${planName(p.plan)} · €${(+p.amount).toFixed(2)}</div><div class="d">${p.provider==="stars"?"Telegram Stars":p.provider} · ${fmtDate(p.created_at)}</div></div>
+    <span class="pill ${p.status==="succeeded"?"on":""}">${esc(p.status)}</span></div>`).join("")
+    : `<div class="d">${t("pays_none")}</div>`;
 }
 window.buyPlan = async function(plan){
-  if (!confirm(`Оформити підписку ${planName(plan)} на 1 місяць (карткою)?`)) return;
+  if (!confirm(planName(plan)+" · €"+({basic:1.99,premium:4.99,ultimate:7.99}[plan]).toFixed(2)+"?")) return;
   try{
     const j = await api("/api/card/checkout",{method:"POST",body:JSON.stringify({plan})});
-    if (j.url) location.href = j.url; else toast("Посилання на оплату не отримано");
+    if (j.url) location.href = j.url; else toast(t("msg_error"));
   }catch(e){ toast(e.message); }
 };
 
-/* ---------- Профіль ---------- */
-function renderProfile(){
-  $("#profileCard").innerHTML = `
-    <div class="row"><div><div class="t">${esc(ME.web_email || ("Telegram ID: "+ME.tg_id))}</div><div class="d">${ME.tg_id>0?"Обліковий запис Telegram":"Веб-акаунт"}</div></div><span class="pill ${ME.plan!=="free"?"on":""}">${planName(ME.plan)}</span></div>
-    <div class="row"><div class="t">Пристрої</div><div class="d">${(ME.devices||[]).length} / ${ME.device_limit}</div></div>
-    <div class="row"><div class="t">Діє до</div><div class="d">${ME.plan_expires_at?fmtDate(ME.plan_expires_at):"—"}</div></div>`;
-  const inv = ME.referral||{}, tiers = inv.tiers||[];
-  const next = tiers.find(t=>t[0]>(inv.invited||0));
-  const friends = n => n===1 ? "друг" : (n<5 ? "друзі" : "друзів");
-  const hoursTxt = h => h<24 ? (h===3 ? "години" : "годин") : (h===24 ? "1 день" : h===72 ? "3 дні" : "7 днів");
-  $("#refCard").innerHTML = `
-    <div class="row"><div class="t">Запрошено друзів</div><div class="d">${inv.invited||0}</div></div>
-    ${tiers.map(t=>`<div class="row"><div class="t">${t[0]} ${friends(t[0])} = ${t[1]<24?t[1]+" ": ""}${hoursTxt(t[1])} PREMIUM</div><div class="d">${(inv.invited||0)>=t[0]?"✅ отримано":`залишилось ${t[0]-(inv.invited||0)}`}</div></div>`).join("")}
-    <div class="divider"></div>
-    <div class="d" style="word-break:break-all">${esc(inv.link||"")}</div>
-    <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="copyRef()">Скопіювати посилання</button>
-    ${next?`<p class="hint">Наступна нагорода: ${next[0]} ${friends(next[0])} — ${next[1]<24?next[1]+" ":""}${hoursTxt(next[1])} PREMIUM.</p>`:""}`;
-  const pays = ME.payments||[];
-  $("#payCard").innerHTML = pays.length ? pays.map(p=>`
-    <div class="row"><div><div class="t">${planName(p.plan)} · €${(+p.amount).toFixed(2)}</div><div class="d">${p.provider==="stars"?"Telegram Stars":"Картка"} · ${fmtDate(p.created_at)}</div></div>
-    <span class="pill ${p.status==="succeeded"?"on":""}">${esc(p.status)}</span></div>`).join("")
-    : '<div class="d">Платежів ще не було.</div>';
+/* ---------------- Група ---------------- */
+function renderGroup(){
+  const box = $("#groupBox");
+  if (!GROUP || !GROUP.exists){
+    box.innerHTML = `
+      <div class="grid g2">
+        <div class="box">
+          <h3 style="font-size:13px;margin-bottom:12px">${t("grp_create")}</h3>
+          <div class="field"><label>${t("grp_name")}</label><input id="grpName" placeholder="..."></div>
+          <button class="btn btn-primary" id="btnCreateGroup" style="width:100%">${t("grp_create")}</button>
+          <p class="hint">${t("grp_need_plan")}</p>
+        </div>
+        <div class="box">
+          <h3 style="font-size:13px;margin-bottom:12px">${t("grp_join_t")}</h3>
+          <div class="field"><label>${t("grp_code")}</label><input id="grpJoinCode" placeholder="XXXXXXXX"></div>
+          <button class="btn btn-outline" id="btnJoinGroup" style="width:100%">${t("grp_join")}</button>
+        </div>
+      </div>`;
+    $("#btnCreateGroup").addEventListener("click", doCreateGroup);
+    $("#btnJoinGroup").addEventListener("click", doJoinGroup);
+    return;
+  }
+  if (GROUP.role === "owner"){
+    const members = GROUP.members||[];
+    const invites = GROUP.invites||[];
+    box.innerHTML = `
+      <div class="box" style="margin-bottom:16px">
+        <div class="rowline"><div class="t">${t("grp_your")}</div>
+          <span class="pill ${GROUP.active?"on":"off"}">${GROUP.used}/${GROUP.slots} ${t("grp_slots").toLowerCase()}</span></div>
+        <p class="hint">${t("grp_owner_note")}</p>
+        <button class="btn btn-primary" id="btnInvite" ${GROUP.active?"":"disabled"}>${t("grp_invite")}</button>
+        <div id="inviteOut" style="margin-top:12px"></div>
+      </div>
+      <div class="box">
+        <h3 style="font-size:13px;margin-bottom:12px">${t("grp_members")}</h3>
+        ${members.length?members.map(m=>`
+          <div class="rowline"><div><div class="t">${esc(m.username||m.tg_id)}</div><div class="d">${t("dev_limit").toLowerCase()}: ${m.has_vpn?"VPN ✓":"—"}</div></div>
+          <button class="btn btn-danger" onclick="removeMember(${m.tg_id})">${t("grp_remove")}</button></div>`).join("")
+          : `<div class="d">${t("none")}</div>`}
+      </div>`;
+    const btn = $("#btnInvite");
+    if (btn) btn.addEventListener("click", doInvite);
+    renderInvites(invites);
+  } else {
+    box.innerHTML = `
+      <div class="box">
+        <div class="rowline"><div class="t">${t("grp_members")}</div><span class="pill on">${t("grp_join")}</span></div>
+        <p class="hint">${t("grp_member_note")}</p>
+        <button class="btn btn-danger" id="btnLeaveGroup">${t("grp_leave")}</button>
+      </div>`;
+    $("#btnLeaveGroup").addEventListener("click", doLeaveGroup);
+  }
 }
-window.copyRef = async function(){
-  try{ await navigator.clipboard.writeText(ME.referral?.link||""); toast("Посилання скопійовано"); }
-  catch(e){ toast("Скопіюйте посилання вручну"); }
+function renderInvites(invites){
+  if (!invites.length) return;
+  $("#inviteOut").innerHTML = invites.slice(0,1).map(i=>`
+    <div class="okmsg" style="display:block">
+      <b>${t("grp_inv_code")}:</b> <span style="font-family:monospace;font-size:15px">${esc(i.code)}</span>
+      <div class="d" style="margin-top:6px">${t("grp_inv_links")}</div>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="copyTxt('${esc(i.code)}')">${t("ref_copy")}</button>
+      </div>
+    </div>`).join("");
+}
+async function doCreateGroup(){
+  try{
+    await api("/api/group",{method:"POST",body:JSON.stringify({name:$("#grpName").value||""})});
+    toast(t("grp_created")); await loadAll();
+  }catch(e){ toast(e.message); }
+}
+async function doJoinGroup(){
+  try{
+    await api("/api/group/join",{method:"POST",body:JSON.stringify({code:$("#grpJoinCode").value.trim()})});
+    toast("OK"); await loadAll();
+  }catch(e){ toast(e.message); }
+}
+async function doInvite(){
+  try{
+    const j = await api("/api/group/invite",{method:"POST"});
+    $("#inviteOut").innerHTML = `
+      <div class="okmsg" style="display:block">
+        <b>${t("grp_inv_code")}:</b> <span style="font-family:monospace;font-size:15px">${esc(j.code)}</span>
+        <div class="d" style="margin-top:6px">${t("grp_inv_links")}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" onclick="copyTxt('${esc(j.web_link)}')">${t("ref_copy")}</button>
+        </div>
+      </div>`;
+  }catch(e){ toast(e.message); }
+}
+window.removeMember = async function(id){
+  try{ await api(`/api/group/member/${id}`,{method:"DELETE"}); toast("OK"); await loadAll(); }
+  catch(e){ toast(e.message); }
+};
+async function doLeaveGroup(){
+  if (!confirm(t("grp_leave")+"?")) return;
+  try{ await api("/api/group/leave",{method:"POST"}); toast("OK"); await loadAll(); }
+  catch(e){ toast(e.message); }
+};
+window.copyTxt = async function(txt){
+  try{ await navigator.clipboard.writeText(txt); toast(t("copied")); }
+  catch(e){ toast(txt); }
 };
 
-/* ---------- вкладки ---------- */
-document.querySelectorAll("#tabs .tab").forEach(t=>t.addEventListener("click",()=>{
-  document.querySelectorAll("#tabs .tab").forEach(x=>x.classList.remove("active"));
-  document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
-  t.classList.add("active");
-  $("#panel-"+t.dataset.tab).classList.add("active");
-}));
-document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>{
-  const tab = document.querySelector(`#tabs .tab[data-tab="${b.dataset.goto}"]`);
-  if (tab) tab.click();
-}));
+/* ---------------- Реферали ---------------- */
+function renderRef(){
+  const inv = ME.referral||{}, tiers = inv.tiers||[];
+  const next = tiers.find(x=>x[0]>(inv.invited||0));
+  $("#refCard").innerHTML = `
+    <div class="rowline"><div class="t">${t("ref_invited")}</div><div class="d">${inv.invited||0}</div></div>
+    ${tiers.map(x=>`<div class="rowline"><div class="t">${x[0]} → ${x[1]}h PREMIUM</div><div class="d">${(inv.invited||0)>=x[0]?"✅":""}</div></div>`).join("")}
+    <div class="divider"></div>
+    <div class="d" style="word-break:break-all">${esc(inv.link||"")}</div>
+    <button class="btn btn-outline" style="width:100%;margin-top:12px" onclick="copyTxt(ME.referral?ME.referral.link:'')">${t("ref_copy")}</button>
+    ${next?`<p class="hint">${t("ref_next")}: ${next[0]} → ${next[1]}h PREMIUM.</p>`:""}`;
+}
 
-/* ---------- старт ---------- */
+/* ---------------- Тікети ---------------- */
+function renderTickets(){
+  const box = $("#ticketsList");
+  if (!TICKETS.length){ box.innerHTML = `<div class="box"><div class="d">${t("sup_none")}</div></div>`; return; }
+  const stName = s => s==="open"?t("sup_open"):s==="answered"?t("sup_answered"):t("sup_closed");
+  box.innerHTML = TICKETS.map(k=>`
+    <div class="box" style="margin-bottom:14px">
+      <div class="rowline"><div class="t">#${k.id} ${esc(k.subject)}</div>
+        <span class="pill ${k.status==="answered"?"on":k.status==="closed"?"":"off"}">${stName(k.status)}</span></div>
+      ${(k.messages||[]).map(m=>`<div class="tmsg ${m.sender}"><b>${m.sender==="admin"?"CHUPIK":m.sender} · ${fmtDT(m.created_at)}</b>${esc(m.message)}</div>`).join("")}
+    </div>`).join("");
+}
+$("#btnTicket").addEventListener("click", async ()=>{
+  try{
+    await api("/api/tickets",{method:"POST",body:JSON.stringify({subject:$("#tkSubject").value,message:$("#tkMessage").value})});
+    $("#tkSubject").value=""; $("#tkMessage").value="";
+    toast("OK"); await loadAll();
+  }catch(e){ toast(e.message); }
+});
+
+/* ---------------- Профіль ---------------- */
+function renderProfile(){
+  $("#profAcct").innerHTML = `
+    <div class="rowline"><div><div class="t">${esc(ME.web_email || ("Telegram ID: "+ME.tg_id))}</div><div class="d">${ME.tg_id>0?"Telegram":"WEB"}</div></div><span class="pill ${ME.plan!=="free"?"on":""}">${planName(ME.plan)}</span></div>
+    <div class="rowline"><div class="t">${t("dash_dev_u")}</div><div class="d">${(ME.devices||[]).length} / ${ME.device_limit}</div></div>
+    <div class="rowline"><div class="t">${t("dash_expiry")}</div><div class="d">${ME.plan_expires_at?fmtDate(ME.plan_expires_at):t("none")}</div></div>`;
+  $("#langGrid").innerHTML = LANGS.map(([c,n])=>`<button class="${c===LANG?"sel":""}" data-lang="${c}">${n}</button>`).join("");
+  $$("#langGrid button").forEach(b=>b.addEventListener("click",async ()=>{
+    LANG=b.dataset.lang; localStorage.setItem("chupik_lang",LANG);
+    try{ await api("/api/lang",{method:"POST",body:JSON.stringify({lang:LANG})}); }catch(e){}
+    applyLang();
+  }));
+  const np = ME._notify || {expiry_reminders:true,promos:false,tickets:true};
+  $("#npExpire").checked = !!np.expiry_reminders;
+  $("#npPromos").checked = !!np.promos;
+  $("#npTickets").checked = !!np.tickets;
+  const tb = $("#tgBox");
+  if (ME.tg_linked){
+    tb.innerHTML = `<div class="rowline"><div class="t">${t("tg_linked")}</div><span class="pill on">✓</span></div>`;
+  } else {
+    tb.innerHTML = `
+      <p class="hint" style="margin:0 0 12px">${t("tg_not")}</p>
+      <button class="btn btn-outline" id="btnTgLink">${t("tg_btn")}</button>
+      <div id="tgOut" style="margin-top:12px"></div>`;
+    $("#btnTgLink").addEventListener("click", async ()=>{
+      try{
+        const j = await api("/api/web/auth/link",{method:"POST"});
+        $("#tgOut").innerHTML = `<div class="okmsg" style="display:block"><b>${t("tg_hint")}</b><br><span style="font-family:monospace">/link ${esc(j.code)}</span><br><a href="https://t.me/${esc(j.bot)}" target="_blank" rel="noopener">@${esc(j.bot)}</a></div>`;
+      }catch(e){ toast(e.message); }
+    });
+  }
+  const hist = ME._loginHistory||[];
+  $("#loginHist").innerHTML = hist.length ? hist.slice(0,8).map(h=>`
+    <div class="rowline"><div class="t">${esc((h.ua||"").split(")")[0].split("(")[0]||"?").slice(0,28)}</div><div class="d">${fmtDT(h.created_at)} · ${esc(h.ip||"—")}</div></div>`).join("")
+    : `<div class="d">${t("hist_none")}</div>`;
+}
+$("#btnSaveNotify").addEventListener("click", async ()=>{
+  try{
+    await api("/api/notify-prefs",{method:"POST",body:JSON.stringify({prefs:{expiry_reminders:$("#npExpire").checked,promos:$("#npPromos").checked,tickets:$("#npTickets").checked}})});
+    toast("OK");
+  }catch(e){ toast(e.message); }
+});
+$("#btnChangePass").addEventListener("click", async ()=>{
+  try{
+    await api("/api/web/auth/change-password",{method:"POST",body:JSON.stringify({old_password:$("#oldPass").value,new_password:$("#newPass").value})});
+    toast("OK"); setTimeout(()=>location.reload(),1200);
+  }catch(e){ toast(e.message); }
+});
+$("#btnDeleteAcct").addEventListener("click", async ()=>{
+  if (!confirm(t("prof_del_warn"))) return;
+  if (!confirm(t("prof_del")+"?")) return;
+  try{
+    await api("/api/web/auth/delete",{method:"DELETE"});
+    TOKEN=""; localStorage.removeItem("chupik_token"); location.reload();
+  }catch(e){ toast(e.message); }
+});
+
+/* ---------------- профіль: додаткові дані ---------------- */
+async function loadProfileExtras(){
+  try{
+    const p = await api("/api/profile");
+    ME._notify = p.notify_prefs; ME._loginHistory = p.login_history; ME.tg_linked = p.tg_linked;
+    renderProfile();
+  }catch(e){}
+}
+
+/* ---------------- навігація ---------------- */
+$$("#nav button").forEach(b=>b.addEventListener("click",()=>{
+  $$("#nav button").forEach(x=>x.classList.remove("active"));
+  $$(".panel").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  $("#panel-"+b.dataset.tab).classList.add("active");
+  $("#sidebar").classList.remove("open");
+  if (b.dataset.tab==="profile") loadProfileExtras();
+  if (b.dataset.tab==="support") loadAll().catch(()=>{});
+}));
+document.addEventListener("click",e=>{
+  const g = e.target.closest("[data-goto]");
+  if (g){ const b = document.querySelector(`#nav button[data-tab="${g.dataset.goto}"]`); if (b) b.click(); }
+});
+$("#burger").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
+
+/* ---------------- старт ---------------- */
 boot();
 </script>
 </body>

@@ -19,7 +19,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import bot_app, core, db, payments, wg, webauth
+from . import bot_app, core, db, groups, payments, wg, webauth
 from .config import settings
 
 app = FastAPI(title="CHUPIK VPN API", docs_url=None, redoc_url=None)
@@ -93,21 +93,31 @@ class LoginIn(BaseModel):
     password: str
 
 
+class EmailIn(BaseModel):
+    email: str
+
+
 @app.post("/api/web/auth/register")
-async def web_register(body: RegisterIn):
+async def web_register(body: RegisterIn, request: Request):
     try:
         result = webauth.register(body.email, body.password, body.ref)
     except webauth.AuthError as e:
         raise HTTPException(400, str(e))
+    webauth.log_login(result["email"], result["tg_id"],
+                      request.headers.get("x-forwarded-for", ""),
+                      request.headers.get("user-agent", ""))
     return {"ok": True, **result, "user": _user_payload(result["tg_id"])}
 
 
 @app.post("/api/web/auth/login")
-async def web_login(body: LoginIn):
+async def web_login(body: LoginIn, request: Request):
     try:
         result = webauth.login(body.email, body.password)
     except webauth.AuthError as e:
         raise HTTPException(400, str(e))
+    webauth.log_login(body.email, result["tg_id"],
+                      request.headers.get("x-forwarded-for", ""),
+                      request.headers.get("user-agent", ""))
     return {"ok": True, **result, "user": _user_payload(result["tg_id"])}
 
 
@@ -198,12 +208,13 @@ async def api_servers():
 class DeviceIn(BaseModel):
     name: str = "Моё устройство"
     server_id: int
+    type: str = "other"
 
 
 @app.post("/api/devices")
 async def api_add_device(body: DeviceIn, user=Depends(tg_user)):
     try:
-        d = await core.add_device(user["id"], body.server_id, body.name)
+        d = await core.add_device(user["id"], body.server_id, body.name, body.type)
         d.pop("wg_private_key", None)
         return {"ok": True, "device": d}
     except PermissionError as e:
@@ -228,6 +239,203 @@ async def api_remove_device(device_id: int, user=Depends(tg_user)):
     ok = await core.remove_device(user["id"], device_id)
     if not ok:
         raise HTTPException(404, "device not found")
+    return {"ok": True}
+
+
+# ================================================================
+# Групи (збалансовані: слоти за тарифом власника)
+# ================================================================
+class GroupIn(BaseModel):
+    name: str = ""
+
+
+class JoinIn(BaseModel):
+    code: str
+
+
+@app.get("/api/group")
+async def api_group_info(user=Depends(tg_user)):
+    return {"ok": True, **groups.group_info(user["id"])}
+
+
+@app.post("/api/group")
+async def api_group_create(body: GroupIn, user=Depends(tg_user)):
+    try:
+        return {"ok": True, **groups.create_group(user["id"], body.name)}
+    except groups.GroupError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/group/invite")
+async def api_group_invite(user=Depends(tg_user)):
+    try:
+        code = groups.create_invite(user["id"])
+    except groups.GroupError as e:
+        raise HTTPException(400, str(e))
+    invite_link = f"https://t.me/{bot_app.BOT_USERNAME}?start=grp_{code}"
+    web_link = f"{settings.WEB_SITE_URL}/cabinet.html?grp={code}"
+    return {"ok": True, "code": code, "tg_link": invite_link, "web_link": web_link}
+
+
+@app.post("/api/group/join")
+async def api_group_join(body: JoinIn, user=Depends(tg_user)):
+    try:
+        return {"ok": True, **groups.join_group(body.code, user["id"])}
+    except groups.GroupError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.delete("/api/group/member/{member_tg_id}")
+async def api_group_remove_member(member_tg_id: int, user=Depends(tg_user)):
+    ok = await groups.remove_member(user["id"], member_tg_id)
+    if not ok:
+        raise HTTPException(400, "member not found")
+    return {"ok": True}
+
+
+@app.post("/api/group/leave")
+async def api_group_leave(user=Depends(tg_user)):
+    ok = await groups.leave_group(user["id"])
+    if not ok:
+        raise HTTPException(400, "not a member")
+    return {"ok": True}
+
+
+# ================================================================
+# Підтримка: тікети
+# ================================================================
+class TicketIn(BaseModel):
+    subject: str
+    message: str
+
+
+@app.post("/api/tickets")
+async def api_create_ticket(body: TicketIn, user=Depends(tg_user)):
+    if not (body.subject or "").strip() or not (body.message or "").strip():
+        raise HTTPException(400, "subject and message required")
+    cur = db.ex("INSERT INTO tickets(tg_id,subject,status,created_at) VALUES(?,?,'open',?)",
+                (user["id"], body.subject.strip()[:120], int(time.time())))
+    ticket_id = cur.lastrowid
+    db.ex("INSERT INTO ticket_messages(ticket_id,sender,message,created_at) "
+          "VALUES(?,'user',?,?)",
+          (ticket_id, body.message.strip()[:4000], int(time.time())))
+    db.log_admin("system", "ticket_created", f"ticket={ticket_id} tg={user['id']}")
+    return {"ok": True, "ticket_id": ticket_id}
+
+
+@app.get("/api/tickets")
+async def api_my_tickets(user=Depends(tg_user)):
+    rows = db.q("SELECT * FROM tickets WHERE tg_id=? ORDER BY id DESC LIMIT 20", (user["id"],))
+    out = []
+    for t in rows:
+        msgs = [dict(m) for m in db.q(
+            "SELECT sender,message,created_at FROM ticket_messages WHERE ticket_id=? "
+            "ORDER BY id", (t["id"],))]
+        out.append({"id": t["id"], "subject": t["subject"], "status": t["status"],
+                    "created_at": t["created_at"], "messages": msgs})
+    return {"ok": True, "tickets": out}
+
+
+# ================================================================
+# Профіль: мова, сповіщення, пароль, Telegram-прив'язка, видалення
+# ================================================================
+class PasswordChangeIn(BaseModel):
+    old_password: str
+    new_password: str
+
+
+class ResetIn(BaseModel):
+    token: str
+    new_password: str
+
+
+class LangIn(BaseModel):
+    lang: str
+
+
+class NotifyIn(BaseModel):
+    prefs: dict
+
+
+@app.post("/api/web/auth/change-password")
+async def api_change_password(body: PasswordChangeIn, user=Depends(tg_user)):
+    if not user.get("web_email"):
+        raise HTTPException(400, "web account only")
+    try:
+        webauth.change_password(user["web_email"], body.old_password, body.new_password)
+    except webauth.AuthError as e:
+        raise HTTPException(400, str(e))
+    return {"ok": True, "message": "password changed, sessions reset"}
+
+
+@app.post("/api/web/auth/forgot")
+async def api_forgot_password(body: EmailIn):
+    """Запит на скидання: якщо акаунт прив'язаний до Telegram — бот надішле посилання в чат."""
+    result = webauth.request_reset(body.email)
+    delivered = result.get("delivered")
+    if delivered == "telegram":
+        # надсилаємо ботом у прив'язаний чат
+        link = f"{settings.WEB_SITE_URL}/cabinet.html#reset={result['token']}"
+        try:
+            await bot_app.bot.send_message(
+                result["tg_link"],
+                "🔑 Скидання пароля CHUPIK VPN\n\n" + link + "\n\nЛінк діє 1 годину.")
+        except Exception:
+            pass
+        return {"ok": True, "delivered": "telegram"}
+    return {"ok": True, "delivered": "support"}
+
+
+@app.post("/api/web/auth/reset")
+async def api_reset_password(body: ResetIn):
+    try:
+        ok = webauth.confirm_reset(body.token, body.new_password)
+    except webauth.AuthError as e:
+        raise HTTPException(400, str(e))
+    if not ok:
+        raise HTTPException(400, "invalid or expired token")
+    return {"ok": True}
+
+
+@app.get("/api/profile")
+async def api_profile(user=Depends(tg_user)):
+    info = _user_payload(user["id"])
+    info["group"] = groups.group_info(user["id"])
+    info["tg_linked"] = webauth.get_tg_link(user["id"]) is not None
+    info["notify_prefs"] = core.get_notify_prefs(user["id"])
+    if user.get("web_email"):
+        info["login_history"] = webauth.login_history(user["web_email"])
+        info["link_code"] = None
+    return info
+
+
+@app.post("/api/lang")
+async def api_set_lang(body: LangIn, user=Depends(tg_user)):
+    lang = body.lang if body.lang in ("uk", "ru", "fr", "en", "es", "de", "it", "zh") else "uk"
+    core.set_lang(user["id"], lang)
+    return {"ok": True, "lang": lang}
+
+
+@app.post("/api/notify-prefs")
+async def api_set_notify(body: NotifyIn, user=Depends(tg_user)):
+    core.set_notify_prefs(user["id"], body.prefs or {})
+    return {"ok": True}
+
+
+@app.post("/api/web/auth/link")
+async def api_make_link_code(user=Depends(tg_user)):
+    """Код для прив'язки Telegram: надіслати боту /link CODE"""
+    if not user.get("web_email"):
+        raise HTTPException(400, "web account only")
+    code = webauth.make_link_code(user["web_email"])
+    return {"ok": True, "code": code, "bot": bot_app.BOT_USERNAME}
+
+
+@app.delete("/api/web/auth/delete")
+async def api_delete_account(user=Depends(tg_user)):
+    if not user.get("web_email"):
+        raise HTTPException(400, "web account only")
+    webauth.delete_account(user["web_email"])
     return {"ok": True}
 
 
@@ -427,6 +635,78 @@ async def admin_payments(_=Depends(require_admin)):
 async def admin_log(_=Depends(require_admin)):
     rows = db.q("SELECT * FROM admin_log ORDER BY id DESC LIMIT 200")
     return {"ok": True, "log": [dict(r) for r in rows]}
+
+
+# ---------------- тікети підтримки ----------------
+@app.get("/admin/api/tickets")
+async def admin_tickets(status: str = "", _=Depends(require_admin)):
+    if status in ("open", "answered", "closed"):
+        rows = db.q("SELECT * FROM tickets WHERE status=? ORDER BY id DESC LIMIT 200", (status,))
+    else:
+        rows = db.q("SELECT * FROM tickets ORDER BY id DESC LIMIT 200")
+    out = []
+    for t in rows:
+        u = core.get_user(t["tg_id"])
+        msgs = [dict(m) for m in db.q(
+            "SELECT * FROM ticket_messages WHERE ticket_id=? ORDER BY id", (t["id"],))]
+        out.append({"id": t["id"], "tg_id": t["tg_id"],
+                    "username": u["username"] if u else "—",
+                    "subject": t["subject"], "status": t["status"],
+                    "created_at": t["created_at"], "messages": msgs})
+    return {"ok": True, "tickets": out}
+
+
+class TicketReplyIn(BaseModel):
+    message: str
+
+
+@app.post("/admin/api/tickets/{ticket_id}/reply")
+async def admin_ticket_reply(ticket_id: int, body: TicketReplyIn, _=Depends(require_admin)):
+    t = db.q1("SELECT * FROM tickets WHERE id=?", (ticket_id,))
+    if not t:
+        raise HTTPException(404, "ticket not found")
+    db.ex("INSERT INTO ticket_messages(ticket_id,sender,message,created_at) "
+          "VALUES(?,'admin',?,?)",
+          (ticket_id, (body.message or "").strip()[:4000], int(time.time())))
+    db.ex("UPDATE tickets SET status='answered' WHERE id=?", (ticket_id,))
+    # сповіщення клієнту в Telegram (для веб-акаунтів — через прив'язку, інакше тихо)
+    try:
+        dest = t["tg_id"]
+        if dest < 0:
+            wu = db.q1("SELECT tg_link FROM web_users WHERE tg_id=?", (dest,))
+            dest = wu["tg_link"] if (wu and wu["tg_link"]) else None
+        if dest:
+            await bot_app.bot.send_message(
+                dest,
+                f"💬 Відповідь підтримки CHUPIK VPN (тікет #{ticket_id}):\n\n{body.message}")
+    except Exception:
+        pass
+    db.log_admin("admin", "ticket_replied", f"ticket={ticket_id}")
+    return {"ok": True}
+
+
+@app.post("/admin/api/tickets/{ticket_id}/close")
+async def admin_ticket_close(ticket_id: int, _=Depends(require_admin)):
+    db.ex("UPDATE tickets SET status='closed' WHERE id=?", (ticket_id,))
+    db.log_admin("admin", "ticket_closed", f"ticket={ticket_id}")
+    return {"ok": True}
+
+
+# ---------------- групи ----------------
+@app.get("/admin/api/groups")
+async def admin_groups(_=Depends(require_admin)):
+    out = []
+    for g in db.q("SELECT * FROM groups ORDER BY id DESC LIMIT 200"):
+        owner = core.get_user(g["owner_tg_id"])
+        members = [dict(m) for m in db.q(
+            "SELECT tg_id, joined_at, status FROM group_members WHERE group_id=?", (g["id"],))]
+        for m in members:
+            mu = core.get_user(m["tg_id"])
+            m["username"] = mu["username"] if mu else "—"
+        out.append({"id": g["id"], "owner_tg_id": g["owner_tg_id"],
+                    "owner_name": owner["username"] if owner else "—",
+                    "created_at": g["created_at"], "members": members})
+    return {"ok": True, "groups": out}
 
 
 @app.get("/admin/api/settings")

@@ -107,6 +107,31 @@ def add_bonus(tg_id: int, plan: str, hours: float, reason: str):
     db.log_admin(reason, "bonus_granted", f"tg={tg_id} plan={plan} hours={hours}")
 
 
+def set_lang(tg_id: int, lang: str):
+    if lang not in ("uk", "ru", "fr", "en", "es", "de", "it", "zh"):
+        return
+    ex("UPDATE users SET lang=? WHERE tg_id=?", (lang, tg_id))
+
+
+def get_notify_prefs(tg_id: int) -> dict:
+    row = q1("SELECT notify_prefs FROM users WHERE tg_id=?", (tg_id,))
+    if not row or not row["notify_prefs"]:
+        return {"expiry_reminders": True, "promos": False, "tickets": True}
+    try:
+        import json as _json
+        return {**{"expiry_reminders": True, "promos": False, "tickets": True},
+                **_json.loads(row["notify_prefs"])}
+    except Exception:
+        return {"expiry_reminders": True, "promos": False, "tickets": True}
+
+
+def set_notify_prefs(tg_id: int, prefs: dict):
+    import json as _json
+    clean = {k: bool(v) for k, v in (prefs or {}).items()
+             if k in ("expiry_reminders", "promos", "tickets")}
+    ex("UPDATE users SET notify_prefs=? WHERE tg_id=?", (_json.dumps(clean), tg_id))
+
+
 def invited_count(tg_id: int) -> int:
     return q1("SELECT COUNT(*) c FROM referral_events WHERE referrer_id=? AND kind='joined'",
               (tg_id,))["c"]
@@ -177,7 +202,7 @@ def _next_ip(server_id: int, subnet: str) -> str:
     raise wg.WgError("no free IPs on server")
 
 
-async def add_device(tg_id: int, server_id: int, name: str) -> dict:
+async def add_device(tg_id: int, server_id: int, name: str, dtype: str = "other") -> dict:
     user = get_user(tg_id)
     if user is None:
         raise ValueError("user not found")
@@ -191,15 +216,17 @@ async def add_device(tg_id: int, server_id: int, name: str) -> dict:
     srv = q1("SELECT * FROM servers WHERE id=? AND is_active=1", (server_id,))
     if srv is None:
         raise ValueError("server not found")
+    if dtype not in ("windows", "android", "ios", "macos", "linux", "other"):
+        dtype = "other"
     priv, pub = wg.gen_keypair()
     client_ip = _next_ip(server_id, srv["subnet"])
     # створюємо peer на реальному сервері WireGuard
     driver = wg.ServerDriver(srv)
     await driver.add_peer(pub, client_ip)
     # сервер сам обчислює публічний ключ клієнта з приватного — зберігаємо приватний зашифрованим
-    ex("INSERT INTO devices(tg_id,server_id,name,wg_public_key,wg_private_key,client_ip,created_at) "
-       "VALUES(?,?,?,?,?,?,?)",
-       (tg_id, server_id, (name or "Моё устройство")[:40], pub, wg.enc_secret(priv), client_ip,
+    ex("INSERT INTO devices(tg_id,server_id,name,type,wg_public_key,wg_private_key,client_ip,created_at) "
+       "VALUES(?,?,?,?,?,?,?,?)",
+       (tg_id, server_id, (name or "Моё устройство")[:40], dtype, pub, wg.enc_secret(priv), client_ip,
         int(time.time())))
     d = q1("SELECT * FROM devices WHERE tg_id=? AND status='active' ORDER BY id DESC LIMIT 1", (tg_id,))
     db.log_admin("system", "device_added", f"tg={tg_id} device={d['id']} server={server_id}")
@@ -256,6 +283,12 @@ async def expire_check():
         tg_id = user["tg_id"]
         ex("UPDATE users SET plan='free', plan_expires_at=NULL WHERE tg_id=?", (tg_id,))
         ex("UPDATE subscriptions SET status='expired' WHERE tg_id=? AND status='active'", (tg_id,))
+        # група власника деактивується: VPN учасників відкликається
+        try:
+            from . import groups
+            await groups.on_owner_expired(tg_id)
+        except Exception:
+            pass
         removed = 0
         for d in q("SELECT * FROM devices WHERE tg_id=? AND status='active'", (tg_id,)):
             srv = q1("SELECT * FROM servers WHERE id=?", (d["server_id"],))

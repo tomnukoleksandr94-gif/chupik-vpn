@@ -159,7 +159,10 @@ def create_liqpay_checkout(tg_id: int, plan: str) -> str:
     record_payment("card", order_id, tg_id, plan,
                    plan_info["price_eur"], "EUR", "pending",
                    json.dumps({"provider": "liqpay", "order_id": order_id}))
-    return f"https://www.liqpay.ua/api/3/checkout/{data_b64}/{sig}"
+    # підпис у base64 може містити '/' — у шляху URL його кодуємо (%2F),
+    # інакше checkout-посилання ламається
+    from urllib.parse import quote as _quote
+    return f"https://www.liqpay.ua/api/3/checkout/{data_b64}/{_quote(sig, safe='')}"
 
 
 def verify_and_process_liqpay(data_b64: str, signature: str) -> dict:

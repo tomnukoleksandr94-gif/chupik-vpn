@@ -75,6 +75,8 @@ CREATE TABLE IF NOT EXISTS web_users(
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   tg_id INTEGER UNIQUE NOT NULL,               -- синтеэтичний ID (негативний), спільна логіка з Telegram
+  tg_link INTEGER,                             -- реальний Telegram ID (відновлення пароля, сповіщення)
+  link_code TEXT,                              -- одноразовий код прив'язки Telegram
   created_at INTEGER
 );
 CREATE TABLE IF NOT EXISTS web_sessions(
@@ -82,6 +84,53 @@ CREATE TABLE IF NOT EXISTS web_sessions(
   email TEXT NOT NULL,
   created_at INTEGER,
   expires_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS web_reset_tokens(
+  token TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  created_at INTEGER,
+  expires_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS web_logins(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT, tg_id INTEGER,
+  ip TEXT, ua TEXT, created_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS groups(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  owner_tg_id INTEGER UNIQUE NOT NULL,
+  name TEXT,
+  created_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS group_invites(
+  code TEXT PRIMARY KEY,
+  group_id INTEGER NOT NULL,
+  created_at INTEGER,
+  expires_at INTEGER,
+  max_uses INTEGER DEFAULT 1,
+  uses INTEGER DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS group_members(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  group_id INTEGER NOT NULL,
+  tg_id INTEGER NOT NULL,
+  joined_at INTEGER,
+  status TEXT DEFAULT 'active',
+  UNIQUE(group_id, tg_id)
+);
+CREATE TABLE IF NOT EXISTS tickets(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  tg_id INTEGER NOT NULL,
+  subject TEXT, category TEXT,
+  status TEXT DEFAULT 'open',
+  created_at INTEGER, updated_at INTEGER
+);
+CREATE TABLE IF NOT EXISTS ticket_messages(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ticket_id INTEGER NOT NULL,
+  sender TEXT,
+  message TEXT,
+  created_at INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_devices_tg ON devices(tg_id);
 CREATE INDEX IF NOT EXISTS idx_payments_tg ON payments(tg_id);
@@ -97,10 +146,26 @@ def conn() -> sqlite3.Connection:
     return _local.c
 
 
+def _migrate(c):
+    """Додавання колонок до вже існуючих баз (без втрати даних)."""
+    dcols = [r["name"] for r in c.execute("PRAGMA table_info(devices)").fetchall()]
+    if "type" not in dcols:
+        c.execute("ALTER TABLE devices ADD COLUMN type TEXT DEFAULT 'other'")
+    ucols = [r["name"] for r in c.execute("PRAGMA table_info(users)").fetchall()]
+    if "notify_prefs" not in ucols:
+        c.execute("ALTER TABLE users ADD COLUMN notify_prefs TEXT DEFAULT '{}'")
+    # старі таблиці тікетів (from_role/text) → нові назви колонок
+    tm = [r["name"] for r in c.execute("PRAGMA table_info(ticket_messages)").fetchall()]
+    if tm and "sender" not in tm and "from_role" in tm:
+        c.execute("ALTER TABLE ticket_messages RENAME COLUMN from_role TO sender")
+        c.execute("ALTER TABLE ticket_messages RENAME COLUMN text TO message")
+
+
 def init_db():
     with _lock:
         c = conn()
         c.executescript(SCHEMA)
+        _migrate(c)
         # значення за замовчуванням (адмін може змінити через панель)
         defaults = {
             "stars_basic": "160",     # ~€1.99

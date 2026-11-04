@@ -16,7 +16,7 @@ import time
 
 from . import core
 from .config import settings
-from .db import ex, q1
+from .db import ex, q, q1
 
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 MIN_PASSWORD_LEN = 6
@@ -111,3 +111,90 @@ def resolve_session(token: str) -> dict | None:
     if not user:
         return None
     return {"tg_id": user["tg_id"], "email": row["email"]}
+
+
+def log_login(email: str, tg_id: int, ip: str = "", ua: str = ""):
+    ex("INSERT INTO web_logins(email,tg_id,ip,ua,created_at) VALUES(?,?,?,?,?)",
+       (email, tg_id, (ip or "")[:60], (ua or "")[:200], int(time.time())))
+
+
+def login_history(email: str, limit: int = 10) -> list:
+    return [dict(r) for r in q("SELECT ip,ua,created_at FROM web_logins WHERE email=? "
+                               "ORDER BY id DESC LIMIT ?", (email, limit))]
+
+
+# ---------------- зміна пароля / видалення акаунта ----------------
+
+def change_password(email: str, old_password: str, new_password: str):
+    row = q1("SELECT * FROM web_users WHERE email=?", (email,))
+    if not row or not _verify_password(old_password or "", row["password_hash"]):
+        raise AuthError("Поточний пароль невірний")
+    if len(new_password or "") < MIN_PASSWORD_LEN:
+        raise AuthError(f"Новий пароль має містити щонайменше {MIN_PASSWORD_LEN} символів")
+    ex("UPDATE web_users SET password_hash=? WHERE email=?", (_password_fields(new_password), email))
+    # безпека: завершити всі сесії крім поточної не можна выборочно — завершуємо всі
+    ex("DELETE FROM web_sessions WHERE email=?", (email,))
+
+
+def delete_account(email: str):
+    """Видалення акаунта: сесії, тікети; користувач/пристрої лишаються історією системи."""
+    row = q1("SELECT tg_id FROM web_users WHERE email=?", (email,))
+    if not row:
+        return
+    ex("DELETE FROM web_sessions WHERE email=?", (email,))
+    ex("DELETE FROM web_reset_tokens WHERE email=?", (email,))
+    ex("UPDATE tickets SET status='closed' WHERE tg_id=?", (row["tg_id"],))
+    ex("DELETE FROM web_users WHERE email=?", (email,))
+
+
+# ---------------- відновлення пароля ----------------
+
+def request_reset(email: str) -> dict:
+    """Генерує токен скидання. Якщо акаунт прив'язаний до Telegram —
+    посилання надсилається ботом у чат; інакше — зверніться до підтримки."""
+    row = q1("SELECT * FROM web_users WHERE email=?", ((email or "").strip().lower(),))
+    if not row:
+        return {"ok": True, "delivered": False}  # не розкриваємо існування акаунта
+    token = secrets.token_urlsafe(24)
+    now = int(time.time())
+    ex("INSERT INTO web_reset_tokens(token,email,created_at,expires_at) VALUES(?,?,?,?)",
+       (token, row["email"], now, now + 3600))
+    if row["tg_link"]:
+        return {"ok": True, "delivered": "telegram", "tg_link": row["tg_link"], "token": token}
+    return {"ok": True, "delivered": "support", "token": token}
+
+
+def confirm_reset(token: str, new_password: str) -> bool:
+    row = q1("SELECT * FROM web_reset_tokens WHERE token=?", (token or "",))
+    if not row or row["expires_at"] < time.time():
+        return False
+    if len(new_password or "") < MIN_PASSWORD_LEN:
+        raise AuthError(f"Пароль має містити щонайменше {MIN_PASSWORD_LEN} символів")
+    ex("UPDATE web_users SET password_hash=? WHERE email=?",
+       (_password_fields(new_password), row["email"]))
+    ex("DELETE FROM web_reset_tokens WHERE token=?", (token,))
+    ex("DELETE FROM web_sessions WHERE email=?", (row["email"],))
+    return True
+
+
+# ---------------- прив'язка Telegram (для відновлення і сповіщень) ----------------
+
+def make_link_code(email: str) -> str:
+    code = secrets.token_hex(4).upper()
+    ex("UPDATE web_users SET link_code=? WHERE email=?", (code, email))
+    return code
+
+
+def confirm_tg_link(code: str, tg_id: int) -> str | None:
+    """Користувач надсилає боту /link CODE → прив'язка. Повертає email або None."""
+    row = q1("SELECT * FROM web_users WHERE link_code=?", ((code or "").strip().upper(),))
+    if not row:
+        return None
+    ex("UPDATE web_users SET tg_link=?, link_code=NULL WHERE email=?", (tg_id, row["email"]))
+    return row["email"]
+
+
+def get_tg_link(tg_id: int) -> int | None:
+    """Чи прив'язаний цей (синтетичний) акаунт до реального Telegram."""
+    row = q1("SELECT tg_link FROM web_users WHERE tg_id=?", (tg_id,))
+    return row["tg_link"] if row else None

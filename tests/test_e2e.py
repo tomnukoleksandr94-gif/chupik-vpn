@@ -11,6 +11,7 @@ import json
 import os
 import sys
 import time
+import urllib.parse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
@@ -250,17 +251,20 @@ async def main():
         lp_data = _b64.b64encode(json.dumps(lp_payload).encode()).decode()
         lp_sig = base64.b64encode(hashlib.sha1(
             (os.environ["LIQPAY_PRIVATE_KEY"] + lp_data + os.environ["LIQPAY_PRIVATE_KEY"]).encode()).digest()).decode()
-        lp_ok = c.post("/webhook/liqpay", content=f"data={lp_data}&signature={lp_sig}".encode(),
+        lp_ok = c.post("/webhook/liqpay",
+                       content=urllib.parse.urlencode({"data": lp_data, "signature": lp_sig}).encode(),
                       headers={"Content-Type": "application/x-www-form-urlencoded"})
         check("webhook LiqPay активував підписку", lp_ok.status_code == 200 and lp_ok.json().get("ok") is True)
         check("тариф premium після LiqPay", core.get_user(222)["plan"] == "premium")
 
         # повторний той самий webhook — ігнорується (ідемпотентність)
-        lp_dup = c.post("/webhook/liqpay", content=f"data={lp_data}&signature={lp_sig}".encode())
+        lp_dup = c.post("/webhook/liqpay",
+                        content=urllib.parse.urlencode({"data": lp_data, "signature": lp_sig}).encode())
         check("повторний LiqPay-webhook ігнорується", lp_dup.json().get("duplicate") is True)
 
         # невірний підпис
-        lp_bad = c.post("/webhook/liqpay", content=f"data={lp_data}&signature=AAAA".encode())
+        lp_bad = c.post("/webhook/liqpay",
+                        content=urllib.parse.urlencode({"data": lp_data, "signature": "AAAA"}).encode())
         check("невірний підпис LiqPay відкинуто", lp_bad.status_code == 400)
 
         # невдалий платіж позначається failed
@@ -269,13 +273,115 @@ async def main():
         lp_fail = {"status": "failure", "order_id": o2["provider_ref"]}
         d2 = _b64.b64encode(json.dumps(lp_fail).encode()).decode()
         s2 = base64.b64encode(hashlib.sha1((os.environ["LIQPAY_PRIVATE_KEY"] + d2 + os.environ["LIQPAY_PRIVATE_KEY"]).encode()).digest()).decode()
-        c.post("/webhook/liqpay", content=f"data={d2}&signature={s2}".encode())
+        c.post("/webhook/liqpay",
+               content=urllib.parse.urlencode({"data": d2, "signature": s2}).encode())
         check("невдалий LiqPay-платіж позначено failed",
               db.q1("SELECT status FROM payments WHERE provider_ref=?", (o2["provider_ref"],))["status"] == "failed")
 
         # оплата карткою з Bearer-сесії (як робить кабінет сайту)
         co = c.post("/api/card/checkout", json={"plan": "basic"}, headers={"Authorization": f"Bearer {token}"})
         check("checkout карткою з сесії сайту", co.status_code == 200 and co.json().get("provider") == "liqpay")
+
+        # --- 12. тип пристрою ---
+        d3 = await core.add_device(222, srv["id"], "Android-фон", "android")
+        check("тип пристрою збережено", d3.get("type") == "android")
+
+        # --- 13. групи: баланс слотів за тарифом ---
+        from server import groups as _groups
+        from server import webauth
+        core.upsert_user(333, "m1", "M1")
+        core.upsert_user(444, "m2", "M2")
+        core.upsert_user(555, "m3", "M3")
+        ginfo = _groups.create_group(222, "Друзі")
+        check("групу створено для premium", ginfo["role"] == "owner" and ginfo["slots"] == 3)
+        inv1 = _groups.create_invite(222)
+        check("запрошення створено", bool(inv1))
+        jr = _groups.join_group(inv1, 333)
+        check("учасник приєднався", jr.get("ok"))
+        dup_ok = True
+        try:
+            _groups.join_group(inv1, 444)
+        except _groups.GroupError:
+            dup_ok = False
+        check("запрошення одноразове", not dup_ok)
+        inv2 = _groups.create_invite(222)
+        _groups.join_group(inv2, 444)
+        inv3 = _groups.create_invite(222)
+        _groups.join_group(inv3, 555)
+        full_err = None
+        try:
+            _groups.create_invite(222)
+        except _groups.GroupError as e:
+            full_err = str(e)
+        check("слоти premium=3 вичерпано", full_err is not None)
+        dm = await core.add_device(333, srv["id"], "m1 phone", "android")
+        check("учасник групи має VPN-пристрій", dm["status"] == "active")
+        ok = await _groups.remove_member(222, 333)
+        check("учасника видалено", ok)
+        check("VPN учасника відкликано",
+              db.q1("SELECT COUNT(*) c FROM devices WHERE tg_id=333 AND status='active'")["c"] == 0)
+        # закінчення підписки власника → група деактивована
+        db.ex("UPDATE users SET plan_expires_at=? WHERE tg_id=?", (int(time.time()) - 10, 222))
+        await core.expire_check()
+        gi = _groups.group_info(222)
+        check("групу деактивовано після закінчення тарифу", gi["active"] is False and gi["used"] == 0)
+
+        # --- 14. тікети підтримки ---
+        auth = {"Authorization": f"Bearer {token}"}
+        tk = c.post("/api/tickets", json={"subject": "Не працює VPN", "message": "Допоможіть"},
+                    headers=auth)
+        check("тікет створено", tk.status_code == 200 and tk.json().get("ticket_id"))
+        tk_id = tk.json()["ticket_id"]
+        rep = c.post(f"/admin/api/tickets/{tk_id}/reply", json={"message": "Вирішено"},
+                     headers={"X-Admin-Token": "test-admin-token"})
+        check("адмін відповів на тікет", rep.status_code == 200)
+        lst = c.get("/api/tickets", headers=auth).json()
+        check("відповідь адміна у тікеті",
+              any(t["id"] == tk_id and any(m["sender"] == "admin" for m in t["messages"])
+                  for t in lst["tickets"]))
+        # API-групи веб-акаунтом без тарифу → 400
+        gr = c.post("/api/group", json={"name": "x"}, headers=auth)
+        check("група без активного тарифу заборонена", gr.status_code == 400)
+
+        # --- 15. профіль: мова, сповіщення, пароль, прив'язка Telegram ---
+        lg = c.post("/api/lang", json={"lang": "de"}, headers=auth)
+        check("мову збережено", lg.status_code == 200 and core.get_user(web_tg_id)["lang"] == "de")
+        c.post("/api/notify-prefs", json={"prefs": {"promos": True, "tickets": False}}, headers=auth)
+        check("сповіщення збережено", core.get_notify_prefs(web_tg_id)["promos"] is True)
+        pr = c.get("/api/profile", headers=auth).json()
+        check("профіль з історією входів",
+              len(pr.get("login_history", [])) >= 1 and pr.get("tg_linked") is False)
+        cp = c.post("/api/web/auth/change-password",
+                    json={"old_password": "pass123", "new_password": "newpass1"}, headers=auth)
+        check("пароль змінено", cp.status_code == 200)
+        check("стара сесія відкликана", c.get("/api/me", headers=auth).status_code == 401)
+        login2 = c.post("/api/web/auth/login", json={"email": "user@site.ua", "password": "newpass1"})
+        check("вхід з новим паролем", login2.status_code == 200)
+        token = login2.json()["token"]
+        auth = {"Authorization": f"Bearer {token}"}
+        # скидання пароля
+        rr = webauth.request_reset("user@site.ua")
+        rst = c.post("/api/web/auth/reset", json={"token": rr["token"], "new_password": "resetpass1"})
+        check("пароль скинуто", rst.status_code == 200)
+        login3 = c.post("/api/web/auth/login", json={"email": "user@site.ua", "password": "resetpass1"})
+        check("вхід після скидання", login3.status_code == 200)
+        token = login3.json()["token"]
+        auth = {"Authorization": f"Bearer {token}"}
+        # прив'язка Telegram
+        lc = c.post("/api/web/auth/link", headers=auth).json()
+        check("код прив'язки видано", bool(lc.get("code")))
+        email = webauth.confirm_tg_link(lc["code"], 777)
+        check("Telegram прив'язано", email == "user@site.ua")
+        fg = c.post("/api/web/auth/forgot", json={"email": "user@site.ua"})
+        check("forgot доставляється через Telegram", fg.json().get("delivered") == "telegram")
+        # видалення акаунта
+        reg_del = c.post("/api/web/auth/register", json={"email": "todelete@site.ua", "password": "pass123"})
+        dl = c.delete("/api/web/auth/delete",
+                      headers={"Authorization": f"Bearer {reg_del.json()['token']}"})
+        check("акаунт видалено", dl.status_code == 200)
+        check("вхід видаленого акаунта неможливий",
+              c.post("/api/web/auth/login", json={"email": "todelete@site.ua",
+                                                  "password": "pass123"}).status_code == 400)
 
         # вихід з веб-сесії
         out = c.post("/api/web/auth/logout", headers={"Authorization": f"Bearer {token}"})

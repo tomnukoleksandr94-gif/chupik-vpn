@@ -111,6 +111,20 @@ async def cmd_start(msg: Message, command=None):
             referrer = int(payload[4:])
         except ValueError:
             pass
+    # приєднання до групи за посиланням-запрошенням (grp_<code>)
+    if payload and payload.startswith("grp_"):
+        from . import groups as _groups
+        user = core.upsert_user(msg.from_user.id, msg.from_user.username,
+                               msg.from_user.first_name)
+        try:
+            _groups.join_group(payload[4:], msg.from_user.id)
+            await msg.answer("✅ Ви приєдналися до групи CHUPIK VPN!\n"
+                             "Один пристрій VPN уже доступний — відкрийте Mini App.")
+        except _groups.GroupError as e:
+            await msg.answer(f"❌ {e}")
+        await _send_welcome_photo(msg, T[L(user)]["welcome"].format(
+            name=msg.from_user.first_name), webapp_kb(L(user)))
+        return
     user = core.upsert_user(msg.from_user.id, msg.from_user.username,
                            msg.from_user.first_name, referrer_id=referrer)
     lang = L(user)
@@ -246,7 +260,39 @@ async def cmd_servers(msg: Message):
 @dp.message(Command("group"))
 async def cmd_group(msg: Message):
     user = core.upsert_user(msg.from_user.id, msg.from_user.username, msg.from_user.first_name)
-    await msg.answer(T[L(user)]["group"])
+    lang = L(user)
+    from . import groups as _groups
+    info = _groups.group_info(msg.from_user.id)
+    if info.get("role") == "owner":
+        text = (f"👥 Ваша група: {info['used']}/{info['slots']} слотів "
+                f"({'активна ✅' if info['active'] else 'неактивна — потрібен тариф'})")
+        kb = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text="🛠 Керувати групою",
+                                 url=f"{settings.WEB_SITE_URL}/cabinet.html")]])
+        await msg.answer(text, reply_markup=kb)
+    elif info.get("role") == "member":
+        await msg.answer(T[lang]["group"])
+    else:
+        await msg.answer(T[lang]["group"])
+
+
+@dp.message(Command("link"))
+async def cmd_link(msg: Message):
+    """Прив'язка веб-акаунта сайту до цього Telegram: /link CODE"""
+    args = (msg.text or "").split(maxsplit=1)
+    code = args[1].strip() if len(args) > 1 else ""
+    if not code:
+        await msg.answer("ℹ️ Щоб прив'язати акаунт сайту до Telegram, "
+                         "зайдіть у веб-кабінет → Профіль → «Прив'язати Telegram» "
+                         "і надішліть сюди команду:\n\n<code>/link КОД</code>")
+        return
+    from . import webauth
+    email = webauth.confirm_tg_link(code, msg.from_user.id)
+    if email:
+        await msg.answer(f"✅ Акаунт <b>{email}</b> прив'язано до цього Telegram.\n"
+                         "Тепер скидання пароля і сповіщення приходитимуть сюди.")
+    else:
+        await msg.answer("❌ Код не знайдено або вже використано. Перевірте код у кабінеті.")
 
 
 @dp.message(Command("referral"))
@@ -436,6 +482,7 @@ async def setup_bot():
         ("start", "Главное меню"), ("profile", "Мой кабинет"), ("buy", "Купить VPN"),
         ("servers", "Серверы"), ("group", "Моя группа"), ("referral", "Пригласить друга"),
         ("language", "Язык"), ("help", "Помощь"), ("support", "Поддержка"),
+        ("link", "Привязать сайт"),
         ("terms", "Условия"), ("paysupport", "Вопросы оплаты"), ("trial", "Пробный PREMIUM")]]
     await bot.set_my_commands(cmds, BotCommandScopeDefault())
     if settings.MINIAPP_URL:

@@ -47,6 +47,8 @@ button.ghost{background:none;border:1px solid rgba(192,132,252,.3)}
     <button data-tab="users">Пользователи</button>
     <button data-tab="payments">Платежи</button>
     <button data-tab="servers">Серверы</button>
+    <button data-tab="tickets">Тікети</button>
+    <button data-tab="groups">Групи</button>
     <button data-tab="settings">Настройки</button>
     <button data-tab="log">Журнал</button>
   </div>
@@ -78,6 +80,21 @@ button.ghost{background:none;border:1px solid rgba(192,132,252,.3)}
       <div class="row"><input id="s_code" placeholder="код (de-1)" style="width:90px"><input id="s_name" placeholder="Германия · Франкфурт" style="width:180px"><input id="s_country" placeholder="Германия" style="width:110px"><input id="s_flag" placeholder="🇩🇪" style="width:60px"><input id="s_host" placeholder="IP / хост" style="width:140px"><input id="s_port" placeholder="51820" style="width:70px"><input id="s_subnet" placeholder="10.7.0.0/24" style="width:120px"></div>
       <div class="row"><input id="s_lon" placeholder="lon 8.68" style="width:90px"><input id="s_lat" placeholder="lat 50.11" style="width:90px"><select id="s_driver"><option value="ssh">ssh</option><option value="local">local</option></select><button onclick="addServer()">Добавить</button></div>
       <p style="font-size:11px;color:var(--muted)">Публичный ключ сервера подтянется автоматически по SSH (нужен WG_SSH_KEY в env backend).</p>
+    </div>
+  </div>
+
+  <div id="tab-tickets" class="hide">
+    <div class="section"><h2>Тікети підтримки</h2>
+      <div class="row">
+        <select id="tkFilter" onchange="loadTickets()"><option value="">усі</option><option value="open">відкриті</option><option value="answered">з відповіддю</option><option value="closed">закриті</option></select>
+      </div>
+      <div id="ticketsList"></div>
+    </div>
+  </div>
+
+  <div id="tab-groups" class="hide">
+    <div class="section"><h2>Групи (балансовані слоти за тарифом)</h2>
+      <div style="overflow-x:auto"><table id="groupsT"></table></div>
     </div>
   </div>
 
@@ -131,7 +148,7 @@ async function refresh(){
       `<div class="stat"><b>${s.plans?.basic||0}</b><span>BASIC</span></div>
        <div class="stat"><b>${s.plans?.premium||0}</b><span>PREMIUM</span></div>
        <div class="stat"><b>${s.plans?.ultimate||0}</b><span>ULTIMATE</span></div>`;
-    loadUsers(); loadPayments(); loadServers(); loadSettings(); loadLog();
+    loadUsers(); loadPayments(); loadServers(); loadSettings(); loadLog(); loadTickets(); loadGroups();
   }catch(e){}
 }
 async function loadUsers(){
@@ -187,9 +204,39 @@ async function loadLog(){
   document.getElementById('logT').innerHTML='<tr><th>Время</th><th>Кто</th><th>Событие</th><th>Детали</th></tr>'+
     rows.map(l=>`<tr><td>${new Date(l.ts*1000).toLocaleString()}</td><td>${l.actor}</td><td>${l.action}</td><td>${l.details||''}</td></tr>`).join('');
 }
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&'+'amp;','<':'&'+'lt;','>':'&'+'gt;','"':'&'+'quot;',"'":'&'+'#39;'}[c]));
+async function loadTickets(){
+  const f = document.getElementById('tkFilter').value;
+  const d = await api('tickets'+(f?'?status='+f:'')); const rows=(d.data||d).tickets||[];
+  document.getElementById('ticketsList').innerHTML = rows.length? rows.map(t=>`
+    <div class="section" style="margin-bottom:12px">
+      <div class="row" style="margin-bottom:6px">
+        <b>#${t.id}</b> <span>${esc(t.subject)}</span>
+        <span class="pill ${t.status==='open'?'bad':t.status==='answered'?'warn':'ok'}">${t.status}</span>
+        <span style="color:var(--muted);font-size:11px">від ${t.tg_id} ${esc(t.username||'')} · ${new Date(t.created_at*1000).toLocaleString()}</span>
+        ${t.status!=='closed'?`<button class="ghost" onclick="tkClose(${t.id})">Закрити</button>`:''}
+      </div>
+      <div style="font-size:12px;margin-bottom:8px">${t.messages.map(m=>`<div style="margin-bottom:4px"><b style="color:${m.sender==='admin'?'var(--green)':'var(--neon)'}">${m.sender}:</b> ${esc(m.message)}</div>`).join('')}</div>
+      <div class="row"><input id="tkReply${t.id}" placeholder="Відповідь клієнту (піде в Telegram)" style="flex:1"><button onclick="tkReply(${t.id})">Відповісти</button></div>
+    </div>`).join('') : '<p style="color:var(--muted);font-size:12px">Тікетів немає</p>';
+}
+async function tkReply(id){
+  const m = document.getElementById('tkReply'+id).value.trim();
+  if(!m) return;
+  await api(`tickets/${id}/reply`,{method:'POST',body:JSON.stringify({message:m})});
+  loadTickets();
+}
+async function tkClose(id){ await api(`tickets/${id}/close`,{method:'POST'}); loadTickets(); }
+async function loadGroups(){
+  const d = await api('groups'); const rows=(d.data||d).groups||[];
+  document.getElementById('groupsT').innerHTML='<tr><th>ID</th><th>Власник</th><th>Створена</th><th>Учасники</th></tr>'+
+    rows.map(g=>`<tr><td>${g.id}</td><td>${g.owner_tg_id} ${esc(g.owner_name||'')}</td>
+      <td>${new Date(g.created_at*1000).toLocaleString()}</td>
+      <td>${g.members.filter(m=>m.status==='active').length} активних · ${g.members.map(m=>`${esc(m.username||m.tg_id)} (${m.status})`).join(', ')}</td></tr>`).join('');
+}
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{
   document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-  ['dash','users','payments','servers','settings','log'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hide',t!==b.dataset.tab));
+  ['dash','users','payments','servers','tickets','groups','settings','log'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('hide',t!==b.dataset.tab));
 }));
 if (TOKEN) { document.getElementById('login').style.display='none'; document.getElementById('app').style.display='block'; refresh(); }
 </script>
