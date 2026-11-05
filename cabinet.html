@@ -358,7 +358,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.04em;line-height:1.15}
 /* ================================================================
    ЧУПИК VPN — кабінет (SPA). Дизайн і бренд збережено 1:1.
    ================================================================ */
-const DEFAULT_API = "https://99a31550229cf5.lhr.life";
+const DEFAULT_API = "https://ac96a4e687a17c.lhr.life";
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const AMP = String.fromCharCode(38);
@@ -426,13 +426,18 @@ async function boot(){
   const mReset = hash.match(/reset=([\w-]+)/);
   if (mReset){ RESET_TOKEN = mReset[1]; show("screenAuth"); $("#authLogin").style.display="none"; $("#authReset").style.display="block"; return; }
   if (API === null){ show("screenSetup"); return; }
-  try {
-    await api("/api/web/config");
-    if (!TOKEN){ show("screenAuth"); return; }
-    await loadAll();
-  } catch(e){
-    show("screenSetup"); $("#setupApi").value = API || "";
+  // збережена адреса мертва? автоматично пробуємо адресу за замовчуванням,
+  // щоб користувач не застрягав на екрані налаштування по колу
+  let cfgOk = false;
+  try { await api("/api/web/config"); cfgOk = true; } catch(e){}
+  if (!cfgOk && DEFAULT_API && API !== DEFAULT_API){
+    API = DEFAULT_API;
+    try { await api("/api/web/config"); cfgOk = true; localStorage.setItem("chupik_api", API); } catch(e){}
   }
+  if (!cfgOk){ show("screenSetup"); $("#setupApi").value = API || ""; return; }
+  if (!TOKEN){ show("screenAuth"); return; }
+  try { await loadAll(); }
+  catch(e){ if (TOKEN) show("screenAuth"); }
 }
 let RESET_TOKEN = null;
 $("#setupSave").addEventListener("click", ()=>{
